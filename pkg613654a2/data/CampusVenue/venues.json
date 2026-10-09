@@ -1,0 +1,56 @@
+[
+  {
+    "id": "seed_venue_state_farm_center",
+    "name": "State Farm Center",
+    "latitude": 40.0959,
+    "longitude": -88.2358,
+    "address": "1800 S First St, Champaign, IL 61820",
+    "capacity": 15544,
+    "venueType": "Arena"
+  },
+  {
+    "id": "seed_venue_memorial_stadium",
+    "name": "Memorial Stadium",
+    "latitude": 40.0998,
+    "longitude": -88.2356,
+    "address": "1402 S First St, Champaign, IL 61820",
+    "capacity": 60670,
+    "venueType": "Stadium"
+  },
+  {
+    "id": "seed_venue_krannert_center",
+    "name": "Krannert Center for the Performing Arts",
+    "latitude": 40.1096,
+    "longitude": -88.2222,
+    "address": "500 S Goodwin Ave, Urbana, IL 61801",
+    "capacity": 2100,
+    "venueType": "Auditorium"
+  },
+  {
+    "id": "seed_venue_foellinger_auditorium",
+    "name": "Foellinger Auditorium",
+    "latitude": 40.1058,
+    "longitude": -88.2286,
+    "address": "709 S Mathews Ave, Urbana, IL 61801",
+    "capacity": 1700,
+    "venueType": "Auditorium"
+  },
+  {
+    "id": "seed_venue_illini_union",
+    "name": "Illini Union",
+    "latitude": 40.1095,
+    "longitude": -88.2272,
+    "address": "1401 W Green St, Urbana, IL 61801",
+    "capacity": 1000,
+    "venueType": "Hall"
+  },
+  {
+    "id": "seed_venue_arc",
+    "name": "Activities and Recreation Center (ARC)",
+    "latitude": 40.1008,
+    "longitude": -88.2362,
+    "address": "201 E Peabody Dr, Champaign, IL 61820",
+    "capacity": 3000,
+    "venueType": "Other"
+  }
+]

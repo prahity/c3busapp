@@ -1,0 +1,70 @@
+// List Item — see list-item.tsx for the prop API.
+// Block: .list-item
+// Elements: .list-item__avatar, .list-item__label-icon, .list-item__main,
+//           .list-item__label, .list-item__value, .list-item__secondary,
+//           .list-item__values, .list-item__action
+// Modifier: .list-item--bordered
+// Tokens: --c3-style-*. No raw hex.
+// SCSS owns padding, gap, border, and the per-line COLOR (keyed off
+// data-emphasis). The font size/weight/family come from text-c3-* utility
+// classes applied in the .tsx; Tailwind also owns the flex layout.
+
+.list-item {
+  // Layout lives here (not Tailwind) because the block name `list-item` collides
+  // with Tailwind's `list-item` display utility — see list-item.tsx.
+  display: flex;
+  width: 100%;
+  align-items: flex-start; // inline default
+  gap: var(--c3-style-spacing-8);
+  padding-block: var(--c3-style-spacing-12);
+
+  // Stacked rows center the avatar/icon against the label+value column.
+  &[data-layout="stacked"] {
+    align-items: center;
+  }
+
+  &--bordered {
+    border-bottom: 1px solid var(--c3-style-basic-border-border);
+  }
+
+  &__label-icon {
+    color: var(--c3-style-basic-fg-secondary);
+  }
+
+  // Stacked column gap (label / value / secondary).
+  &__main {
+    gap: var(--c3-style-spacing-4);
+  }
+
+  // Inline value column gap.
+  &__values {
+    gap: var(--c3-style-spacing-4);
+  }
+
+  // Default ("value" emphasis): label muted, value prominent, secondary muted.
+  &__label {
+    color: var(--c3-style-basic-fg-secondary);
+  }
+
+  &__value {
+    color: var(--c3-style-basic-fg-primary);
+  }
+
+  &__secondary {
+    color: var(--c3-style-basic-fg-secondary);
+  }
+
+  // "label" emphasis swaps the prominence.
+  &[data-emphasis="label"] &__label {
+    color: var(--c3-style-basic-fg-primary);
+  }
+
+  &[data-emphasis="label"] &__value {
+    color: var(--c3-style-basic-fg-secondary);
+  }
+
+  // "none" emphasis: value is muted too (label already muted).
+  &[data-emphasis="none"] &__value {
+    color: var(--c3-style-basic-fg-secondary);
+  }
+}

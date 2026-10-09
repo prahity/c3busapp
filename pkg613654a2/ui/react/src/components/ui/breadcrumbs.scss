@@ -1,0 +1,61 @@
+// Breadcrumbs — see breadcrumbs.tsx for prop API.
+// Tokens: --c3-style-*. No raw hex, no palette, no Themes layer.
+// Tailwind owns flex/typography/icon-size; SCSS owns color + spacing tokens.
+
+.breadcrumbs {
+  display: inline-flex;
+  align-items: center;
+
+  &__list {
+    display: flex;
+    align-items: center;
+    gap: var(--c3-style-spacing-6); // 6px between crumb and separator
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__item {
+    gap: var(--c3-style-spacing-4); // 4px inner gap (icon / label / badge / chevron)
+    padding-block: var(--c3-style-spacing-8); // 8px vertical padding
+  }
+
+  // Interactive crumbs (links / buttons) — secondary fg, darken on hover.
+  &__link {
+    gap: var(--c3-style-spacing-4);
+    color: var(--c3-style-basic-fg-secondary);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: none;
+    border-radius: var(--c3-style-border-radius-4);
+    transition: color 120ms ease;
+
+    // A crumb with neither href nor onClick is plain text, not actionable.
+    &--static {
+      cursor: default;
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--c3-style-shadow-ring-accent);
+    }
+
+    // Only actionable crumbs darken on hover.
+    &:hover:not(.breadcrumbs__link--static) {
+      color: var(--c3-style-basic-fg-neutral);
+    }
+  }
+
+  // Current page — last crumb. Darker, non-interactive.
+  &__current {
+    gap: var(--c3-style-spacing-4);
+    color: var(--c3-style-basic-fg-neutral);
+  }
+
+  &__separator,
+  &__ellipsis {
+    color: var(--c3-style-basic-fg-secondary);
+  }
+}

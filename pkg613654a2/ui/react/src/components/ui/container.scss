@@ -1,0 +1,75 @@
+// Container — see container.tsx for the prop API.
+// Block: .c3-container  (NOT .container — that's a Tailwind core utility)
+// Elements: .c3-container__header, .c3-container__body, .c3-container__footer
+// Modifiers: .c3-container--size-{xs,sm,md}, .c3-container--full-width
+// Tokens: --c3-style-*. No raw hex.
+// SCSS owns the surface, per-size/variant padding + gap, and the full-width
+// header/footer borders; Tailwind in the .tsx owns the flex-col layout.
+
+.c3-container {
+  background-color: var(--c3-style-basic-bg-primary);
+  border: 1px solid var(--c3-style-basic-border-border);
+  border-radius: var(--c3-style-border-radius-6);
+  overflow: hidden;
+
+  // ===========================================================================
+  // CONTAINED — the card is padded; sections share the padding with a gap.
+  // ===========================================================================
+  &--size-md:not(.c3-container--full-width) {
+    gap: var(--c3-style-spacing-16);
+    padding: var(--c3-style-spacing-16);
+  }
+
+  &--size-sm:not(.c3-container--full-width) {
+    gap: var(--c3-style-spacing-8);
+    padding: var(--c3-style-spacing-8) var(--c3-style-spacing-12) var(--c3-style-spacing-12);
+  }
+
+  &--size-xs:not(.c3-container--full-width) {
+    gap: var(--c3-style-spacing-8);
+    padding: var(--c3-style-spacing-4) var(--c3-style-spacing-8) var(--c3-style-spacing-8);
+  }
+
+  // ===========================================================================
+  // FULL WIDTH — padding 0; header/footer get padded rows + borders, body flush.
+  // ===========================================================================
+  &--full-width {
+    gap: var(--c3-style-spacing-0);
+    padding: var(--c3-style-spacing-0);
+
+    .c3-container__header {
+      width: 100%;
+      border-bottom: 1px solid var(--c3-style-basic-border-border);
+    }
+
+    .c3-container__footer {
+      width: 100%;
+      border-top: 1px solid var(--c3-style-basic-border-border);
+    }
+
+    .c3-container__body {
+      width: 100%;
+    }
+
+    &.c3-container--size-md {
+      .c3-container__header,
+      .c3-container__footer {
+        padding: var(--c3-style-spacing-16);
+      }
+    }
+
+    &.c3-container--size-sm {
+      .c3-container__header,
+      .c3-container__footer {
+        padding: var(--c3-style-spacing-8) var(--c3-style-spacing-12);
+      }
+    }
+
+    &.c3-container--size-xs {
+      .c3-container__header,
+      .c3-container__footer {
+        padding: var(--c3-style-spacing-4) var(--c3-style-spacing-8);
+      }
+    }
+  }
+}

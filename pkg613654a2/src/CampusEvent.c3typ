@@ -1,0 +1,58 @@
+/**
+ * An event relevant to UIUC bus-route planning — either entered manually by a user or
+ * ingested by the automated web scraper.
+ *
+ * Each event captures the three dimensions the route optimizer cares about: timing
+ * ({@link CampusEvent#startTime} / {@link CampusEvent#endTime}), the approximate number of
+ * people ({@link CampusEvent#expectedAttendance}), and location (a {@link CampusEvent#venue}
+ * reference, or free-text {@link CampusEvent#locationName} with
+ * {@link CampusEvent#latitude}/{@link CampusEvent#longitude}). The {@link CampusEvent#source}
+ * field distinguishes manual entries from scraped ones.
+ */
+@db(index=['venue, startTime'])
+entity type CampusEvent {
+  /** Event title, e.g. "Illini Men's Basketball vs. Purdue". */
+  name: !string
+
+  /** Free-text details about the event. */
+  description: string
+
+  /** When the event starts. */
+  startTime: !datetime
+
+  /** When the event ends; optional when the end time is unknown. */
+  endTime: datetime
+
+  /** The {@link CampusVenue} where the event is held, when it maps to a known venue. */
+  venue: CampusVenue
+
+  /** Free-text location description used when the event is not tied to a {@link CampusVenue}. */
+  locationName: string
+
+  /** Event latitude in decimal degrees, used when not tied to a {@link CampusVenue}. */
+  latitude: double
+
+  /** Event longitude in decimal degrees, used when not tied to a {@link CampusVenue}. */
+  longitude: double
+
+  /** Approximate number of people expected to attend; a key input to demand estimation. */
+  expectedAttendance: int
+
+  /** The category of the event, used to group similar demand patterns. */
+  category: string enum('Sports', 'Concert', 'Academic', 'Conference', 'Social', 'Arts', 'Other')
+
+  /** How the record was created: hand-entered ('Manual') or ingested by the scraper ('Scraped'). */
+  source: !string enum('Manual', 'Scraped')
+
+  /** Originating URL for scraped events; empty for manual entries. */
+  sourceUrl: string
+
+  /**
+   * Stable identifier of the event in its external source (e.g. the UIUC Localist
+   * event id). Used by the scraper to deduplicate on re-ingest; empty for manual entries.
+   */
+  externalId: string
+
+  /** Lifecycle status of the event. */
+  status: string enum('Scheduled', 'Cancelled', 'Completed')
+}

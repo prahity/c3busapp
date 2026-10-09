@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="./src/assets/c3Logo.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Package</title>
+  </head>
+  <body>
+    <div id="root" class="page-content"></div>
+    <script type="module" src="./src/main.tsx"></script>
+    <script>
+      (function() {
+        // Send hash changes to parent Genesis window to support URL bar
+        function notifyParentOfHashChange() {
+          // Remove the leading # from the hash
+          const hash = window.location.hash.substring(1) || '/';
+
+          // Send the hash change to the parent window
+          window.parent.postMessage({
+            type: 'hashchange',
+            hash: hash
+          }, '*');
+        }
+
+        // Listen for hash changes
+        window.addEventListener('hashchange', notifyParentOfHashChange);
+
+        // Send initial hash on load
+        window.addEventListener('load', notifyParentOfHashChange);
+
+        // Also try to send immediately in case load event already fired
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+          notifyParentOfHashChange();
+        }
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,61 @@
+// InputFrame — see input-frame.tsx for prop API.
+// Appearance recolors all four label slots; disabled fades the whole frame.
+
+.input-frame {
+  gap: var(--c3-style-spacing-4);
+
+  &--disabled {
+    opacity: 50%;
+  }
+
+  &__label {
+    padding-block: var(--c3-style-spacing-4);
+    color: var(--c3-style-basic-fg-primary);
+  }
+
+  &__required {
+    color: var(--c3-style-basic-fg-secondary);
+  }
+
+  &__helper {
+    padding-block: var(--c3-style-spacing-4);
+    color: var(--c3-style-basic-fg-secondary);
+  }
+
+  &__counter {
+    color: var(--c3-style-basic-fg-secondary);
+  }
+
+  &__body {
+    display: flex;
+    gap: var(--c3-style-spacing-8);
+    width: 100%;
+
+    &--direction-vertical {
+      flex-direction: column;
+    }
+
+    &--direction-horizontal {
+      flex-direction: row;
+    }
+  }
+
+  // Appearance overrides — every label slot recolors to match.
+  &--appearance-success {
+    .input-frame__label,
+    .input-frame__required,
+    .input-frame__helper,
+    .input-frame__counter {
+      color: var(--c3-style-basic-fg-success);
+    }
+  }
+
+  &--appearance-danger {
+    .input-frame__label,
+    .input-frame__required,
+    .input-frame__helper,
+    .input-frame__counter {
+      color: var(--c3-style-basic-fg-danger);
+    }
+  }
+}

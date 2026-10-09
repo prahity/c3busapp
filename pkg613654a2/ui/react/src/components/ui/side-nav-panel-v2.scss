@@ -1,0 +1,119 @@
+// SideNavPanelV2 — see side-nav-panel-v2.tsx for the prop API.
+// Tokens: --c3-style-*. No raw hex, no palette, no Themes layer, no dark: rules.
+// SCSS owns the surface color, the right rule, the section divider, and the row
+// state colors. Width / padding / layout / typography live in Tailwind utilities
+// in the .tsx.
+//
+// Rows recolor by inherited `color`: the icon (currentColor SVG), the label, and
+// the trailing chevron all follow the row's `color`, so hover / selected need to
+// set it only once — matching side-nav-panel.scss / side-nav-bar.scss.
+//
+// Motion: the rail glides between its expanded (256px) and collapsed (48px)
+// widths using the shared design-system curve — the 200ms "standard" ease
+// `cubic-bezier(0.4, 0, 0.2, 1)`, the same one Tabs uses. Disabled under
+// `prefers-reduced-motion: reduce`.
+
+$c3-motion-duration: 200ms;
+$c3-motion-ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+.side-nav-panel-v2 {
+  // WIDTHS live here, not in Tailwind: this project's Tailwind only emits
+  // arbitrary utilities that already existed at scan time, so novel values like
+  // w-[48px] silently produce nothing (see side-nav-bar.scss, which sets width
+  // in SCSS for the same reason). 256px expanded / 48px collapsed are RAW values
+  // — no --c3-style-width-* token reaches either (scale tops out at w-80 / 80px).
+  width: 256px;
+  background-color: var(--c3-style-basic-bg-primary);
+  border-right: 1px solid var(--c3-style-basic-border-border);
+  transition: width $c3-motion-duration $c3-motion-ease;
+
+  // The content that only renders when expanded (labels, header, search) is
+  // clipped rather than allowed to overflow the 48px rail while the width
+  // animates in/out.
+  overflow-x: hidden;
+
+  &--collapsed {
+    width: 48px;
+  }
+
+  &__flyout {
+    // RAW: 220px flyout — no width token near this size.
+    width: 220px;
+  }
+
+  &__section--divider {
+    border-bottom: 1px solid var(--c3-style-basic-border-border);
+  }
+
+  &__section-label {
+    color: var(--c3-style-basic-fg-secondary);
+  }
+
+  &__section-info,
+  &__section-chevron {
+    color: var(--c3-style-basic-fg-secondary);
+  }
+
+  &__section-header {
+    cursor: default;
+  }
+
+  &__flyout-label {
+    color: var(--c3-style-basic-fg-primary);
+  }
+}
+
+// Interactive section header (collapsible) is a <button>.
+button.side-nav-panel-v2__section-header {
+  cursor: pointer;
+}
+
+.side-nav-panel-v2-item {
+  // Row box sizes live here for the same tree-shaking reason as the widths
+  // above. Expanded rows are 32px tall; collapsed rows are a fixed 32×32 icon
+  // box. Tokens resolve to 32px.
+  min-height: var(--c3-style-height-h-32);
+  cursor: pointer;
+  color: var(--c3-style-basic-fg-secondary);
+  transition:
+    background-color $c3-motion-duration $c3-motion-ease,
+    color $c3-motion-duration $c3-motion-ease;
+
+  &[data-collapsed] {
+    width: var(--c3-style-width-w-32);
+    height: var(--c3-style-height-h-32);
+    min-height: 0;
+    flex: none;
+  }
+
+  &:hover {
+    background-color: var(--c3-style-basic-bg-hover);
+    color: var(--c3-style-basic-fg-primary);
+  }
+
+  &[data-selected="true"] {
+    background-color: var(--c3-style-basic-bg-selected);
+    color: var(--c3-style-basic-fg-primary);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--c3-style-shadow-ring-accent);
+  }
+
+  &:disabled {
+    pointer-events: none;
+    opacity: 50%;
+  }
+}
+
+// Respect the OS "reduce motion" setting: snap between widths / row states.
+@media (prefers-reduced-motion: reduce) {
+  .side-nav-panel-v2 {
+    transition: none;
+  }
+
+  .side-nav-panel-v2-item {
+    transition: none;
+  }
+}

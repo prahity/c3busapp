@@ -1,0 +1,43 @@
+// Header — see header.tsx for prop API.
+// Tokens: --c3-style-*. No raw hex, no palette, no Themes layer.
+// SCSS owns color + the per-size title↔subtitle gap + the top-row min-height.
+// Layout, spacing, and typography live in Tailwind utilities in the .tsx.
+
+.header {
+  &__title {
+    color: var(--c3-style-basic-fg-primary);
+  }
+
+  &__subtitle {
+    color: var(--c3-style-basic-fg-secondary);
+  }
+
+  &__leading {
+    color: var(--c3-style-basic-fg-primary);
+  }
+
+  &__info {
+    color: var(--c3-style-basic-fg-secondary);
+  }
+
+  // The title row holds inline 28px ghost icon actions; keep it from collapsing
+  // below that on the small sizes. xl puts actions outside, so it opts out.
+  &--size-xs &__top,
+  &--size-sm &__top,
+  &--size-md &__top,
+  &--size-lg &__top {
+    min-height: var(--c3-style-height-h-28);
+  }
+
+  // Title↔subtitle gap: flush on the compact sizes, 2px on the rest (Figma).
+  &--size-xs &__main,
+  &--size-sm &__main {
+    gap: var(--c3-style-spacing-0);
+  }
+
+  &--size-md &__main,
+  &--size-lg &__main,
+  &--size-xl &__main {
+    gap: var(--c3-style-spacing-2);
+  }
+}

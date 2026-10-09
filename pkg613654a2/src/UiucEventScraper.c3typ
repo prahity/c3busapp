@@ -1,0 +1,42 @@
+/**
+ * Automated web-scraping client for the public UIUC Localist events calendar
+ * (`https://calendars.illinois.edu`).
+ *
+ * Localist exposes a JSON API at `/api/2/events` that returns upcoming campus events with
+ * exactly the fields the bus route optimizer needs: timing (event instance start/end),
+ * location (name + geo coordinates), and an estimate of the crowd. This client fetches those
+ * events and normalizes them into {@link CampusEvent} records tagged with
+ * `source = 'Scraped'`, deduplicated by {@link CampusEvent#externalId}.
+ */
+type UiucEventScraper mixes REST {
+
+  /**
+   * Declarative GET against the Localist `/api/2/events` endpoint. The platform performs the
+   * HTTP call automatically for this abstract method — no implementation is written for it.
+   *
+   * @param days Size of the forward-looking window, in days, to fetch events for.
+   * @param pp   Page size ("per page") — the maximum number of events to return in one call.
+   * @return The raw Localist JSON response: an object with an `events` array, each element
+   *   wrapping an `event` object (title, description_text, location_name, geo,
+   *   event_instances, localist_url, filters, …).
+   */
+  @rest(uri='api/2/events', method='GET')
+  getEvents: abstract function(@rest(queryParameter=true) days: int, @rest(queryParameter=true) pp: int): json
+
+  /**
+   * Scrapes the UIUC Localist calendar and upserts the results as {@link CampusEvent} records.
+   *
+   * Points the client at the Localist base URL, calls {@link UiucEventScraper#getEvents}, maps
+   * each Localist event into a {@link CampusEvent} (start/end time, location name, geo
+   * coordinates, approximate attendance, best-effort category, source URL, and
+   * {@link CampusEvent#externalId} set to the Localist event id), deduplicates by external id,
+   * and persists them with `CampusEvent.mergeBatch` so re-runs update rather than duplicate.
+   *
+   * @param days Forward-looking window, in days, to scrape. Defaults to 30 when null or
+   *   non-positive.
+   * @return A JSON summary `{ scraped, saved, skipped, errors }`: `scraped` is the number of
+   *   events Localist returned, `saved` the number upserted, `skipped` those dropped for
+   *   missing a title or start time, and `errors` any per-event parse failures.
+   */
+  scrapeAndSave: function(days: int): json js-server
+}

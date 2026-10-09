@@ -1,0 +1,102 @@
+// Listbox — see listbox.tsx for prop API.
+// Outer .listbox-item (Item Frame, 4px L/R padding) wraps inner
+// .listbox-item__state (State Container, 8px padding) so hover/pressed/
+// selected backgrounds never bleed to the popover's edge.
+// Tokens: --c3-style-*. No raw hex, no palette, no Themes layer.
+
+.listbox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--c3-style-spacing-2);
+  padding-block: var(--c3-style-spacing-4);
+  margin: 0;
+  list-style: none;
+  outline: none;
+  max-height: inherit;
+  overflow-y: auto;
+}
+
+.listbox-item {
+  padding-inline: var(--c3-style-spacing-4);
+  cursor: pointer;
+  list-style: none;
+
+  &[data-disabled] {
+    cursor: not-allowed;
+    opacity: 50%;
+  }
+
+  &__state {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--c3-style-spacing-8);
+    padding: var(--c3-style-spacing-8);
+    border-radius: var(--c3-style-border-radius-4);
+    color: var(--c3-style-basic-fg-primary);
+    transition: background-color 120ms ease;
+  }
+
+  &[data-selected] .listbox-item__state {
+    background-color: var(--c3-style-basic-bg-selected);
+  }
+
+  &[data-selected] .listbox-item__trailing {
+    color: var(--c3-style-basic-fg-accent);
+  }
+
+  // Destructive rows (e.g. DropdownMenu "Delete") — danger fg. The danger
+  // hover/active bg lives after the generic hover/active rules below so it wins.
+  &[data-destructive] .listbox-item__state,
+  &[data-destructive] .listbox-item__leading,
+  &[data-destructive] .listbox-item__trailing {
+    color: var(--c3-style-basic-fg-danger);
+  }
+
+  // Active/hover/pressed only apply when the row is NOT also selected — selected wins.
+  &[data-active]:not([data-disabled], [data-selected]) .listbox-item__state {
+    background-color: var(--c3-style-basic-bg-hover);
+  }
+
+  &:hover:not([data-disabled], [data-selected]) .listbox-item__state {
+    background-color: var(--c3-style-basic-bg-hover);
+  }
+
+  &:active:not([data-disabled], [data-selected]) .listbox-item__state {
+    background-color: var(--c3-style-basic-bg-pressed);
+  }
+
+  // Destructive hover/active bg — higher specificity + after the generic rules.
+  &[data-destructive][data-active]:not([data-disabled]) .listbox-item__state,
+  &[data-destructive]:hover:not([data-disabled]) .listbox-item__state {
+    background-color: var(--c3-style-basic-bg-danger);
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--c3-style-spacing-4);
+    min-width: 0;
+    flex: 1;
+  }
+
+  &__sub {
+    color: var(--c3-style-basic-fg-secondary);
+  }
+
+  &__trailing {
+    color: var(--c3-style-basic-fg-secondary);
+  }
+}
+
+.listbox-header {
+  padding: var(--c3-style-spacing-8);
+  color: var(--c3-style-basic-fg-secondary);
+  list-style: none;
+  pointer-events: none;
+}
+
+.listbox-separator {
+  list-style: none;
+
+  // No own margin — the parent .listbox's gap:2px provides the 2px rhythm above + below.
+}

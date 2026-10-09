@@ -1,0 +1,55 @@
+// InputNumber — see input-number.tsx for prop API.
+// Tokens: --c3-style-*. No raw hex, no palette, no Themes layer.
+
+.input-number {
+  border-radius: var(--c3-style-border-radius-4);
+  background-color: var(--c3-style-basic-bg-primary);
+  border: 1px solid var(--c3-style-basic-border-input);
+  transition: box-shadow 120ms ease, border-color 120ms ease;
+
+  // Hover overlay — matches Input's hover: translucent token stacked over the
+  // frame bg via background-image so the bg is preserved.
+  &:hover:not(:has(:disabled)) {
+    background-image: linear-gradient(
+      var(--c3-style-basic-bg-hover),
+      var(--c3-style-basic-bg-hover)
+    );
+  }
+
+  // Focus ring applies on all appearances (default/success/danger).
+  &:focus-within {
+    box-shadow: 0 0 0 2px var(--c3-style-shadow-ring-accent);
+  }
+
+  &--appearance-success {
+    border-color: var(--c3-style-basic-bg-success-inverse);
+  }
+
+  &--appearance-danger {
+    border-color: var(--c3-style-basic-bg-danger-inverse);
+  }
+
+  &:has(:disabled) {
+    opacity: 50%;
+    cursor: not-allowed;
+  }
+
+  &__stepper {
+    border-radius: 0;
+  }
+
+  // Inner <Input> renders a wrapper div + bare <input>. We want the wrapper
+  // to disappear (no border, no radius, no focus ring) so the outer frame
+  // owns those. Text + placeholder colors still come from .input / .input__field.
+  &__field {
+    border: 0;
+    border-left: 1px solid var(--c3-style-basic-border-input);
+    border-right: 1px solid var(--c3-style-basic-border-input);
+    border-radius: 0;
+    box-shadow: none;
+
+    &:focus-within {
+      box-shadow: none;
+    }
+  }
+}

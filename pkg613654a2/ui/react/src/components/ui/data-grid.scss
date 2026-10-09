@@ -1,0 +1,162 @@
+// stylelint-disable no-descending-specificity
+// DataGrid — see data-grid.tsx for the composable API.
+// Block: .c3-data-grid  (NOT .table / table-row / table-cell — Tailwind utilities)
+// Elements: .c3-data-grid__scroll, .c3-data-grid__header, .c3-data-grid__body,
+//           .c3-data-grid__row, .c3-data-grid__head, .c3-data-grid__head-inner,
+//           .c3-data-grid__head-label, .c3-data-grid__head-actions, .c3-data-grid__head-action,
+//           .c3-data-grid__cell
+// Tokens: --c3-style-*. No raw hex.
+// SCSS owns the surface, cell padding, row/column borders, header/cell typography
+// colors, and the row hover/selected + header-action states.
+
+// Toolbar band above the grid: search slot + action group. Owns the bottom
+// border that separates the toolbar from the header row.
+.c3-data-grid-toolbar {
+  padding: var(--c3-style-spacing-12) var(--c3-style-spacing-16);
+  background-color: var(--c3-style-basic-bg-primary);
+  border-bottom: 1px solid var(--c3-style-basic-border-border);
+}
+
+.c3-data-grid__scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.c3-data-grid {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--c3-style-basic-bg-primary);
+  text-align: left;
+
+  // ===========================================================================
+  // Header cells — L2/primary label, 8px padding, row baseline border, optional
+  // right column divider.
+  // ===========================================================================
+  &__head {
+    padding: var(--c3-style-spacing-8);
+    color: var(--c3-style-basic-fg-primary);
+    vertical-align: middle;
+    border-bottom: 1px solid var(--c3-style-basic-border-border);
+
+    &[data-align="right"] {
+      text-align: right;
+    }
+
+    &[data-column-border="true"] {
+      border-right: 1px solid var(--c3-style-basic-border-border);
+    }
+  }
+
+  // Edge columns share the container's 16px outer gutter (the toolbar, header,
+  // and footer all sit at spacing-16), so the select/actions columns line up
+  // with the toolbar search + action group above and the pager below. Interior
+  // column spacing stays the 8px set above.
+  &__head:first-child,
+  &__cell:first-child {
+    padding-left: var(--c3-style-spacing-16);
+  }
+
+  &__head:last-child,
+  &__cell:last-child {
+    padding-right: var(--c3-style-spacing-16);
+  }
+
+  &__head-inner {
+    display: flex;
+    align-items: center;
+    gap: var(--c3-style-spacing-2);
+  }
+
+  &__head[data-align="right"] &__head-inner {
+    justify-content: flex-end;
+  }
+
+  &__head-label {
+    flex: 1 0 0;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__head[data-align="right"] &__head-label {
+    text-align: right;
+  }
+
+  &__head-actions {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+  }
+
+  // Sort / filter toggle — ghost icon button; accent + tinted when active.
+  &__head-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--c3-style-spacing-6);
+    border-radius: var(--c3-style-border-radius-4);
+    color: var(--c3-style-basic-fg-secondary);
+    cursor: pointer;
+    transition: background-color 120ms ease, color 120ms ease;
+
+    svg {
+      width: 1rem;
+      height: 1rem;
+    }
+
+    &:hover {
+      background-color: var(--c3-style-basic-bg-hover);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--c3-style-shadow-ring-accent);
+    }
+
+    &[data-active] {
+      color: var(--c3-style-basic-fg-accent);
+    }
+  }
+
+  // ===========================================================================
+  // Body cells + rows.
+  // ===========================================================================
+  &__cell {
+    padding: var(--c3-style-spacing-12) var(--c3-style-spacing-8);
+    color: var(--c3-style-basic-fg-primary);
+    vertical-align: middle;
+
+    &[data-align="right"] {
+      text-align: right;
+    }
+  }
+
+  &__body &__row {
+    border-bottom: 1px solid var(--c3-style-basic-border-border);
+    transition: background-color 120ms ease;
+
+    &:hover {
+      background-color: var(--c3-style-basic-bg-hover);
+    }
+
+    &[data-selected] {
+      background-color: var(--c3-style-basic-bg-selected);
+    }
+  }
+
+  // End-of-row actions: hidden at rest, revealed on row hover, when the row is
+  // selected, or on keyboard focus-within. `data-always-visible` opts out.
+  &__row-actions {
+    gap: var(--c3-style-spacing-4);
+    opacity: 0%;
+    transition: opacity 120ms ease;
+  }
+
+  &__body &__row:hover &__row-actions,
+  &__body &__row[data-selected] &__row-actions,
+  &__body &__row:focus-within &__row-actions,
+  &__row-actions[data-always-visible] {
+    opacity: 100%;
+  }
+}

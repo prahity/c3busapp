@@ -1,0 +1,86 @@
+// Input — see input.tsx for prop API.
+// Tokens: --c3-style-*. No raw hex, no palette, no Themes layer.
+
+.input {
+  gap: var(--c3-style-spacing-8);
+  padding-inline: var(--c3-style-spacing-12);
+  border-radius: var(--c3-style-border-radius-4);
+  background-color: var(--c3-style-basic-bg-input);
+  border: 1px solid var(--c3-style-basic-border-input);
+  transition: box-shadow 120ms ease, border-color 120ms ease, background-image 120ms ease;
+  color: var(--c3-style-basic-fg-primary);
+
+  // --- Size modifiers — padding-block + height (all via tokens) ---
+  &--size-sm {
+    padding-block: var(--c3-style-spacing-4);
+    height: var(--c3-style-height-h-28);
+  }
+
+  &--size-md {
+    padding-block: var(--c3-style-spacing-6);
+    height: var(--c3-style-height-h-32);
+  }
+
+  &--size-lg {
+    padding-block: var(--c3-style-spacing-8);
+    height: var(--c3-style-height-h-36);
+  }
+
+  // Hover overlay — translucent token stacked over --c3-style-basic-bg-input
+  // via background-image so the input bg is preserved. Applies regardless of
+  // appearance (success/danger keep their per-appearance border colors).
+  // Excludes both <input disabled> children and a bare `.input` element with
+  // a disabled attribute (e.g. when `.input` is rendered on a <button>).
+  &:hover:not(:has(:disabled)):not([disabled]) {
+    background-image: linear-gradient(
+      var(--c3-style-basic-bg-hover),
+      var(--c3-style-basic-bg-hover)
+    );
+  }
+
+  // Focus ring on all 3 appearances — you can still keyboard-focus success/danger.
+  // `data-state="open"` covers the case where `.input` is the trigger of a
+  // Radix popover (DatePicker / DateRangePicker) and the popover is open.
+  // (Radix sets `data-state` itself; that's a different concept from our
+  // `data-appearance` attribute, which writes the semantic-color axis.)
+  &:focus-within,
+  &[data-state="open"] {
+    box-shadow: 0 0 0 2px var(--c3-style-shadow-ring-accent);
+  }
+
+  // Appearance modifiers — semantic border color (orthogonal to interaction states).
+  &--appearance-success {
+    border-color: var(--c3-style-basic-bg-success-inverse);
+  }
+
+  &--appearance-danger {
+    border-color: var(--c3-style-basic-bg-danger-inverse);
+  }
+
+  // Disabled handling covers both `.input` rendered as a div wrapping a
+  // disabled <input> (Input component) and `.input` rendered directly on a
+  // disabled <button> (DatePicker trigger).
+  &:has(:disabled),
+  &[disabled] {
+    opacity: 50%;
+    cursor: not-allowed;
+  }
+
+  &__field {
+    background-color: transparent;
+    color: var(--c3-style-basic-fg-primary);
+    outline: none;
+
+    &::placeholder {
+      color: var(--c3-style-basic-fg-secondary);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+
+  &__icon {
+    color: var(--c3-style-basic-fg-secondary);
+  }
+}

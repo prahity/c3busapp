@@ -1,0 +1,87 @@
+// stylelint-disable no-descending-specificity
+// Radio — see radio.tsx for prop API. RadioGroup styles live in radio-group.scss.
+// Tokens: --c3-style-*. No raw hex, no palette, no Themes layer.
+
+.radio {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid var(--c3-style-basic-border-input);
+  border-radius: var(--c3-style-border-radius-rounded);
+  background-color: transparent;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+
+  &:focus-visible {
+    box-shadow: 0 0 0 2px var(--c3-style-shadow-ring-accent);
+  }
+
+  &:hover:not(:disabled):not([data-state="checked"]) {
+    background-color: var(--c3-style-basic-bg-hover);
+  }
+
+  &:disabled,
+  &[aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+
+  &[data-state="checked"] {
+    border-color: var(--c3-style-basic-bg-accent-inverse);
+  }
+}
+
+.radio__indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: var(--c3-style-border-radius-rounded);
+  background-color: var(--c3-style-basic-bg-accent-inverse);
+  pointer-events: none;
+
+  // Per-size dot dimensions (outer ring → inner dot): sm 16→8, md 20→12, lg 24→16
+  .radio[data-size="sm"] & {
+    width: var(--c3-style-spacing-8);
+    height: var(--c3-style-spacing-8);
+  }
+
+  .radio[data-size="md"] & {
+    width: var(--c3-style-spacing-12);
+    height: var(--c3-style-spacing-12);
+  }
+
+  .radio[data-size="lg"] & {
+    width: var(--c3-style-spacing-16);
+    height: var(--c3-style-spacing-16);
+  }
+}
+
+.radio-field {
+  gap: var(--c3-style-spacing-12);
+
+  &--disabled {
+    opacity: 50%;
+  }
+
+  &__label {
+    gap: var(--c3-style-spacing-4);
+    color: var(--c3-style-basic-fg-primary);
+    cursor: pointer;
+    user-select: none;
+
+    &--size-md {
+      padding-top: var(--c3-style-spacing-2);
+    }
+
+    &--size-lg {
+      padding-top: var(--c3-style-spacing-4);
+    }
+  }
+
+  &__sub {
+    color: var(--c3-style-basic-fg-secondary);
+  }
+}

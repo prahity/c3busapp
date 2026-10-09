@@ -1,0 +1,84 @@
+// stylelint-disable no-descending-specificity
+// Pagination — see pagination.tsx for the prop API.
+// Block: .pagination
+// Elements: .pagination__controls, .pagination__pages, .pagination__page,
+//           .pagination__per-page, .pagination__per-page-label, .pagination__range
+// Modifier: .pagination__page--current
+// Tokens: --c3-style-*. No raw hex.
+// SCSS owns the page-button sizing/padding/colors/states, gaps, and the muted
+// label colors; Tailwind in the .tsx owns flex layout + typography classes.
+
+.pagination {
+  gap: var(--c3-style-spacing-2);
+
+  &__controls {
+    gap: var(--c3-style-spacing-2);
+  }
+
+  // The page-number row keeps its buttons snug; the arrows sit outside it.
+  &__pages {
+    gap: var(--c3-style-spacing-2);
+  }
+
+  // A single page-number button: 28px tall, rounded, snug horizontal padding.
+  &__page {
+    position: relative;
+    min-width: var(--c3-style-width-w-28);
+    max-height: var(--c3-style-height-h-28);
+    padding: var(--c3-style-spacing-8) var(--c3-style-spacing-4);
+    border: 1px solid transparent;
+    border-radius: var(--c3-style-border-radius-4);
+    color: var(--c3-style-basic-fg-primary);
+    cursor: pointer;
+    transition: background-color 120ms ease;
+
+    &:hover:not(.pagination__page--current) {
+      background-color: var(--c3-style-basic-bg-hover);
+    }
+
+    &:active {
+      background-color: var(--c3-style-basic-bg-pressed);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--c3-style-shadow-ring-accent);
+    }
+
+    // Current page: outlined chip (text weight handled by the .tsx class).
+    &--current {
+      border-color: var(--c3-style-basic-border-border);
+    }
+  }
+
+  &__per-page {
+    gap: var(--c3-style-spacing-4);
+  }
+
+  // Compact select trigger (Figma "Input/Select"): bordered field + chevron.
+  &__per-page-select {
+    gap: var(--c3-style-spacing-8);
+    min-width: var(--c3-style-width-w-64);
+    padding: var(--c3-style-spacing-4) var(--c3-style-spacing-12);
+    background-color: var(--c3-style-basic-bg-input);
+    border: 1px solid var(--c3-style-basic-border-input);
+    border-radius: var(--c3-style-border-radius-4);
+    color: var(--c3-style-basic-fg-primary);
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--c3-style-shadow-ring-accent);
+    }
+  }
+
+  &__per-page-label,
+  &__range {
+    color: var(--c3-style-basic-fg-secondary);
+    white-space: nowrap;
+  }
+
+  &__range {
+    padding-inline: var(--c3-style-spacing-8);
+  }
+}

@@ -1,0 +1,29 @@
+/**
+ * A physical location on or near the UIUC campus where {@link CampusEvent}s take place.
+ *
+ * Venues anchor events to a fixed geographic point ({@link CampusVenue#latitude},
+ * {@link CampusVenue#longitude}) and a known {@link CampusVenue#capacity}, which the bus
+ * route optimizer uses to estimate demand and plan service around high-traffic locations.
+ */
+entity type CampusVenue {
+  /** Human-readable venue name, e.g. "State Farm Center". */
+  name: !string
+
+  /** WGS84 latitude of the venue, in decimal degrees. */
+  latitude: !double
+
+  /** WGS84 longitude of the venue, in decimal degrees. */
+  longitude: !double
+
+  /** Street address of the venue, when known. */
+  address: string
+
+  /** Maximum seated/standing capacity of the venue; informs expected crowd size. */
+  capacity: int
+
+  /** The kind of venue, used to categorize demand patterns. */
+  venueType: string enum('Stadium', 'Arena', 'Auditorium', 'Hall', 'Classroom', 'Outdoor', 'Other')
+
+  /** All {@link CampusEvent}s held at this venue (inverse of {@link CampusEvent#venue}). */
+  events: [CampusEvent](venue)
+}

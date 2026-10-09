@@ -1,0 +1,51 @@
+// Page Header — see page-header.tsx for the prop API.
+// Block: .page-header
+// Elements: .page-header__breadcrumbs, .page-header__title-group,
+//           .page-header__content, .page-header__tabs
+// Modifier: .page-header--with-content (content region present)
+// Tokens: --c3-style-*. No raw hex, no palette, no Themes layer.
+// SCSS owns the surface color, bottom border, and the section paddings/gaps
+// (Tailwind arbitrary `var()` padding utilities don't generate here — see
+// every sibling component, which likewise sets token padding in SCSS). Tailwind
+// in the .tsx owns only the flex layout (flex / flex-col / items-*).
+
+.page-header {
+  padding-top: var(--c3-style-spacing-16);
+  background-color: var(--c3-style-basic-bg-primary);
+  border-bottom: 1px solid var(--c3-style-basic-border-border);
+
+  // Every region shares the 24px horizontal page gutter — the same gutter the
+  // page body uses (p-6 on ListPage/DetailPage/DashboardPage content zones), so
+  // the header title/actions line up vertically with the content below. The
+  // container stacks the regions flush (no row gap); each region owns its own
+  // bottom padding.
+  &__breadcrumbs,
+  &__title-group,
+  &__content,
+  &__tabs {
+    padding-inline: var(--c3-style-spacing-24);
+  }
+
+  // Default type: 16px below the title group. With a content region present it
+  // tightens to 8px (Figma Type=Default vs Type=With Content).
+  &__title-group {
+    padding-bottom: var(--c3-style-spacing-16);
+  }
+
+  // Title ↔ status-badge gap. The base Header uses 4px across all sizes; the
+  // page band gives the status chip a touch more room (sm / 8px) beside the
+  // H4 title. Scoped here so other Header consumers are unaffected.
+  .header__title-group {
+    gap: var(--c3-style-spacing-8);
+  }
+
+  &--with-content &__title-group {
+    padding-bottom: var(--c3-style-spacing-8);
+  }
+
+  // Content region: 16px between columns, 24px below before the tab row.
+  &__content {
+    gap: var(--c3-style-spacing-16);
+    padding-bottom: var(--c3-style-spacing-24);
+  }
+}

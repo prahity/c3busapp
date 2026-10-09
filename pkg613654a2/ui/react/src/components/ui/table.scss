@@ -1,0 +1,55 @@
+// Table — see table.tsx for prop API.
+// Lightweight inline-content table (docs tables, spec sheets, comparison grids).
+// For interactive data use DataGrid. Tokens: --c3-style-*. No raw hex, no
+// palette, no Themes layer.
+
+// Rounded, bordered frame that clips the table's square corners and scrolls
+// horizontally on overflow (overflow-x comes from a Tailwind class in the tsx).
+.table-container {
+  border: 1px solid var(--c3-style-basic-border-border);
+  border-radius: var(--c3-style-border-radius-8);
+  overflow: hidden;
+}
+
+.table {
+  border-collapse: collapse;
+  color: var(--c3-style-basic-fg-primary);
+
+  // Caption sits below the table as a quiet secondary line.
+  &__caption {
+    padding: var(--c3-style-spacing-8) var(--c3-style-spacing-16);
+    color: var(--c3-style-basic-fg-secondary);
+    text-align: left;
+    caption-side: bottom;
+  }
+
+  // Shared cell box: comfortable padding + a hairline row divider.
+  &__head,
+  &__cell {
+    padding: var(--c3-style-spacing-12) var(--c3-style-spacing-16);
+    border-bottom: 1px solid var(--c3-style-basic-border-border);
+  }
+
+  // Header row: subtle neutral fill to separate it from the body.
+  &__head {
+    background-color: var(--c3-style-basic-bg-secondary);
+  }
+
+  // Compact density (specificity 0,2,0 — after the 0,1,0 rules above).
+  &--size-sm .table__head,
+  &--size-sm .table__cell {
+    padding: var(--c3-style-spacing-8) var(--c3-style-spacing-12);
+  }
+
+  // The last body row's divider is redundant against the container border.
+  // (specificity 0,3,1 — kept after all lower-specificity rules.)
+  &__body .table__row:last-child .table__cell {
+    border-bottom: 0;
+  }
+
+  // Optional hover tint for tables that double as selectable lists.
+  // (specificity 0,3,1 — same tier, placed last.)
+  &--hover .table__body .table__row:hover {
+    background-color: var(--c3-style-basic-bg-hover);
+  }
+}

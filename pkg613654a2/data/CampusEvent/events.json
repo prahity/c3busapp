@@ -1,0 +1,74 @@
+[
+  {
+    "id": "seed_event_bball_purdue",
+    "name": "Illini Men's Basketball vs. Purdue",
+    "description": "Big Ten conference home game at the State Farm Center.",
+    "startTime": "2026-10-15T19:00:00Z",
+    "endTime": "2026-10-15T21:30:00Z",
+    "venue": "seed_venue_state_farm_center",
+    "expectedAttendance": 14000,
+    "category": "Sports",
+    "source": "Manual",
+    "status": "Scheduled"
+  },
+  {
+    "id": "seed_event_football_michigan",
+    "name": "Illinois Football vs. Michigan",
+    "description": "Homecoming football game at Memorial Stadium. Expect heavy pre- and post-game traffic.",
+    "startTime": "2026-10-17T11:00:00Z",
+    "endTime": "2026-10-17T14:30:00Z",
+    "venue": "seed_venue_memorial_stadium",
+    "expectedAttendance": 55000,
+    "category": "Sports",
+    "source": "Manual",
+    "status": "Scheduled"
+  },
+  {
+    "id": "seed_event_symphony",
+    "name": "UI Symphony Orchestra Concert",
+    "description": "Evening performance in the Foellinger Great Hall at Krannert Center.",
+    "startTime": "2026-10-12T19:30:00Z",
+    "endTime": "2026-10-12T21:30:00Z",
+    "venue": "seed_venue_krannert_center",
+    "expectedAttendance": 1800,
+    "category": "Concert",
+    "source": "Manual",
+    "status": "Scheduled"
+  },
+  {
+    "id": "seed_event_ai_lecture",
+    "name": "Guest Lecture: AI & Society",
+    "description": "Distinguished speaker series lecture open to the public.",
+    "startTime": "2026-10-14T16:00:00Z",
+    "endTime": "2026-10-14T17:30:00Z",
+    "venue": "seed_venue_foellinger_auditorium",
+    "expectedAttendance": 1200,
+    "category": "Academic",
+    "source": "Manual",
+    "status": "Scheduled"
+  },
+  {
+    "id": "seed_event_org_fair",
+    "name": "Fall Student Organization Fair",
+    "description": "Hundreds of registered student organizations table at the Illini Union.",
+    "startTime": "2026-10-10T10:00:00Z",
+    "endTime": "2026-10-10T15:00:00Z",
+    "venue": "seed_venue_illini_union",
+    "expectedAttendance": 800,
+    "category": "Social",
+    "source": "Manual",
+    "status": "Scheduled"
+  },
+  {
+    "id": "seed_event_intramural_final",
+    "name": "Intramural Basketball Championship",
+    "description": "Campus intramural finals at the Activities and Recreation Center.",
+    "startTime": "2026-10-18T18:00:00Z",
+    "endTime": "2026-10-18T22:00:00Z",
+    "venue": "seed_venue_arc",
+    "expectedAttendance": 2000,
+    "category": "Social",
+    "source": "Manual",
+    "status": "Scheduled"
+  }
+]

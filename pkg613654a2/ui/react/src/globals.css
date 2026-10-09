@@ -1,0 +1,164 @@
+/*
+ * Copyright 2009-2026 C3 AI (www.c3.ai). All Rights Reserved.
+ * Confidential and Proprietary C3 Materials.
+ * This material, including without limitation any software, is the confidential trade secret and proprietary
+ * information of C3 and its licensors. Reproduction, use and/or distribution of this material in any form is
+ * strictly prohibited except as set forth in a written license agreement with C3 and/or its authorized distributors.
+ * This material may be covered by one or more patents or pending patent applications.
+ */
+
+/*
+ * C3 Design System global stylesheet.
+ *
+ * This is the design-system entrypoint that the vendored `@/components/ui/*`
+ * primitives and page layouts depend on. It is kept in lockstep with the
+ * c3-frontend skill's `references/examples/styles/index.css` — if you re-vendor
+ * components from the skill, keep the import order and the @theme inline / @layer
+ * base blocks below aligned with that file so `--c3-style-*` tokens and the
+ * `text-c3-*` typography utilities resolve.
+ *
+ * - tokens.css        Figma-generated design tokens (three-layer cascade;
+ *                     components reference the Layer-3 `--c3-style-basic-*` set).
+ * - manual-tokens.css One-off tokens not yet in the Figma pipeline.
+ *
+ * Do not reintroduce the old `src/c3ui/*` / `src/tailwind/*` token files — they
+ * defined a divergent `--c3-style-*` vocabulary and custom utilities
+ * (text-primary, bg-primary, border-weak, c3-card) that the new components do
+ * not use.
+ */
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+@import '@fontsource-variable/inter';
+@import './styles/tokens.css';
+@import './styles/manual-tokens.css';
+
+/*
+  Dark mode is driven by a `.dark` class on <html> (see src/hooks/useTheme.ts),
+  not the OS media query. https://tailwindcss.com/docs/dark-mode#using-a-selector
+*/
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  /* font-family: c3 tokens, not shadcn defaults. */
+  --font-sans: var(--c3-style-font-family-font-family), system-ui, sans-serif;
+  --font-heading: var(--c3-style-font-family-font-family), system-ui, sans-serif;
+
+  /* shadcn color slots mapped onto the c3 token vars emitted by tokens.css. */
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+
+  /* radius: c3 tokens, not shadcn's calc(--radius * N). */
+  --radius-xs: var(--c3-style-border-radius-2); /* 2px */
+  --radius-sm: var(--c3-style-border-radius-4); /* 4px */
+  --radius-md: var(--c3-style-border-radius-6); /* 6px */
+  --radius-lg: var(--c3-style-border-radius-8); /* 8px */
+  --radius-xl: var(--c3-style-border-radius-12); /* 12px */
+  --radius-full: var(--c3-style-border-radius-rounded); /* 9999px */
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  /* Constant 1.5px icon stroke at every size. Lucide icons live on a 24-unit
+     grid, so stroke-width would otherwise scale down with the icon. stroke-width
+     is inherited onto the drawn shapes; non-scaling-stroke (not inherited, so set
+     on the shapes) pins the result to a true 1.5 CSS px regardless of size. */
+  svg {
+    stroke-width: 1.5;
+  }
+  svg * {
+    vector-effect: non-scaling-stroke;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+/*
+ * Page-level enter motion (soft lift + fade + micro-scale, no layout jank).
+ * Use on route or data-loaded content; pair with prefers-reduced-motion.
+ */
+@keyframes c3-page-content-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0) scale(0.99);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes c3-page-skeleton-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Ease-out with slight overshoot feel (cubic-bezier ≈ expo-out) */
+.c3-page-content-enter {
+  animation: c3-page-content-enter 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.c3-page-skeleton-enter {
+  animation: c3-page-skeleton-enter 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Staggered cards: fly in one-by-one (optional delay via --c3-card-fly-in-delay) */
+@keyframes c3-card-fly-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.c3-card-fly-in-enter {
+  animation: c3-card-fly-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: var(--c3-card-fly-in-delay, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .c3-page-content-enter,
+  .c3-page-skeleton-enter {
+    animation: none;
+  }
+
+  .c3-card-fly-in-enter {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

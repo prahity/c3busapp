@@ -1,0 +1,181 @@
+// MultiSelect — see multi-select.tsx for prop API.
+// Trigger frame mirrors .input chrome (same tokens). The frame itself stays a
+// single row (no wrap): a fixed leading search icon, a flex-grow chip slot that
+// wraps internally, and a trailing chevron pinned right. min-height holds the
+// empty-state height; padding-block shrinks one step when chips are present so
+// the row total stays constant (matches Figma 45657-465).
+// Menu surface + empty state mirror .combobox-content / .combobox__empty.
+// Tokens: --c3-style-*. No raw hex, no palette, no Themes layer.
+
+.multi-select {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--c3-style-spacing-8);
+  padding-inline: var(--c3-style-spacing-12);
+  border-radius: var(--c3-style-border-radius-4);
+  background-color: var(--c3-style-basic-bg-input);
+  border: 1px solid var(--c3-style-basic-border-input);
+  transition: box-shadow 120ms ease, border-color 120ms ease, background-image 120ms ease;
+  color: var(--c3-style-basic-fg-primary);
+  cursor: text;
+
+  // Focus ring on all 3 appearances.
+  &:focus-within {
+    box-shadow: 0 0 0 2px var(--c3-style-shadow-ring-accent);
+  }
+
+  // Appearance modifiers — semantic border color (orthogonal to interaction states).
+  &--appearance-success {
+    border-color: var(--c3-style-basic-bg-success-inverse);
+  }
+
+  &--appearance-danger {
+    border-color: var(--c3-style-basic-bg-danger-inverse);
+  }
+
+  &:has(:disabled) {
+    opacity: 50%;
+    cursor: not-allowed;
+  }
+
+  // Hover overlay — translucent token stacked over --c3-style-basic-bg-input via
+  // background-image so the input bg is preserved (mirrors .input).
+  &:hover:not(:has(:disabled)) {
+    background-image: linear-gradient(
+      var(--c3-style-basic-bg-hover),
+      var(--c3-style-basic-bg-hover)
+    );
+  }
+
+  // --- Size modifiers — min-height holds the empty-state height; padding-block
+  // shrinks one step when chips are present so the 24px md chip stays centered.
+  &--size-sm {
+    min-height: var(--c3-style-height-h-28);
+    padding-block: var(--c3-style-spacing-4);
+
+    &[data-filled] {
+      padding-block: var(--c3-style-spacing-2);
+    }
+  }
+
+  &--size-md {
+    min-height: var(--c3-style-height-h-32);
+    padding-block: var(--c3-style-spacing-6);
+
+    &[data-filled] {
+      padding-block: var(--c3-style-spacing-4);
+    }
+  }
+
+  &--size-lg {
+    min-height: var(--c3-style-height-h-36);
+    padding-block: var(--c3-style-spacing-8);
+
+    &[data-filled] {
+      padding-block: var(--c3-style-spacing-6);
+    }
+  }
+
+  // --- Leading search icon + trailing chevron. Both stay on the first row when
+  // chips wrap (frame is top-aligned). padding-block centers the 16px icon on
+  // the row: empty → (20px text line − 16) / 2 = 2px; filled → (24px chip − 16)
+  // / 2 = 4px. The frame's own padding shrinks one step when filled, so the
+  // overall height stays constant across both. ---
+  &__icon,
+  &__icons {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    flex-shrink: 0;
+    padding-block: var(--c3-style-spacing-2);
+    color: var(--c3-style-basic-fg-secondary);
+
+    svg {
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+
+  &__icons {
+    gap: var(--c3-style-spacing-8);
+  }
+
+  &[data-filled] &__icon,
+  &[data-filled] &__icons {
+    padding-block: var(--c3-style-spacing-4);
+  }
+
+  &__chevron {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: inherit;
+
+    &:hover {
+      color: var(--c3-style-basic-fg-primary);
+    }
+  }
+
+  &__chevron[data-open] svg {
+    transform: rotate(180deg);
+    transition: transform 120ms ease;
+  }
+
+  // --- Chip slot — fills the row, wraps internally. 2px chip gap (Figma). ---
+  &__values {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--c3-style-spacing-2);
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  // Chip fill — Figma's Outline/Primary chip carries a basic/bg/primary fill that
+  // the base Badge outline-primary variant omits (it's transparent). Applied here
+  // so chips read on the gray input bg. See multi-select.md "Chip fill".
+  &__chip {
+    background-color: var(--c3-style-basic-bg-primary);
+  }
+
+  // Bare typeahead field — reset UA chrome (border/padding/margin) so it sits
+  // flush at the P2 line height and never inflates the chip row. flex-basis is
+  // small with min-width: 0 so it shares the chips' row and shrinks rather than
+  // wrapping onto its own line when chips fill the width.
+  &__field {
+    flex: 1 1 3rem;
+    min-width: 0;
+    appearance: none;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    color: var(--c3-style-basic-fg-primary);
+    outline: none;
+
+    &::placeholder {
+      color: var(--c3-style-basic-fg-secondary);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+
+  &__empty {
+    padding: var(--c3-style-spacing-8) var(--c3-style-spacing-12);
+    color: var(--c3-style-basic-fg-secondary);
+    font-family: var(--font-sans);
+  }
+}
+
+.multi-select-content {
+  border: 1px solid var(--c3-style-basic-border-input);
+  border-radius: var(--c3-style-border-radius-6);
+  background-color: var(--c3-style-basic-bg-overlay);
+  box-shadow: var(--c3-style-shadow-default-lg);
+}

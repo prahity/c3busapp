@@ -1,0 +1,72 @@
+// SideNavBar — see side-nav-bar.tsx for prop API.
+// Tokens: --c3-style-*. No raw hex, no palette, no Themes layer.
+
+.side-nav-bar {
+  position: relative;
+  width: var(--c3-style-width-w-64);
+  background-color: var(--c3-style-basic-bg-primary);
+  border-right: 1px solid var(--c3-style-basic-border-border);
+
+  &__primary {
+    gap: var(--c3-style-spacing-12);
+    padding-block: var(--c3-style-spacing-8);
+  }
+
+  &__footer {
+    gap: var(--c3-style-spacing-12);
+    padding-top: var(--c3-style-spacing-8);
+    padding-bottom: var(--c3-style-spacing-16);
+  }
+}
+
+.side-nav-bar-item {
+  width: var(--c3-style-width-w-56); // 56px text/hit area, centered in the 64px rail
+  gap: var(--c3-style-spacing-2);
+  cursor: pointer;
+
+  &__icon {
+    // RAW VALUE — no --c3-style-width-w-40 / height-h-40 token exists (only
+    // 28/32/36). Flagged in side-nav-bar.md. Replace once a 40px size token lands.
+    width: 40px;
+    height: 40px;
+    border-radius: var(--c3-style-border-radius-4);
+    color: var(--c3-style-basic-fg-secondary);
+    transition: background-color 120ms ease, color 120ms ease;
+  }
+
+  &__label {
+    width: 100%; // fill the 56px item so text wraps past 56px
+    color: var(--c3-style-basic-fg-secondary);
+    overflow-wrap: break-word;
+
+    // wrap up to 2 lines, then truncate with an ellipsis — never taller than 2 lines
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    transition: color 120ms ease;
+  }
+
+  &:hover &__icon {
+    background-color: var(--c3-style-basic-bg-hover);
+    color: var(--c3-style-basic-fg-accent);
+  }
+
+  &:hover &__label {
+    color: var(--c3-style-basic-fg-neutral);
+  }
+
+  &[data-selected="true"] &__icon {
+    background-color: var(--c3-style-basic-bg-selected);
+    color: var(--c3-style-basic-fg-accent);
+  }
+
+  &[data-selected="true"] &__label {
+    color: var(--c3-style-basic-fg-neutral);
+  }
+
+  &:disabled {
+    pointer-events: none;
+    opacity: 50%;
+  }
+}

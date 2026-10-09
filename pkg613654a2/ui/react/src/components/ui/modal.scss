@@ -1,0 +1,89 @@
+// Modal — see modal.tsx for the prop API.
+// Block: .modal__content (Radix Dialog Content)
+// Elements: .modal__overlay, .modal__header, .modal__header-row,
+//           .modal__header-text, .modal__header-close, .modal__header-divider,
+//           .modal__title, .modal__subtitle, .modal__body,
+//           .modal__footer, .modal__footer-row, .modal__footer-divider,
+//           .modal__footer-tertiary, .modal__footer-actions
+// Modifiers: .modal__content--{contained|full},
+//            .modal__content--footer-{default|fixed},
+//            .modal__header--footer-{default|fixed},
+//            .modal__footer--footer-{default|fixed},
+//            .modal__header-row--padded, .modal__footer-row--padded
+// Fixed-mode rules are the <Divider> component (see divider.scss), not CSS borders.
+// Tokens: --c3-style-*. No raw hex.
+
+.modal__overlay {
+  // Backdrop scrim — Figma `opacity/primary/60`.
+  background-color: var(--c3-style-opacity-primary-60);
+}
+
+.modal__content {
+  background-color: var(--c3-style-basic-bg-primary);
+  box-shadow: var(--c3-style-shadow-default-lg);
+  padding-block: var(--c3-style-spacing-24);
+  border-radius: var(--c3-style-border-radius-6);
+
+  // contained + default footer: full 24px frame + 24px gap between rows
+  &--contained.modal__content--footer-default {
+    padding-inline: var(--c3-style-spacing-24);
+    gap: var(--c3-style-spacing-24);
+  }
+
+  &--full.modal__content--footer-default {
+    gap: var(--c3-style-spacing-24);
+  }
+}
+
+.modal__header-row {
+  gap: var(--c3-style-spacing-12);
+
+  &--padded {
+    padding-inline: var(--c3-style-spacing-24);
+  }
+}
+
+// Fixed mode: 24px between the header text and the divider rule.
+.modal__header--footer-fixed .modal__header-row {
+  padding-bottom: var(--c3-style-spacing-24);
+}
+
+.modal__header-text {
+  gap: var(--c3-style-spacing-2);
+}
+
+.modal__body {
+  &--footer-fixed {
+    padding-block: var(--c3-style-spacing-24);
+  }
+
+  &--footer-fixed-contained {
+    padding-inline: var(--c3-style-spacing-24);
+  }
+}
+
+.modal__footer-row {
+  gap: var(--c3-style-spacing-8);
+
+  &--padded {
+    padding-inline: var(--c3-style-spacing-24);
+  }
+}
+
+// Right-side action cluster (primary + secondary). 8px between buttons.
+.modal__footer-actions {
+  gap: var(--c3-style-spacing-8);
+}
+
+// Fixed mode: 24px between the divider rule and the footer actions.
+.modal__footer--footer-fixed .modal__footer-row {
+  padding-top: var(--c3-style-spacing-24);
+}
+
+.modal__title {
+  color: var(--c3-style-basic-fg-primary);
+}
+
+.modal__subtitle {
+  color: var(--c3-style-basic-fg-neutral);
+}

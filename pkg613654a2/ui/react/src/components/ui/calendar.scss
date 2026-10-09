@@ -1,0 +1,151 @@
+// Calendar — see calendar.tsx for prop API.
+// Tokens: --c3-style-*. No raw hex, no palette, no Themes layer.
+
+.calendar {
+  padding: var(--c3-style-spacing-12);
+  border-radius: var(--c3-style-border-radius-4);
+  background-color: var(--c3-style-basic-bg-overlay);
+  box-shadow:
+    0 1px 3px var(--c3-style-opacity-primary-20),
+    0 1px 2px var(--c3-style-opacity-primary-10);
+
+  &__months {
+    gap: var(--c3-style-spacing-12);
+  }
+
+  &__month {
+    gap: var(--c3-style-spacing-12);
+  }
+
+  &__caption-label--dropdown {
+    gap: var(--c3-style-spacing-4);
+    border-radius: var(--c3-style-border-radius-4);
+  }
+
+  &__dropdowns {
+    gap: var(--c3-style-spacing-6);
+  }
+
+  &__dropdown-root {
+    border-radius: var(--c3-style-border-radius-4);
+  }
+
+  &__week {
+    margin-top: var(--c3-style-spacing-8);
+  }
+
+  &__day {
+    padding: var(--c3-style-spacing-0);
+  }
+
+  &__range-middle {
+    border-radius: var(--c3-style-border-radius-0);
+  }
+
+  &__range-start {
+    border-top-left-radius: var(--c3-style-border-radius-4);
+    border-bottom-left-radius: var(--c3-style-border-radius-4);
+  }
+
+  &__range-end {
+    border-top-right-radius: var(--c3-style-border-radius-4);
+    border-bottom-right-radius: var(--c3-style-border-radius-4);
+  }
+
+  &__caption,
+  &__caption-label {
+    color: var(--c3-style-basic-fg-primary);
+  }
+
+  &__weekday {
+    padding: var(--c3-style-spacing-2) var(--c3-style-spacing-8);
+    color: var(--c3-style-basic-fg-secondary);
+  }
+
+  &__week-number {
+    color: var(--c3-style-basic-fg-secondary);
+  }
+
+  &__range-middle,
+  &__range-start,
+  &__range-end {
+    background-color: var(--c3-style-basic-bg-accent);
+  }
+
+  &__outside {
+    color: var(--c3-style-basic-fg-secondary);
+    opacity: 60%;
+  }
+
+  &__disabled {
+    color: var(--c3-style-basic-fg-secondary);
+    opacity: 50%;
+    pointer-events: none;
+  }
+
+  &__day-button {
+    border-radius: var(--c3-style-border-radius-4);
+    color: var(--c3-style-basic-fg-primary);
+    transition: background-color 120ms ease, color 120ms ease;
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--c3-style-basic-bg-hover);
+    }
+
+    &[data-selected-single="true"],
+    &[data-range-start="true"],
+    &[data-range-end="true"] {
+      background-color: var(--c3-style-basic-bg-accent-inverse);
+      color: var(--c3-style-basic-fg-inverse);
+    }
+
+    &[data-range-start="true"] {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    &[data-range-end="true"] {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+
+    &[data-range-middle="true"] {
+      background-color: var(--c3-style-basic-bg-accent);
+      color: var(--c3-style-basic-fg-accent);
+      border-radius: 0;
+    }
+
+    // mode="multiple" — same soft tint as range-middle (not the solid
+    // single/range-endpoint fill), but each day is its own disconnected
+    // square, so — unlike range-middle — it keeps the default border-radius
+    // instead of flattening to 0.
+    &[data-multi-selected="true"] {
+      background-color: var(--c3-style-basic-bg-accent);
+      color: var(--c3-style-basic-fg-accent);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--c3-style-shadow-ring-accent);
+    }
+
+    &:active:not([data-selected-single="true"]):not([data-range-start="true"]):not([data-range-end="true"]):not([data-range-middle="true"]):not([data-multi-selected="true"]) {
+      background-color: var(--c3-style-basic-bg-pressed);
+    }
+  }
+
+  // Today indicator — small blue dot centered at the bottom of the cell
+  &__today > .calendar__day-button::after {
+    content: "";
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background-color: var(--c3-style-basic-bg-accent-inverse);
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+}

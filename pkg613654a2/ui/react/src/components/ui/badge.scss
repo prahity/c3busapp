@@ -1,0 +1,244 @@
+// Badge — see badge.tsx for prop API.
+// Two blocks live here: .badge (solid/soft/outline text badge) and
+// .badge-indicator (the bare 8px dot used for variant="indicator").
+// Tokens: --c3-style-*. No raw hex, no palette, no Themes layer.
+
+// =============================================================================
+// .badge — text badge: Solid / Soft / Outline × 7 appearances
+// =============================================================================
+
+.badge {
+  position: relative;
+  isolation: isolate;
+  transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
+
+  // Elements
+  &__close {
+    border-radius: var(--c3-style-border-radius-2);
+    color: inherit;
+    opacity: 100%;
+    cursor: pointer;
+    transition: opacity 120ms ease;
+  }
+
+  &__close:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--c3-style-shadow-ring-secondary);
+  }
+
+  // Interactive badges (onClick) get a hover/pressed overlay painted over the
+  // base fill — basic/bg/hover = 5% primary, basic/bg/pressed = 10–20% primary.
+  &--interactive::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-color: transparent;
+    transition: background-color 120ms ease;
+    pointer-events: none;
+  }
+
+  &--interactive:hover::after {
+    background-color: var(--c3-style-basic-bg-hover);
+  }
+
+  &--interactive:active::after {
+    background-color: var(--c3-style-basic-bg-pressed);
+  }
+
+  // --- Variant: SOLID — bold fill + inverse (light) text ---
+  &--solid {
+    &.badge--appearance-primary {
+      background-color: var(--c3-style-basic-bg-tooltip);
+      color: var(--c3-style-basic-fg-inverse);
+    }
+
+    &.badge--appearance-secondary {
+      background-color: var(--c3-style-basic-bg-neutral-inverse);
+      color: var(--c3-style-basic-fg-inverse);
+    }
+
+    &.badge--appearance-accent {
+      background-color: var(--c3-style-basic-bg-accent-inverse);
+      color: var(--c3-style-basic-fg-inverse);
+    }
+
+    &.badge--appearance-info {
+      background-color: var(--c3-style-basic-bg-info-inverse);
+      color: var(--c3-style-basic-fg-inverse);
+    }
+
+    &.badge--appearance-success {
+      background-color: var(--c3-style-basic-bg-success-inverse);
+      color: var(--c3-style-basic-fg-inverse);
+    }
+
+    &.badge--appearance-warning {
+      background-color: var(--c3-style-basic-bg-warning-inverse);
+      color: var(--c3-style-basic-fg-inverse);
+    }
+
+    &.badge--appearance-danger {
+      background-color: var(--c3-style-basic-bg-danger-inverse);
+      color: var(--c3-style-basic-fg-inverse);
+    }
+  }
+
+  // --- Variant: SOFT — subtle tint bg + appearance-colored text ---
+  // primary = white (bg/primary), secondary = light gray (bg/secondary);
+  // both use fg/primary text.
+  &--soft {
+    &.badge--appearance-primary {
+      background-color: var(--c3-style-basic-bg-primary);
+      color: var(--c3-style-basic-fg-primary);
+    }
+
+    &.badge--appearance-secondary {
+      background-color: var(--c3-style-basic-bg-secondary);
+      color: var(--c3-style-basic-fg-primary);
+    }
+
+    &.badge--appearance-accent {
+      background-color: var(--c3-style-basic-bg-accent);
+      color: var(--c3-style-basic-fg-accent);
+    }
+
+    &.badge--appearance-info {
+      background-color: var(--c3-style-basic-bg-info);
+      color: var(--c3-style-basic-fg-info);
+    }
+
+    &.badge--appearance-success {
+      background-color: var(--c3-style-basic-bg-success);
+      color: var(--c3-style-basic-fg-success);
+    }
+
+    &.badge--appearance-warning {
+      background-color: var(--c3-style-basic-bg-warning);
+      color: var(--c3-style-basic-fg-warning);
+    }
+
+    &.badge--appearance-danger {
+      background-color: var(--c3-style-basic-bg-danger);
+      color: var(--c3-style-basic-fg-danger);
+    }
+  }
+
+  // --- Variant: OUTLINE — per-appearance border + appearance text ---
+  // Default fill transparent; primary/secondary share basic/border/border.
+  // secondary carries a light-gray bg/secondary fill (primary stays transparent).
+  &--outline {
+    background-color: transparent;
+
+    &.badge--appearance-primary {
+      border-color: var(--c3-style-basic-border-border);
+      color: var(--c3-style-basic-fg-primary);
+    }
+
+    &.badge--appearance-secondary {
+      background-color: var(--c3-style-basic-bg-secondary);
+      border-color: var(--c3-style-basic-border-border);
+      color: var(--c3-style-basic-fg-primary);
+    }
+
+    &.badge--appearance-accent {
+      border-color: var(--c3-style-basic-border-accent);
+      color: var(--c3-style-basic-fg-accent);
+    }
+
+    &.badge--appearance-info {
+      border-color: var(--c3-style-basic-border-info);
+      color: var(--c3-style-basic-fg-info);
+    }
+
+    &.badge--appearance-success {
+      border-color: var(--c3-style-basic-border-success);
+      color: var(--c3-style-basic-fg-success);
+    }
+
+    &.badge--appearance-warning {
+      border-color: var(--c3-style-basic-border-warning);
+      color: var(--c3-style-basic-fg-warning);
+    }
+
+    &.badge--appearance-danger {
+      border-color: var(--c3-style-basic-border-danger);
+      color: var(--c3-style-basic-fg-danger);
+    }
+  }
+
+  // --- Focus ring per appearance (interactive badges; modifier alone) ---
+  &--appearance-primary:focus-visible {
+    box-shadow: 0 0 0 2px var(--c3-style-shadow-ring-primary);
+  }
+
+  &--appearance-secondary:focus-visible {
+    box-shadow: 0 0 0 2px var(--c3-style-shadow-ring-secondary);
+  }
+
+  &--appearance-accent:focus-visible {
+    box-shadow: 0 0 0 2px var(--c3-style-shadow-ring-accent);
+  }
+
+  &--appearance-info:focus-visible {
+    box-shadow: 0 0 0 2px var(--c3-style-shadow-ring-info);
+  }
+
+  &--appearance-success:focus-visible {
+    box-shadow: 0 0 0 2px var(--c3-style-shadow-ring-success);
+  }
+
+  &--appearance-warning:focus-visible {
+    box-shadow: 0 0 0 2px var(--c3-style-shadow-ring-warning);
+  }
+
+  &--appearance-danger:focus-visible {
+    box-shadow: 0 0 0 2px var(--c3-style-shadow-ring-danger);
+  }
+
+  // Disabled (defensive — badges are spans, but asChild may render a control)
+  &:disabled,
+  &[aria-disabled="true"] {
+    pointer-events: none;
+    opacity: 50%;
+  }
+}
+
+// =============================================================================
+// .badge-indicator — bare 8px dot. Fill = basic/fg/{appearance}; a 1px neutral
+// border is drawn OUTSIDE the dot via `outline` (so it doesn't shrink the fill).
+// Figma 323-390 uses basic/fg/neutral for the primary dot (not fg-primary).
+// =============================================================================
+
+.badge-indicator {
+  outline: 1px solid var(--c3-style-basic-border-border);
+  outline-offset: 0;
+
+  &--appearance-primary {
+    background-color: var(--c3-style-basic-fg-neutral);
+  }
+
+  &--appearance-secondary {
+    background-color: var(--c3-style-basic-fg-secondary);
+  }
+
+  &--appearance-accent {
+    background-color: var(--c3-style-basic-fg-accent);
+  }
+
+  &--appearance-info {
+    background-color: var(--c3-style-basic-fg-info);
+  }
+
+  &--appearance-success {
+    background-color: var(--c3-style-basic-fg-success);
+  }
+
+  &--appearance-warning {
+    background-color: var(--c3-style-basic-fg-warning);
+  }
+
+  &--appearance-danger {
+    background-color: var(--c3-style-basic-fg-danger);
+  }
+}

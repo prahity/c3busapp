@@ -1,0 +1,57 @@
+// stylelint-disable no-descending-specificity
+// Link — see link.tsx for the prop API.
+// Block: .link
+// Elements: .link__icon (--start / --end)
+// Modifiers: .link--size-{sm,md,lg}
+// Tokens: --c3-style-*. No raw hex.
+// SCSS owns color, per-size gap, the underline border, and the state styling
+// (hover/active/focus/disabled); Tailwind in the .tsx owns flex layout,
+// typography, and icon sizing.
+
+.link {
+  color: var(--c3-style-basic-fg-accent);
+
+  // Reserve the underline so hover/active don't shift layout.
+  border-bottom: 1px solid transparent;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease;
+
+  &--size-sm {
+    gap: var(--c3-style-spacing-4);
+  }
+
+  &--size-md,
+  &--size-lg {
+    gap: var(--c3-style-spacing-8);
+  }
+
+  // Hover + active darken the text/icon + underline by compositing the hover
+  // overlay ON TOP of the accent color (not a background box) — exactly how
+  // Figma layers it. The overlay is primary @ 5% (hover) / 10% (active); its
+  // opaque base is --c3-style-basic-fg-primary, which also flips correctly in
+  // dark mode, so this matches `basic/bg/hover` without a box or raw hex.
+  // Icons inherit `color` (lucide currentColor), so they darken too.
+  &:hover:not([aria-disabled="true"]) {
+    color: color-mix(in srgb, var(--c3-style-basic-fg-primary) 5%, var(--c3-style-basic-fg-accent));
+    border-bottom-color: color-mix(in srgb, var(--c3-style-basic-fg-primary) 5%, var(--c3-style-basic-border-accent));
+  }
+
+  &:active:not([aria-disabled="true"]) {
+    color: color-mix(in srgb, var(--c3-style-basic-fg-primary) 10%, var(--c3-style-basic-fg-accent));
+    border-bottom-color: color-mix(in srgb, var(--c3-style-basic-fg-primary) 10%, var(--c3-style-basic-border-accent));
+  }
+
+  // Keyboard focus: selected-surface fill + accent ring (no underline).
+  &:focus-visible {
+    border-bottom-color: transparent;
+    border-radius: var(--c3-style-border-radius-4);
+    background-color: var(--c3-style-basic-bg-selected);
+    box-shadow: 0 0 0 2px var(--c3-style-shadow-ring-accent);
+  }
+
+  &[aria-disabled="true"] {
+    pointer-events: none;
+    opacity: 50%;
+    cursor: not-allowed;
+  }
+}

@@ -1,0 +1,30 @@
+// DatePicker / DateRangePicker — see date-picker.tsx for prop API.
+// The trigger composes `.input` for all base styling (border, bg, hover,
+// focus, disabled, size, appearance). This file only owns DatePicker-
+// specific bits: value placeholder vs filled color, clear-icon color, and
+// the popover-content padding reset.
+
+.date-picker {
+  &__value {
+    color: var(--c3-style-basic-fg-secondary);
+
+    // `data-filled` is set on the value span when the picker has a value.
+    // Not a state-enum value, not a prop — it's a derived data attribute that
+    // reflects "the component holds content" (see references/scss-bem-convention.md).
+    &[data-filled="true"] {
+      color: var(--c3-style-basic-fg-primary);
+    }
+  }
+
+  &__clear {
+    color: var(--c3-style-basic-fg-secondary);
+
+    &:hover {
+      color: var(--c3-style-basic-fg-primary);
+    }
+  }
+
+  &__popover {
+    padding: var(--c3-style-spacing-0);
+  }
+}

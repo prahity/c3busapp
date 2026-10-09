@@ -1,0 +1,89 @@
+// Switch — see switch.tsx for prop API.
+// Tokens: --c3-style-*. No raw hex, no palette, no Themes layer.
+
+.switch {
+  position: relative;
+  padding: var(--c3-style-spacing-2);
+  border-radius: var(--c3-style-border-radius-rounded);
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+
+  &:focus-visible {
+    box-shadow: 0 0 0 2px var(--c3-style-shadow-ring-accent);
+    border-color: var(--c3-style-basic-border-input);
+  }
+
+  &:disabled,
+  &[aria-disabled="true"] {
+    cursor: not-allowed;
+    opacity: 50%;
+  }
+
+  // --- Variant: SOLID — track fills with color; thumb stays white ---
+  &--solid {
+    &[data-state="checked"] {
+      background-color: var(--c3-style-basic-bg-accent-inverse);
+    }
+
+    &[data-state="unchecked"] {
+      background-color: var(--c3-style-basic-fg-neutral);
+    }
+  }
+
+  // --- Variant: OUTLINE — white track, border + thumb take the color ---
+  &--outline {
+    background-color: var(--c3-style-basic-bg-primary);
+    border: 1px solid transparent;
+
+    &[data-state="checked"] {
+      border-color: var(--c3-style-basic-bg-accent-inverse);
+    }
+
+    &[data-state="unchecked"] {
+      border-color: var(--c3-style-basic-fg-neutral);
+    }
+  }
+}
+
+.switch__thumb {
+  border-radius: var(--c3-style-border-radius-rounded);
+  pointer-events: none;
+
+  // Tailwind v4 uses the modern `translate` CSS property for translate-x utilities,
+  // not `transform` — so transition `translate` (not `transform`) to actually animate.
+  transition: translate 200ms ease, transform 200ms ease, background-color 120ms ease;
+
+  // Solid: knob contrasts the track in both states (pairs with the icon at .switch__icon)
+  .switch--solid & {
+    background-color: var(--c3-style-basic-fg-inverse);
+  }
+
+  // Outline: knob matches the border color
+  .switch--outline &[data-state="checked"] {
+    background-color: var(--c3-style-basic-bg-accent-inverse);
+  }
+
+  .switch--outline &[data-state="unchecked"] {
+    background-color: var(--c3-style-basic-fg-neutral);
+  }
+}
+
+.switch__icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+
+  // Solid: white icon on the colored track
+  .switch--solid & {
+    color: var(--c3-style-basic-fg-inverse);
+  }
+
+  // Outline: icon takes the color of its side
+  .switch--outline &--check {
+    color: var(--c3-style-basic-bg-accent-inverse);
+  }
+
+  .switch--outline &--x {
+    color: var(--c3-style-basic-fg-neutral);
+  }
+}

@@ -1,0 +1,40 @@
+// CheckboxGroup — see checkbox-group.tsx for prop API.
+// Tokens: --c3-style-*. No raw hex, no palette, no Themes layer.
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--c3-style-spacing-12);
+
+  // --- Nested level: left indent + vertical guide line ---
+  &--nested {
+    position: relative;
+    padding-left: var(--c3-style-spacing-24);
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: var(--c3-style-spacing-8);
+      width: 1px;
+      background-color: var(--c3-style-basic-border-input);
+    }
+  }
+
+  // Per-size indent + line position
+  &--size-sm.checkbox-group--nested {
+    padding-left: var(--c3-style-spacing-24);
+    &::before { left: var(--c3-style-spacing-8); }
+  }
+
+  &--size-md.checkbox-group--nested {
+    padding-left: 30px; /* TODO: --c3-style-spacing-30 role token missing */
+    &::before { left: 10px; } /* TODO: --c3-style-spacing-10 role token missing */
+  }
+
+  &--size-lg.checkbox-group--nested {
+    padding-left: 36px; /* TODO: --c3-style-spacing-36 role token missing */
+    &::before { left: var(--c3-style-spacing-12); }
+  }
+}

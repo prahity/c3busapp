@@ -1,0 +1,182 @@
+// stylelint-disable no-descending-specificity
+// Tabs — see tabs.tsx for the prop API.
+// Block: .tabs
+// Elements: .tabs__list, .tabs__trigger, .tabs__content, .tabs__indicator
+// Modifiers: .tabs__list--{boxed|bordered}, .tabs__trigger--{boxed|bordered},
+//            .tabs__trigger--size-{sm|md|lg}
+// Tokens: --c3-style-*. No raw hex.
+//
+// Motion: one shared curve/duration across the design system — the 200ms
+// "standard" ease `cubic-bezier(0.4, 0, 0.2, 1)`. Triggers cross-fade their
+// color/background on state change; the active content panel fades + rises in.
+// All of it is disabled under `prefers-reduced-motion: reduce`.
+
+$c3-motion-duration: 200ms;
+$c3-motion-ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+@keyframes tabs-content-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tabs {
+  gap: var(--c3-style-spacing-8);
+
+  // ===========================================================================
+  // LIST — boxed = grey pill row;   bordered = bottom rule baseline
+  // ===========================================================================
+  &__list {
+    &--boxed {
+      gap: var(--c3-style-spacing-2);
+      padding: var(--c3-style-spacing-2);
+      border-radius: var(--c3-style-border-radius-6);
+      background-color: var(--c3-style-basic-bg-secondary);
+    }
+
+    &--bordered {
+      gap: var(--c3-style-spacing-24);
+      border-color: var(--c3-style-basic-border-border);
+    }
+  }
+
+  // ===========================================================================
+  // TRIGGER — base color (inactive) and per-variant state styles
+  // ===========================================================================
+  &__trigger {
+    color: var(--c3-style-basic-fg-secondary);
+    transition:
+      background-color $c3-motion-duration $c3-motion-ease,
+      color $c3-motion-duration $c3-motion-ease,
+      box-shadow $c3-motion-duration $c3-motion-ease;
+
+    // Optional accent dot — composed via <Badge variant="indicator">.
+    // Tabs only owns the absolute positioning (Figma: top-right, 2px inset).
+    .tabs__indicator {
+      position: absolute;
+      top: var(--c3-style-spacing-2);
+      right: var(--c3-style-spacing-2);
+    }
+
+    // --- BOXED ------------------------------------------------------------
+    &--boxed {
+      border-radius: var(--c3-style-border-radius-4);
+
+      // Per-size padding + gap (Figma node 408-8904).
+      &.tabs__trigger--size-sm {
+        gap: var(--c3-style-spacing-4);
+        padding: var(--c3-style-spacing-4) var(--c3-style-spacing-8);
+      }
+
+      &.tabs__trigger--size-md {
+        gap: var(--c3-style-spacing-6);
+        padding: var(--c3-style-spacing-8);
+      }
+
+      &.tabs__trigger--size-lg {
+        gap: var(--c3-style-spacing-8);
+        padding: var(--c3-style-spacing-12);
+      }
+
+      &:hover:not(:disabled, [data-state="active"]) {
+        background-color: var(--c3-style-basic-bg-hover);
+      }
+
+      &:focus-visible {
+        box-shadow: 0 0 0 2px var(--c3-style-shadow-ring-accent);
+      }
+
+      &[data-state="active"] {
+        background-color: var(--c3-style-basic-bg-primary);
+        color: var(--c3-style-basic-fg-primary);
+
+        // Figma shadow/default/sm
+        box-shadow:
+          0 1px 3px 0 rgb(10 10 10 / 20%),
+          0 1px 2px -1px rgb(10 10 10 / 20%);
+      }
+    }
+
+    // --- BORDERED ---------------------------------------------------------
+    &--bordered {
+      gap: var(--c3-style-spacing-8);
+
+      // Per-size vertical padding (Figma node 408-8904); horizontal is 0.
+      &.tabs__trigger--size-sm {
+        padding: var(--c3-style-spacing-4) 0;
+      }
+
+      &.tabs__trigger--size-md {
+        padding: var(--c3-style-spacing-8) 0;
+      }
+
+      &.tabs__trigger--size-lg {
+        padding: var(--c3-style-spacing-12) 0;
+      }
+
+      &::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -1px;
+        height: 0;
+        border-bottom: 0 solid transparent;
+        pointer-events: none;
+      }
+
+      &:hover:not(:disabled, [data-state="active"]) {
+        color: var(--c3-style-basic-fg-primary);
+
+        &::after {
+          border-bottom-width: 1px;
+          border-color: var(--c3-style-basic-border-border);
+        }
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--c3-style-basic-border-accent);
+        outline-offset: -2px;
+        border-radius: var(--c3-style-border-radius-4);
+      }
+
+      &[data-state="active"] {
+        color: var(--c3-style-basic-fg-accent);
+
+        &::after {
+          border-bottom-width: 2px;
+          border-color: var(--c3-style-basic-border-accent);
+        }
+      }
+    }
+  }
+
+  // ===========================================================================
+  // CONTENT — the active panel fades + rises in when its tab is selected.
+  // Radix only mounts/marks the active panel with [data-state="active"], so the
+  // keyframe runs on each tab switch.
+  // ===========================================================================
+  &__content[data-state="active"] {
+    animation: tabs-content-in $c3-motion-duration $c3-motion-ease;
+  }
+}
+
+// Respect the OS "reduce motion" setting: keep the state colors, drop the
+// movement/animation.
+@media (prefers-reduced-motion: reduce) {
+  .tabs {
+    &__trigger {
+      transition: none;
+    }
+
+    &__content[data-state="active"] {
+      animation: none;
+    }
+  }
+}

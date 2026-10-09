@@ -1,0 +1,220 @@
+// stylelint-disable no-descending-specificity
+// Alert — see alert.tsx for the prop API.
+// Block: .alert
+// Elements: .alert__icon, .alert__avatar, .alert__content, .alert__title,
+//           .alert__description, .alert__action, .alert__close
+// Modifiers: .alert--{solid|soft|ghost}, .alert--appearance-{default|info|success|warning|destructive}
+// Tokens: --c3-style-*. No raw hex.
+
+.alert {
+  gap: var(--c3-style-spacing-12);
+  padding: var(--c3-style-spacing-12) var(--c3-style-spacing-16);
+  border-radius: var(--c3-style-border-radius-4);
+
+  &__icon {
+    margin-top: var(--c3-style-spacing-2);
+  }
+
+  &__avatar {
+    border-radius: var(--c3-style-border-radius-8);
+  }
+
+  &__content {
+    gap: var(--c3-style-spacing-2);
+  }
+
+  &__action {
+    gap: var(--c3-style-spacing-4);
+    padding: var(--c3-style-spacing-6) var(--c3-style-spacing-8);
+    border-radius: var(--c3-style-border-radius-4);
+  }
+
+  &__close {
+    margin-top: var(--c3-style-spacing-2);
+    border-radius: var(--c3-style-border-radius-rounded);
+  }
+
+  // --- description sits a notch softer than the title in every variant ---
+  &__description {
+    opacity: 80%;
+  }
+
+  // ===========================================================================
+  // SOLID — bold fill, inverse text. Action = soft pill in color family.
+  // ===========================================================================
+  &--solid {
+    color: var(--c3-style-basic-fg-inverse);
+
+    &.alert--appearance-default {
+      background-color: var(--c3-style-basic-bg-tooltip);
+
+      .alert__action {
+        background-color: var(--c3-style-basic-bg-secondary);
+        color: var(--c3-style-basic-fg-primary);
+      }
+    }
+
+    &.alert--appearance-info {
+      background-color: var(--c3-style-basic-bg-info-inverse);
+
+      .alert__action {
+        background-color: var(--c3-style-basic-bg-info);
+        color: var(--c3-style-basic-fg-info);
+      }
+    }
+
+    &.alert--appearance-success {
+      background-color: var(--c3-style-basic-bg-success-inverse);
+
+      .alert__action {
+        background-color: var(--c3-style-basic-bg-success);
+        color: var(--c3-style-basic-fg-success);
+      }
+    }
+
+    &.alert--appearance-warning {
+      background-color: var(--c3-style-basic-bg-warning-inverse);
+
+      .alert__action {
+        background-color: var(--c3-style-basic-bg-warning);
+        color: var(--c3-style-basic-fg-warning);
+      }
+    }
+
+    &.alert--appearance-destructive {
+      background-color: var(--c3-style-basic-bg-danger-inverse);
+
+      .alert__action {
+        background-color: var(--c3-style-basic-bg-danger);
+        color: var(--c3-style-basic-fg-danger);
+      }
+    }
+  }
+
+  // ===========================================================================
+  // SOFT — tinted fill, color text. Action = solid bold pill in color family.
+  // ===========================================================================
+  &--soft {
+    &.alert--appearance-default {
+      background-color: var(--c3-style-basic-bg-secondary);
+      color: var(--c3-style-basic-fg-primary);
+
+      .alert__action {
+        background-color: var(--c3-style-basic-fg-secondary);
+        color: var(--c3-style-basic-fg-inverse);
+      }
+    }
+
+    &.alert--appearance-info {
+      background-color: var(--c3-style-basic-bg-info);
+      color: var(--c3-style-basic-fg-info);
+
+      .alert__action {
+        background-color: var(--c3-style-basic-bg-info-inverse);
+        color: var(--c3-style-basic-fg-inverse);
+      }
+    }
+
+    &.alert--appearance-success {
+      background-color: var(--c3-style-basic-bg-success);
+      color: var(--c3-style-basic-fg-success);
+
+      .alert__action {
+        background-color: var(--c3-style-basic-bg-success-inverse);
+        color: var(--c3-style-basic-fg-inverse);
+      }
+    }
+
+    &.alert--appearance-warning {
+      background-color: var(--c3-style-basic-bg-warning);
+      color: var(--c3-style-basic-fg-warning);
+
+      .alert__action {
+        background-color: var(--c3-style-basic-bg-warning-inverse);
+        color: var(--c3-style-basic-fg-inverse);
+      }
+    }
+
+    &.alert--appearance-destructive {
+      background-color: var(--c3-style-basic-bg-danger);
+      color: var(--c3-style-basic-fg-danger);
+
+      .alert__action {
+        background-color: var(--c3-style-basic-bg-danger-inverse);
+        color: var(--c3-style-basic-fg-inverse);
+      }
+    }
+  }
+
+  // ===========================================================================
+  // GHOST — white bg + color border, color text. Action = outline pill in color.
+  // (Figma calls this "Outline".)
+  // ===========================================================================
+  &--ghost {
+    background-color: var(--c3-style-basic-bg-primary);
+    border: 1px solid var(--c3-style-basic-border-border);
+
+    .alert__action {
+      background-color: transparent;
+      border-color: var(--c3-style-basic-border-border);
+    }
+
+    &.alert--appearance-default {
+      color: var(--c3-style-basic-fg-primary);
+
+      .alert__description {
+        color: var(--c3-style-basic-fg-secondary);
+        opacity: 100%;
+      }
+
+      .alert__action {
+        color: var(--c3-style-basic-fg-primary);
+      }
+    }
+
+    &.alert--appearance-info {
+      border-color: var(--c3-style-basic-border-info);
+      color: var(--c3-style-basic-fg-info);
+
+      .alert__action {
+        border-color: var(--c3-style-basic-border-info);
+        color: var(--c3-style-basic-fg-info);
+      }
+    }
+
+    &.alert--appearance-success {
+      border-color: var(--c3-style-basic-border-success);
+      color: var(--c3-style-basic-fg-success);
+
+      .alert__action {
+        border-color: var(--c3-style-basic-border-success);
+        color: var(--c3-style-basic-fg-success);
+      }
+    }
+
+    &.alert--appearance-warning {
+      border-color: var(--c3-style-basic-border-warning);
+      color: var(--c3-style-basic-fg-warning);
+
+      .alert__action {
+        border-color: var(--c3-style-basic-border-warning);
+        color: var(--c3-style-basic-fg-warning);
+      }
+    }
+
+    &.alert--appearance-destructive {
+      border-color: var(--c3-style-basic-border-danger);
+      color: var(--c3-style-basic-fg-danger);
+
+      .alert__action {
+        border-color: var(--c3-style-basic-border-danger);
+        color: var(--c3-style-basic-fg-danger);
+      }
+    }
+  }
+
+  // --- Avatar default placeholder bg (matches Figma chart-5 swatch) ---
+  &__avatar {
+    background-color: var(--c3-style-basic-bg-secondary);
+  }
+}

@@ -1,0 +1,52 @@
+// SideNavPanel — see side-nav-panel.tsx for prop API.
+// Tokens: --c3-style-*. No raw hex, no palette, no Themes layer.
+// SCSS owns surface color, the right rule, and row state colors. Width/padding/
+// layout/typography live in Tailwind utilities in the .tsx.
+// Rows recolor by inherited `color`: the icon (currentColor SVG), label, and
+// chevron all follow the row's color, so hover/selected need only set it once.
+
+.side-nav-panel {
+  // RAW VALUE — no --c3-style-width-* token at 256px (max is w-80 / 80px).
+  // Flagged in side-nav-panel.md. Applied via w-[256px] in the .tsx. The
+  // collapsed rail uses --c3-style-width-w-36 (36px) and needs no raw value.
+  background-color: var(--c3-style-basic-bg-primary);
+  border-right: 1px solid var(--c3-style-basic-border-border);
+
+  &__collapsed-title {
+    color: var(--c3-style-basic-fg-primary);
+  }
+
+  &__section-label {
+    color: var(--c3-style-basic-fg-secondary);
+  }
+
+  &__section-info {
+    color: var(--c3-style-basic-fg-secondary);
+  }
+}
+
+.side-nav-panel-item {
+  cursor: pointer;
+  color: var(--c3-style-basic-fg-secondary);
+  transition: background-color 120ms ease, color 120ms ease;
+
+  &:hover {
+    background-color: var(--c3-style-basic-bg-hover);
+    color: var(--c3-style-basic-fg-primary);
+  }
+
+  &[data-selected="true"] {
+    background-color: var(--c3-style-basic-bg-selected);
+    color: var(--c3-style-basic-fg-primary);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--c3-style-shadow-ring-accent);
+  }
+
+  &:disabled {
+    pointer-events: none;
+    opacity: 50%;
+  }
+}

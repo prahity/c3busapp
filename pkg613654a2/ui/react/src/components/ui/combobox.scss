@@ -1,0 +1,55 @@
+// Combobox — see combobox.tsx for prop API.
+// Trigger reuses .input styling (composed via <Input>). Menu surface owns
+// chrome (border + radius); options come from <Listbox>.
+// Tokens: --c3-style-*. No raw hex, no palette, no Themes layer.
+
+.combobox {
+  display: block;
+  width: 100%;
+
+  &__icons {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--c3-style-spacing-8);
+    color: var(--c3-style-basic-fg-secondary);
+  }
+
+  &__clear,
+  &__chevron {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: inherit;
+
+    &:hover {
+      color: var(--c3-style-basic-fg-primary);
+    }
+
+    svg {
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+
+  &__chevron[data-open] svg {
+    transform: rotate(180deg);
+    transition: transform 120ms ease;
+  }
+
+  &__empty {
+    padding: var(--c3-style-spacing-8) var(--c3-style-spacing-12);
+    color: var(--c3-style-basic-fg-secondary);
+    font-family: var(--font-sans);
+  }
+}
+
+.combobox-content {
+  border: 1px solid var(--c3-style-basic-border-input);
+  border-radius: var(--c3-style-border-radius-6);
+  background-color: var(--c3-style-basic-bg-overlay);
+  box-shadow: var(--c3-style-shadow-default-lg);
+}

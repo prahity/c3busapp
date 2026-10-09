@@ -1,0 +1,44 @@
+// Textarea — see textarea.tsx for prop API.
+// Tokens: --c3-style-*. No raw hex, no palette, no Themes layer.
+
+.textarea {
+  padding: var(--c3-style-spacing-8) var(--c3-style-spacing-12);
+  border-radius: var(--c3-style-border-radius-4);
+  background-color: var(--c3-style-basic-bg-input);
+  border: 1px solid var(--c3-style-basic-border-input);
+  color: var(--c3-style-basic-fg-primary);
+  outline: none;
+  transition: box-shadow 120ms ease, border-color 120ms ease, background-image 120ms ease;
+
+  &::placeholder {
+    color: var(--c3-style-basic-fg-secondary);
+  }
+
+  // Hover overlay — translucent token stacked over --c3-style-basic-bg-input.
+  // Uses background-image (not background-color) so the input bg is preserved.
+  // Applies regardless of appearance (success/danger keep their border colors).
+  &:hover:not(:disabled) {
+    background-image: linear-gradient(
+      var(--c3-style-basic-bg-hover),
+      var(--c3-style-basic-bg-hover)
+    );
+  }
+
+  // Focus ring on all 3 appearances — you can still keyboard-focus an error textarea.
+  &:focus-visible {
+    box-shadow: 0 0 0 2px var(--c3-style-shadow-ring-accent);
+  }
+
+  &--appearance-success {
+    border-color: var(--c3-style-basic-bg-success-inverse);
+  }
+
+  &--appearance-danger {
+    border-color: var(--c3-style-basic-bg-danger-inverse);
+  }
+
+  &:disabled {
+    opacity: 50%;
+    cursor: not-allowed;
+  }
+}

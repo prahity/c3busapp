@@ -1,0 +1,74 @@
+// Checkbox — see checkbox.tsx for prop API.
+// Tokens: --c3-style-*. No raw hex, no palette, no Themes layer.
+
+.checkbox {
+  border-radius: var(--c3-style-border-radius-2);
+  border: 1px solid var(--c3-style-basic-border-input);
+  background-color: transparent;
+  color: transparent;
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+  cursor: pointer;
+
+  &:focus-visible {
+    box-shadow: 0 0 0 2px var(--c3-style-shadow-ring-accent);
+  }
+
+  &:hover:not(:disabled):not([data-state="checked"]):not([data-state="indeterminate"]) {
+    background-color: var(--c3-style-basic-bg-hover);
+  }
+
+  &[data-state="checked"],
+  &[data-state="indeterminate"] {
+    background-color: var(--c3-style-basic-bg-accent-inverse);
+    border-color: var(--c3-style-basic-bg-accent-inverse);
+    color: var(--c3-style-basic-fg-inverse);
+  }
+
+  &:disabled {
+    opacity: 50%;
+    cursor: not-allowed;
+  }
+}
+
+// Both the check and dash icon are always mounted inside the indicator (see
+// checkbox.tsx); only one shows at a time, picked by the checkbox's own
+// live data-state — not by a JS condition computed from props, which would
+// go stale after Radix flips state internally on an uncontrolled checkbox.
+.checkbox__icon {
+  display: none;
+}
+
+.checkbox[data-state="checked"] .checkbox__icon--check {
+  display: block;
+}
+
+.checkbox[data-state="indeterminate"] .checkbox__icon--indeterminate {
+  display: block;
+}
+
+.checkbox-field {
+  gap: var(--c3-style-spacing-12);
+
+  &--disabled {
+    opacity: 50%;
+  }
+
+  &__label {
+    gap: var(--c3-style-spacing-4);
+    color: var(--c3-style-basic-fg-primary);
+    cursor: pointer;
+    user-select: none;
+
+    &--size-md {
+      padding-top: var(--c3-style-spacing-2);
+    }
+
+    &--size-lg {
+      padding-top: var(--c3-style-spacing-4);
+    }
+  }
+
+  &__sub {
+    color: var(--c3-style-basic-fg-secondary);
+  }
+}

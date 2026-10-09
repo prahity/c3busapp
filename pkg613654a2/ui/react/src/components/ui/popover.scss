@@ -1,0 +1,23 @@
+// Popover — see popover.tsx for prop API.
+// Positioning primitive only. Inner padding / gap / item structure belong to
+// the consumer (Listbox, DropdownMenu, Dialog, info panel, etc.) — see
+// references/context.md:240 for the scope contract.
+// Tokens: --c3-style-*. No raw hex, no palette, no Themes layer.
+
+.popover-content {
+  border-radius: var(--c3-style-border-radius-6);
+  background-color: var(--c3-style-basic-bg-overlay);
+  color: var(--c3-style-basic-fg-primary);
+  border: 1px solid var(--c3-style-basic-border-input);
+  box-shadow: var(--c3-style-shadow-default-lg);
+}
+
+// Optional content-helper sub-components. Use these only for the
+// "raw info panel" use case; wrappers like Listbox/Menu provide their own.
+.popover-header {
+  gap: var(--c3-style-spacing-2);
+}
+
+.popover-description {
+  color: var(--c3-style-basic-fg-secondary);
+}
