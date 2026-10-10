@@ -1,0 +1,394 @@
+[
+  {
+    "id": "rt_normal_north",
+    "name": "Route north",
+    "scenarioId": "sc_normal",
+    "description": "Core northbound: residence halls to the engineering campus.",
+    "isCore": true,
+    "stopSequence": [
+      "stop_normal_ike",
+      "stop_normal_green",
+      "stop_normal_union",
+      "stop_normal_grainger"
+    ],
+    "isSynthetic": true
+  },
+  {
+    "id": "rt_normal_south",
+    "name": "Route south",
+    "scenarioId": "sc_normal",
+    "description": "Core southbound: engineering campus back to the residence halls.",
+    "isCore": true,
+    "stopSequence": [
+      "stop_normal_grainger",
+      "stop_normal_union",
+      "stop_normal_green",
+      "stop_normal_ike"
+    ],
+    "isSynthetic": true
+  },
+  {
+    "id": "rt_normal_arenaOut",
+    "name": "Route arenaOut",
+    "scenarioId": "sc_normal",
+    "description": "Core arena outbound: venue to campus.",
+    "isCore": true,
+    "stopSequence": [
+      "stop_normal_arena",
+      "stop_normal_ike",
+      "stop_normal_green",
+      "stop_normal_union"
+    ],
+    "isSynthetic": true
+  },
+  {
+    "id": "rt_normal_arenaIn",
+    "name": "Route arenaIn",
+    "scenarioId": "sc_normal",
+    "description": "Core arena inbound: campus to the venue.",
+    "isCore": true,
+    "stopSequence": [
+      "stop_normal_union",
+      "stop_normal_green",
+      "stop_normal_ike",
+      "stop_normal_arena"
+    ],
+    "isSynthetic": true
+  },
+  {
+    "id": "rt_rush_north",
+    "name": "Route north",
+    "scenarioId": "sc_rush",
+    "description": "Core northbound: residence halls to the engineering campus.",
+    "isCore": true,
+    "stopSequence": [
+      "stop_rush_ike",
+      "stop_rush_green",
+      "stop_rush_union",
+      "stop_rush_grainger"
+    ],
+    "isSynthetic": true
+  },
+  {
+    "id": "rt_rush_south",
+    "name": "Route south",
+    "scenarioId": "sc_rush",
+    "description": "Core southbound: engineering campus back to the residence halls.",
+    "isCore": true,
+    "stopSequence": [
+      "stop_rush_grainger",
+      "stop_rush_union",
+      "stop_rush_green",
+      "stop_rush_ike"
+    ],
+    "isSynthetic": true
+  },
+  {
+    "id": "rt_rush_arenaOut",
+    "name": "Route arenaOut",
+    "scenarioId": "sc_rush",
+    "description": "Core arena outbound: venue to campus.",
+    "isCore": true,
+    "stopSequence": [
+      "stop_rush_arena",
+      "stop_rush_ike",
+      "stop_rush_green",
+      "stop_rush_union"
+    ],
+    "isSynthetic": true
+  },
+  {
+    "id": "rt_rush_arenaIn",
+    "name": "Route arenaIn",
+    "scenarioId": "sc_rush",
+    "description": "Core arena inbound: campus to the venue.",
+    "isCore": true,
+    "stopSequence": [
+      "stop_rush_union",
+      "stop_rush_green",
+      "stop_rush_ike",
+      "stop_rush_arena"
+    ],
+    "isSynthetic": true
+  },
+  {
+    "id": "rt_surge_north",
+    "name": "Route north",
+    "scenarioId": "sc_surge",
+    "description": "Core northbound: residence halls to the engineering campus.",
+    "isCore": true,
+    "stopSequence": [
+      "stop_surge_ike",
+      "stop_surge_green",
+      "stop_surge_union",
+      "stop_surge_grainger"
+    ],
+    "isSynthetic": true
+  },
+  {
+    "id": "rt_surge_south",
+    "name": "Route south",
+    "scenarioId": "sc_surge",
+    "description": "Core southbound: engineering campus back to the residence halls.",
+    "isCore": true,
+    "stopSequence": [
+      "stop_surge_grainger",
+      "stop_surge_union",
+      "stop_surge_green",
+      "stop_surge_ike"
+    ],
+    "isSynthetic": true
+  },
+  {
+    "id": "rt_surge_arenaOut",
+    "name": "Route arenaOut",
+    "scenarioId": "sc_surge",
+    "description": "Core arena outbound: venue to campus.",
+    "isCore": true,
+    "stopSequence": [
+      "stop_surge_arena",
+      "stop_surge_ike",
+      "stop_surge_green",
+      "stop_surge_union"
+    ],
+    "isSynthetic": true
+  },
+  {
+    "id": "rt_surge_arenaIn",
+    "name": "Route arenaIn",
+    "scenarioId": "sc_surge",
+    "description": "Core arena inbound: campus to the venue.",
+    "isCore": true,
+    "stopSequence": [
+      "stop_surge_union",
+      "stop_surge_green",
+      "stop_surge_ike",
+      "stop_surge_arena"
+    ],
+    "isSynthetic": true
+  },
+  {
+    "id": "rt_lowconf_north",
+    "name": "Route north",
+    "scenarioId": "sc_lowconf",
+    "description": "Core northbound: residence halls to the engineering campus.",
+    "isCore": true,
+    "stopSequence": [
+      "stop_lowconf_ike",
+      "stop_lowconf_green",
+      "stop_lowconf_union",
+      "stop_lowconf_grainger"
+    ],
+    "isSynthetic": true
+  },
+  {
+    "id": "rt_lowconf_south",
+    "name": "Route south",
+    "scenarioId": "sc_lowconf",
+    "description": "Core southbound: engineering campus back to the residence halls.",
+    "isCore": true,
+    "stopSequence": [
+      "stop_lowconf_grainger",
+      "stop_lowconf_union",
+      "stop_lowconf_green",
+      "stop_lowconf_ike"
+    ],
+    "isSynthetic": true
+  },
+  {
+    "id": "rt_lowconf_arenaOut",
+    "name": "Route arenaOut",
+    "scenarioId": "sc_lowconf",
+    "description": "Core arena outbound: venue to campus.",
+    "isCore": true,
+    "stopSequence": [
+      "stop_lowconf_arena",
+      "stop_lowconf_ike",
+      "stop_lowconf_green",
+      "stop_lowconf_union"
+    ],
+    "isSynthetic": true
+  },
+  {
+    "id": "rt_lowconf_arenaIn",
+    "name": "Route arenaIn",
+    "scenarioId": "sc_lowconf",
+    "description": "Core arena inbound: campus to the venue.",
+    "isCore": true,
+    "stopSequence": [
+      "stop_lowconf_union",
+      "stop_lowconf_green",
+      "stop_lowconf_ike",
+      "stop_lowconf_arena"
+    ],
+    "isSynthetic": true
+  },
+  {
+    "id": "rt_empty_north",
+    "name": "Route north",
+    "scenarioId": "sc_empty",
+    "description": "Core northbound: residence halls to the engineering campus.",
+    "isCore": true,
+    "stopSequence": [
+      "stop_empty_ike",
+      "stop_empty_green",
+      "stop_empty_union",
+      "stop_empty_grainger"
+    ],
+    "isSynthetic": true
+  },
+  {
+    "id": "rt_empty_south",
+    "name": "Route south",
+    "scenarioId": "sc_empty",
+    "description": "Core southbound: engineering campus back to the residence halls.",
+    "isCore": true,
+    "stopSequence": [
+      "stop_empty_grainger",
+      "stop_empty_union",
+      "stop_empty_green",
+      "stop_empty_ike"
+    ],
+    "isSynthetic": true
+  },
+  {
+    "id": "rt_empty_arenaOut",
+    "name": "Route arenaOut",
+    "scenarioId": "sc_empty",
+    "description": "Core arena outbound: venue to campus.",
+    "isCore": true,
+    "stopSequence": [
+      "stop_empty_arena",
+      "stop_empty_ike",
+      "stop_empty_green",
+      "stop_empty_union"
+    ],
+    "isSynthetic": true
+  },
+  {
+    "id": "rt_empty_arenaIn",
+    "name": "Route arenaIn",
+    "scenarioId": "sc_empty",
+    "description": "Core arena inbound: campus to the venue.",
+    "isCore": true,
+    "stopSequence": [
+      "stop_empty_union",
+      "stop_empty_green",
+      "stop_empty_ike",
+      "stop_empty_arena"
+    ],
+    "isSynthetic": true
+  },
+  {
+    "id": "rt_overload_north",
+    "name": "Route north",
+    "scenarioId": "sc_overload",
+    "description": "Core northbound: residence halls to the engineering campus.",
+    "isCore": true,
+    "stopSequence": [
+      "stop_overload_ike",
+      "stop_overload_green",
+      "stop_overload_union",
+      "stop_overload_grainger"
+    ],
+    "isSynthetic": true
+  },
+  {
+    "id": "rt_overload_south",
+    "name": "Route south",
+    "scenarioId": "sc_overload",
+    "description": "Core southbound: engineering campus back to the residence halls.",
+    "isCore": true,
+    "stopSequence": [
+      "stop_overload_grainger",
+      "stop_overload_union",
+      "stop_overload_green",
+      "stop_overload_ike"
+    ],
+    "isSynthetic": true
+  },
+  {
+    "id": "rt_overload_arenaOut",
+    "name": "Route arenaOut",
+    "scenarioId": "sc_overload",
+    "description": "Core arena outbound: venue to campus.",
+    "isCore": true,
+    "stopSequence": [
+      "stop_overload_arena",
+      "stop_overload_ike",
+      "stop_overload_green",
+      "stop_overload_union"
+    ],
+    "isSynthetic": true
+  },
+  {
+    "id": "rt_overload_arenaIn",
+    "name": "Route arenaIn",
+    "scenarioId": "sc_overload",
+    "description": "Core arena inbound: campus to the venue.",
+    "isCore": true,
+    "stopSequence": [
+      "stop_overload_union",
+      "stop_overload_green",
+      "stop_overload_ike",
+      "stop_overload_arena"
+    ],
+    "isSynthetic": true
+  },
+  {
+    "id": "rt_disrupt_north",
+    "name": "Route north",
+    "scenarioId": "sc_disrupt",
+    "description": "Core northbound: residence halls to the engineering campus.",
+    "isCore": true,
+    "stopSequence": [
+      "stop_disrupt_ike",
+      "stop_disrupt_green",
+      "stop_disrupt_union",
+      "stop_disrupt_grainger"
+    ],
+    "isSynthetic": true
+  },
+  {
+    "id": "rt_disrupt_south",
+    "name": "Route south",
+    "scenarioId": "sc_disrupt",
+    "description": "Core southbound: engineering campus back to the residence halls.",
+    "isCore": true,
+    "stopSequence": [
+      "stop_disrupt_grainger",
+      "stop_disrupt_union",
+      "stop_disrupt_green",
+      "stop_disrupt_ike"
+    ],
+    "isSynthetic": true
+  },
+  {
+    "id": "rt_disrupt_arenaOut",
+    "name": "Route arenaOut",
+    "scenarioId": "sc_disrupt",
+    "description": "Core arena outbound: venue to campus.",
+    "isCore": true,
+    "stopSequence": [
+      "stop_disrupt_arena",
+      "stop_disrupt_ike",
+      "stop_disrupt_green",
+      "stop_disrupt_union"
+    ],
+    "isSynthetic": true
+  },
+  {
+    "id": "rt_disrupt_arenaIn",
+    "name": "Route arenaIn",
+    "scenarioId": "sc_disrupt",
+    "description": "Core arena inbound: campus to the venue.",
+    "isCore": true,
+    "stopSequence": [
+      "stop_disrupt_union",
+      "stop_disrupt_green",
+      "stop_disrupt_ike",
+      "stop_disrupt_arena"
+    ],
+    "isSynthetic": true
+  }
+]

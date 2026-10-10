@@ -1,0 +1,27 @@
+/**
+ * Mock source adapter for the external, LLM-based **event estimator**.
+ *
+ * Reads authored {@link SimEventEstimate} rows; no LLM call, no credentials. Estimates are
+ * evidence *about* events rather than events themselves, so they can raise or lower an event's
+ * reliability but can never by themselves inject passengers — see {@link SimEventEstimate}.
+ */
+type SimEventEstimateAdapter {
+
+  /**
+   * Returns every {@link SimEventEstimate} for a scenario, ordered by
+   * {@link SimEventEstimate#knownAt} then id.
+   *
+   * @param scenarioId Id of the {@link SimScenario}.
+   * @return All event estimates for the scenario, in deterministic order.
+   */
+  getEventEstimates: function(scenarioId: !string): [SimEventEstimate] js-server
+
+  /**
+   * Describes this adapter for the handoff documentation, including the expectation that a real
+   * producer populates {@link SimEventEstimate#canonicalEventId} so identity never has to be
+   * resolved by fuzzy location/time matching.
+   *
+   * @return A JSON descriptor of the adapter contract.
+   */
+  adapterInfo: function(): json js-server
+}

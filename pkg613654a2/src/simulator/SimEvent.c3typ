@@ -1,0 +1,202 @@
+/**
+ * A canonical, reconciled event in the simulator's **`events` collection** — the single
+ * full-fidelity representation of "something happening on the service day that the bus plan has
+ * to cope with".
+ *
+ * {@link SimulationInput#events} carries these records verbatim. Events are deliberately **not**
+ * pre-reduced to passenger counts before entering the simulator: timing
+ * ({@link SimEvent#startTime}/{@link SimEvent#endTime}), planning visibility
+ * ({@link SimEvent#knownAt}), location ({@link SimEvent#affectedStopIds} and friends),
+ * provenance ({@link SimEvent#eventSource}, {@link SimEvent#reportingUserId}), reliability
+ * ({@link SimEvent#confidence} plus the referenced {@link SimReputationScore}s) and explicit
+ * effects ({@link SimEvent#demandEffect}, {@link SimEvent#operationalEffects}) all survive into
+ * the engine so their consequences can be modelled and traced.
+ *
+ * **Mock categories.** The five values of {@link SimEvent#eventType} are configurable mock
+ * categories chosen to exercise the engine, *not* claims about the shape of the real event feed:
+ *
+ * | {@link SimEvent#eventType}     | Demand effect                                        | Operational effect                   |
+ * | ------------------------------ | ---------------------------------------------------- | ------------------------------------ |
+ * | `ClassOrGathering`             | inbound arrivals before start; outbound after end    | none unless explicitly configured    |
+ * | `LargeEvent`                   | attendance-driven arrival/departure surge            | optional congestion                  |
+ * | `TrafficDisruption`            | usually none                                         | increased travel time on links       |
+ * | `StopClosure`                  | none generated; affected riders become unserved      | stop unavailable during the window   |
+ * | `BusAvailabilityDisruption`    | none                                                 | named bus unavailable for a window   |
+ *
+ * The engine does not branch on {@link SimEvent#eventType} — it reads
+ * {@link SimEvent#demandEffect} and {@link SimEvent#operationalEffects}. The category is
+ * descriptive metadata for the UI and for authoring, which is what keeps
+ * {@link SimEventFeedAdapter} extensible when the other agents' real contract lands: a new
+ * category only needs new effect rows, not new engine code.
+ *
+ * **Planning vs replay.** {@link SimEvent#knownAt} splits the day in two.
+ * {@link SimPlanner#buildPlan} may only see events with `knownAt <=`
+ * {@link SimScenario#planningCutoff} (recorded in {@link SimPlan#eventIdsVisibleToPlanner});
+ * {@link SimEngine#run} realizes **every** event. That asymmetry is the point: it measures how a
+ * plan fixed at the start of the day copes with disruptions that surface later, without granting
+ * the planner hindsight and without live rerouting. Baseline and all candidates experience the
+ * identical realized event set and the identical {@link SimDemandSnapshot}.
+ *
+ * **Reconciliation.** Raw observations arrive as {@link SimEventReport}s and are attached here
+ * via {@link SimEventReport#event}; duplicates of an already-canonical event set
+ * {@link SimEvent#canonicalEventId} and are skipped by the demand generator so no event is
+ * counted twice. Low-confidence events are retained rather than dropped so their weighted effect
+ * stays inspectable.
+ *
+ * All instances are synthetic ({@link SimEvent#isSynthetic}).
+ */
+@db(index=['scenarioId, startTime'])
+entity type SimEvent {
+
+  /**
+   * Id of the owning {@link SimScenario}. Every adapter query is scoped by this field, which is
+   * what keeps the mock scenarios independent of one another.
+   */
+  scenarioId: !string
+
+  /**
+   * Mock category of the event; see the table in the type comment. Descriptive only — the engine
+   * dispatches on the presence of {@link SimEvent#demandEffect} and
+   * {@link SimEvent#operationalEffects}, never on this value.
+   *
+   * Named `eventType` rather than `type` because `type` collides with the inherited `Obj#type`
+   * method.
+   */
+  eventType: !string enum('ClassOrGathering','LargeEvent','TrafficDisruption','StopClosure','BusAvailabilityDisruption')
+
+  /**
+   * Absolute instant the event begins, and the anchor for
+   * {@link SimDemandEffect#inboundWindowStartOffsetMin} and
+   * {@link SimDemandEffect#classDeadlineOffsetMin}. Stored UTC; rendered in
+   * {@link SimScenario#serviceTimezone}.
+   */
+  startTime: !datetime
+
+  /**
+   * Absolute instant the event ends, and the anchor for
+   * {@link SimDemandEffect#outboundWindowStartOffsetMin}. Must be >=
+   * {@link SimEvent#startTime} — {@link SimInputAssembler#validate} raises a `TimeOrdering`
+   * error otherwise.
+   */
+  endTime: !datetime
+
+  /**
+   * When this event became **available to the planning system** — not when it occurs.
+   *
+   * The planner may only use events satisfying `knownAt <=`
+   * {@link SimScenario#planningCutoff}. A scheduled class is typically known days ahead; an
+   * auto-detected traffic jam becomes known mid-morning and is therefore invisible to the plan
+   * but fully realized by the simulator.
+   */
+  knownAt: !datetime
+
+  /**
+   * Ids of the {@link SimStop}s this event touches — the venue stops for a demand event, the
+   * closed stops for a `StopClosure`. Drives the "affected locations" highlight on the network
+   * map and is validated for dangling references.
+   */
+  affectedStopIds: [string]
+
+  /**
+   * Ids of the {@link SimRouteDef}s this event touches. Informational for the UI; the engine
+   * works at link and stop granularity because core route schedules are fixed.
+   */
+  affectedRouteIds: [string]
+
+  /**
+   * Ids of the {@link SimTravelLink}s this event touches, used by `TrafficDisruption` events to
+   * say *where* travel slows down.
+   */
+  affectedLinkIds: [string]
+
+  /**
+   * Provenance of the event: `Scheduled` (from a calendar or class timetable), `AutoDetected`
+   * (inferred by a detector), or `ManuallyReported` (submitted by a user).
+   *
+   * Preserved rather than collapsed, so the UI and the reliability policy can treat a
+   * crowd-sourced report differently from a timetabled class.
+   */
+  eventSource: !string enum('Scheduled','AutoDetected','ManuallyReported')
+
+  /**
+   * Id of the submitting user for `ManuallyReported` events; null otherwise. A synthetic handle
+   * such as `user_mock_03` — no personally identifying data is used anywhere in the mock set.
+   */
+  reportingUserId: string
+
+  /**
+   * Producer confidence that this event is real and as described, on 0..1.
+   *
+   * Deliberately **separate from demand magnitude** ({@link SimDemandEffect#attendance}): a
+   * confidently-known small class and a dubiously-reported large concert are distinguishable.
+   * Null is treated as {@link SimAssumptions#defaultConfidence}.
+   */
+  confidence: double
+
+  /**
+   * Id of the {@link SimReputationScore} describing the reliability of
+   * {@link SimEvent#reportingUserId}. Null when there is no reporting user or no score is
+   * available, in which case {@link SimAssumptions#defaultReputation} applies.
+   */
+  userReputationScoreId: string
+
+  /**
+   * Id of the {@link SimReputationScore} describing the reliability of this event itself (for
+   * example, how often events from this feed materialize). Null falls back to
+   * {@link SimAssumptions#defaultReputation}.
+   */
+  eventReputationScoreId: string
+
+  /**
+   * Explicit demand effect: attendance, bus-use share, origin/destination distributions and
+   * arrival/departure windows from which {@link SimDemandGenerator#generate} synthesizes
+   * passenger journeys.
+   *
+   * Null for purely operational events (`TrafficDisruption`, `StopClosure`,
+   * `BusAvailabilityDisruption`).
+   */
+  demandEffect: SimDemandEffect
+
+  /**
+   * Explicit operational effects — travel-time multipliers, stop closures, bus withdrawals — each
+   * with its own window. Empty for pure demand events; a `LargeEvent` may carry a congestion
+   * effect alongside its demand effect.
+   *
+   * Overlap combination rules are documented on {@link SimOperationalEffect} and implemented by
+   * {@link SimEffects#resolve}.
+   */
+  operationalEffects: [SimOperationalEffect]
+
+  /**
+   * Id of the {@link SimEvent} this record duplicates, or null when this record **is** the
+   * canonical one.
+   *
+   * Set during reconciliation when two producers describe the same real-world event. Duplicates
+   * are retained for audit (they show up in {@link SimReconciliationEntry}) but are excluded from
+   * demand generation and effect resolution, which is what prevents double-counting.
+   */
+  canonicalEventId: string
+
+  /**
+   * Id of a later {@link SimEvent} that replaces this one (for example a revised attendance
+   * estimate). Superseded events are excluded from generation exactly like duplicates.
+   */
+  supersededByEventId: string
+
+  /** Free-text authoring note shown in the UI's event detail panel. */
+  notes: string
+
+  /**
+   * Always true in this package — every record is synthetic mock data. Surfaced so the review UI
+   * can label results as simulated rather than live.
+   */
+  isSynthetic: boolean
+
+  /**
+   * All raw observations reconciled to this event (inverse of {@link SimEventReport#event}).
+   *
+   * More than one report here is the normal duplicate case: several users reporting the same
+   * concert. The reports contribute to confidence but never to a second cohort of passengers.
+   */
+  reports: [SimEventReport](event)
+}

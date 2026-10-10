@@ -1,0 +1,27 @@
+/**
+ * One term of a discrete probability distribution over bus stops: "`share` of this
+ * population boards/alights at `stopId`".
+ *
+ * Used for both {@link SimDemandEffect#originDistribution} and
+ * {@link SimDemandEffect#destinationDistribution}, and by
+ * {@link SimEventEstimate#destinationDistribution}.
+ *
+ * **Units.** {@link SimStopShare#share} is a dimensionless fraction on 0..1. The shares of a
+ * single distribution are expected to sum to 1.0; {@link SimInputAssembler#validate} emits a
+ * warning (not an error) when a distribution sums to anything outside 1.0 +/- 0.01, and
+ * {@link SimDemandGenerator} renormalizes before generating journeys so that the generated
+ * passenger total always matches the weighted attendance.
+ */
+type SimStopShare {
+
+  /** Id of the {@link SimStop} this term refers to. Must resolve against the scenario network. */
+  stopId: !string
+
+  /**
+   * Fraction of the population assigned to {@link SimStopShare#stopId}, on 0..1.
+   *
+   * This is a *proportion of people*, not a confidence — producer confidence lives on
+   * {@link SimEvent#confidence} and is deliberately kept separate from demand magnitude.
+   */
+  share: !double
+}

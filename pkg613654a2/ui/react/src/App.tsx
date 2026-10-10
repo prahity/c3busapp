@@ -10,6 +10,10 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import Dashboard from './pages/Dashboard/Dashboard';
+import Busplanning from './pages/Busplanning/Busplanning';
+import ManualEntry from './pages/ManualEntry/ManualEntry';
+import SurgePlanner from './pages/SurgePlanner/SurgePlanner';
+import SurgePlanning from './pages/SurgePlanning/SurgePlanning';
 import SideNav from './components/SideNav/SideNav';
 import TopNav from './components/TopNav/TopNav';
 import ErrorReporterProvider from './components/ErrorBoundary/ErrorBoundary';
@@ -28,7 +32,7 @@ export default function App() {
   return (
     <ErrorReporterProvider>
       <div className="h-screen flex flex-col max-w-full overflow-hidden">
-        <TopNav title="Application Name" />
+        <TopNav title="SurgeShift" />
         <div className="flex flex-1 min-h-0">
           <SideNav />
           <div className="flex-1 flex flex-col min-w-0">
@@ -36,6 +40,10 @@ export default function App() {
               <Routes>
                 {/* Add page routes here */}
                 <Route path="/" element={<Dashboard />} />
+                <Route path="/busplanning" element={<Busplanning />} />
+                <Route path="/events/new" element={<ManualEntry />} />
+                <Route path="/surge-planner" element={<SurgePlanner />} />
+                <Route path="/surge-planning" element={<SurgePlanning />} />
                 <Route
                   path="*"
                   element={

@@ -1,0 +1,92 @@
+/**
+ * A daily supplemental-service plan: which extra buses are allocated and exactly what each one
+ * does, fixed at the start of the service day.
+ *
+ * A plan is deliberately a **separate contract from its results** ({@link SimResults}). The same
+ * plan evaluated against different demand would give different results, so conflating the two
+ * would make it impossible to say what was being compared.
+ *
+ * **What a plan does not contain.** Core service is referenced by id
+ * ({@link SimPlan#coreTripIds}) and never modified — the plan adds supplemental capacity on top of
+ * MTD's fixed routes and does not compete with or override MTD's own routing. A plan is advisory:
+ * nothing in this system dispatches a bus.
+ *
+ * **Frozen at the cutoff.** {@link SimPlan#eventIdsVisibleToPlanner} records exactly which events
+ * the planner was allowed to see. Once built, the plan is executed as-is: there is no live
+ * rerouting, because a poor mid-day routing decision is hard to recover from and the team rejected
+ * it.
+ */
+type SimPlan {
+
+  /** Stable deterministic id, e.g. `plan_<scenarioId>_<allocation>` or `plan_<scenarioId>_baseline`. */
+  planId: !string
+
+  /**
+   * Whether this is the mock old-model baseline or a candidate recommendation.
+   *
+   * `MockOldModelBaseline` is fixed core service with **zero** extra buses. It is labelled "mock"
+   * everywhere because no historical MTD model was available to integrate — it does not reproduce
+   * one. By construction the zero-extra-bus candidate and this baseline produce identical results,
+   * which is asserted rather than assumed.
+   */
+  planKind: !string enum('MockOldModelBaseline','Candidate')
+
+  /** Id of the {@link SimScenario} this plan is for. */
+  scenarioId: !string
+
+  /**
+   * Number of extra buses allocated, from 0 to {@link SimScenario#maxExtraBuses}. Counts buses
+   * *allocated*, including any that end up idle — see {@link SimBusItinerary#isIdle}.
+   */
+  allocation: !int
+
+  /** One itinerary per allocated bus; see {@link SimBusItinerary}. Empty for the baseline. */
+  extraBusItineraries: [SimBusItinerary]
+
+  /**
+   * Ids of the {@link SimCoreTrip}s in force, recorded to make the invariance explicit: this list
+   * is identical in the baseline and in every candidate.
+   */
+  coreTripIds: [string]
+
+  /** The {@link SimScenario#planningCutoff} this plan was built against. */
+  planningCutoff: !datetime
+
+  /**
+   * Ids of exactly those {@link SimEvent}s with {@link SimEvent#knownAt} at or before
+   * {@link SimPlan#planningCutoff} — the planner's entire knowledge of the day.
+   *
+   * Recorded on the plan so the no-hindsight property is auditable after the fact, not merely
+   * asserted in prose. Any event realized by the engine and absent from this list is a disruption
+   * the plan had to absorb blind.
+   */
+  eventIdsVisibleToPlanner: [string]
+
+  /** Plan-level notes: the bottlenecks targeted, buses deliberately left idle, candidates rejected as infeasible. */
+  explanations: [string]
+
+  /**
+   * Version of the planning heuristic that produced this plan, e.g.
+   * `greedy-bottleneck-benefit-cost-1.0`. Lets two plans in an export be told apart when the
+   * heuristic changes.
+   */
+  heuristicVersion: string
+
+  /**
+   * Feasibility findings for this plan — a stop closed under a planned call, a bus withdrawn after
+   * the cutoff, a trip that would overrun {@link SimExtraBus#availableTo}.
+   *
+   * Reported, never repaired: a plan that is infeasible against the realized day keeps its issues
+   * and earns the metrics that follow from them.
+   */
+  validation: SimValidationReport
+
+  /** Total allocated-bus operating cost, in {@link SimCostConfig#currency}; the sum over {@link SimPlan#extraBusItineraries}. */
+  totalOperatingCost: double
+
+  /** Count of allocated buses that run at least one trip. Always <= {@link SimPlan#allocation}. */
+  busesUsed: int
+
+  /** Count of allocated buses that run nothing; `allocation - busesUsed`. */
+  busesIdle: int
+}

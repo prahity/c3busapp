@@ -1,0 +1,43 @@
+/**
+ * A bus stop in a scenario's synthetic network.
+ *
+ * Stops are the only places passengers appear, wait, board and alight. Every stop id referenced
+ * elsewhere — {@link SimEvent#affectedStopIds}, {@link SimStopShare#stopId},
+ * {@link SimRouteDef#stopSequence}, {@link SimTravelLink#fromStopId},
+ * {@link SimExtraBus#startStopId} — must resolve to one of these records, which
+ * {@link SimInputAssembler#validate} checks before the engine runs.
+ *
+ * The network is small and fictional; coordinates are plausible-looking but invented
+ * ({@link SimStop#isSynthetic} is always true). They exist so the review UI can draw the network
+ * map and highlight the locations an event affects, and so deadhead distance between stops can be
+ * estimated.
+ */
+@db(index=['scenarioId'])
+entity type SimStop {
+
+  /** Id of the owning {@link SimScenario}. Stops are never shared between scenarios. */
+  scenarioId: !string
+
+  /**
+   * WGS84 latitude in decimal degrees. Used for map rendering and, with
+   * {@link SimStop#longitude}, for the great-circle estimate behind
+   * {@link SimAssumptions#deadheadSpeedKmPerHour} when no explicit
+   * {@link SimTravelLink} exists between two stops.
+   */
+  latitude: !double
+
+  /** WGS84 longitude in decimal degrees. See {@link SimStop#latitude}. */
+  longitude: !double
+
+  /**
+   * Whether the fixed core MTD service calls at this stop. Supplemental extra-bus trips may also
+   * serve non-core stops, which is one of the levers the planner has.
+   */
+  isCoreStop: boolean
+
+  /** Short human-facing code shown in tables and on the map, e.g. `UNION`. */
+  stopCode: string
+
+  /** Always true — synthetic mock data. */
+  isSynthetic: boolean
+}

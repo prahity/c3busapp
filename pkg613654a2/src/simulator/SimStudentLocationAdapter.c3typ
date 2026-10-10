@@ -1,0 +1,31 @@
+/**
+ * Mock source adapter for the external, LLM-based **student location estimator**.
+ *
+ * Reads authored {@link SimStudentLocationEstimate} rows. No LLM is called and no credentials are
+ * needed, which is what lets the whole simulator run locally. Replacing this adapter with one that
+ * calls the real producer is the single change needed to consume live estimates.
+ */
+type SimStudentLocationAdapter {
+
+  /**
+   * Returns every {@link SimStudentLocationEstimate} for a scenario, ordered by
+   * {@link SimStudentLocationEstimate#knownAt} then id.
+   *
+   * Superseded rows are **included**: deciding which estimate wins is
+   * {@link SimInputAssembler}'s job, and it records that decision as an `EstimateSuperseded`
+   * {@link SimReconciliationEntry} rather than letting the adapter drop data invisibly.
+   *
+   * @param scenarioId Id of the {@link SimScenario}.
+   * @return All student location estimates for the scenario, in deterministic order.
+   */
+  getEstimates: function(scenarioId: !string): [SimStudentLocationEstimate] js-server
+
+  /**
+   * Describes this adapter for the handoff documentation: required and optional fields, units,
+   * identifier expectations (notably that {@link SimStudentLocationEstimate#cohortId} must be
+   * stable and shared with {@link SimDemandEffect#cohortId}), and the missing-data defaults.
+   *
+   * @return A JSON descriptor of the adapter contract.
+   */
+  adapterInfo: function(): json js-server
+}

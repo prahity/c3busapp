@@ -1,0 +1,59 @@
+/**
+ * One row linking a demand **source** to the {@link SimPassengerJourney}s generated from it, with
+ * the arithmetic that got from attendance to passengers.
+ *
+ * Collected in {@link SimDemandSnapshot#trace}. Together with
+ * {@link SimReconciliationTrace#entries} this satisfies the requirement that generated demand
+ * always trace back to its source event: pick any passenger, find their
+ * {@link SimPassengerJourney#sourceEventId}, and this row shows exactly why that many of them
+ * exist.
+ */
+type SimDemandTraceEntry {
+
+  /** Id of the {@link SimEvent} this demand came from, when {@link SimDemandTraceEntry#sourceKind} is `Event`. */
+  sourceEventId: string
+
+  /** Id of the {@link SimStudentLocationEstimate} this demand came from, for `LocationEstimate`. */
+  sourceEstimateId: string
+
+  /** Which producer the demand came from; mirrors {@link SimPassengerJourney#sourceKind}. */
+  sourceKind: !string enum('Event','LocationEstimate')
+
+  /** Which leg this row accounts for; mirrors {@link SimPassengerJourney#legKind}. */
+  legKind: string
+
+  /** Ids of every {@link SimPassengerJourney} generated from this source and leg. */
+  journeyIds: [string]
+
+  /** {@link SimDemandEffect#attendance} used, or {@link SimStudentLocationEstimate#predictedStudentCount}. */
+  attendance: int
+
+  /** {@link SimDemandEffect#busUseShare} used, on 0..1. 1.0 for location estimates, which are already travel demand. */
+  busUseShare: double
+
+  /** Reliability weight applied, on 0..1; see {@link SimReconciliationEntry#appliedWeight}. */
+  appliedWeight: double
+
+  /** `attendance * busUseShare * appliedWeight`, before rounding and distribution across stops. */
+  expectedPassengers: double
+
+  /**
+   * Passengers actually generated — the sum of {@link SimPassengerJourney#passengerCount} over
+   * {@link SimDemandTraceEntry#journeyIds}.
+   *
+   * May differ slightly from {@link SimDemandTraceEntry#expectedPassengers} because of integer
+   * rounding when splitting across an origin/destination distribution. The generator uses
+   * largest-remainder apportionment so the total is preserved exactly and no passengers are lost
+   * to rounding.
+   */
+  generatedPassengers: int
+
+  /** Name of the reliability policy applied; see {@link SimAssumptions#reliabilityPolicy}. */
+  policy: string
+
+  /** First arrival instant among the generated journeys, for quick inspection on the timeline. */
+  windowStart: datetime
+
+  /** Last arrival instant among the generated journeys. */
+  windowEnd: datetime
+}

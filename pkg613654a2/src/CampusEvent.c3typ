@@ -55,4 +55,21 @@ entity type CampusEvent {
 
   /** Lifecycle status of the event. */
   status: string enum('Scheduled', 'Cancelled', 'Completed')
+
+  /**
+   * Per-observation reputation in `[0, 1]`, set by {@link EventResolver}. For manual entries
+   * this is the computed credibility; for scraped events it is the owning
+   * {@link EventSource#reliabilityScore} at resolve time. This is the weight the event carries
+   * into merge conflict-resolution and population estimation.
+   */
+  reputationScore: double
+
+  /** Human-readable explanation of how {@link CampusEvent#reputationScore} was derived. */
+  credibilityBasis: string
+
+  /**
+   * The canonical {@link MergedEvent} this observation was deduplicated into (inverse of
+   * {@link MergedEvent#contributingEvents}); null until the resolver has run.
+   */
+  mergedEvent: MergedEvent
 }

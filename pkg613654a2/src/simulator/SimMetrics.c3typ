@@ -1,0 +1,148 @@
+/**
+ * The headline metrics for one simulation run, with their denominators and censoring made
+ * explicit.
+ *
+ * **Why the field names are so pedantic.** Waiting-time comparisons across plans are the metric
+ * most easily made to lie. If a candidate plan serves more people, the extra people it serves are
+ * typically the ones who waited longest — so an average over *completed* passengers alone can
+ * improve while the day gets worse, or worsen while it gets better. This type therefore reports
+ * three things side by side and refuses to collapse them:
+ *
+ * 1. completed-passenger average and p95, over {@link SimMetrics#completedPassengers};
+ * 2. a horizon-based total ({@link SimMetrics#horizonTotalWaitingMinutes}) that *includes* wait
+ *    accrued by passengers who never boarded;
+ * 3. the unserved counts themselves ({@link SimMetrics#unservedAtHorizon}).
+ *
+ * Accrued wait is a **lower bound**, not an eventual wait, and is labelled as such.
+ *
+ * **Lateness.** The denominator is {@link SimMetrics#deadlineBearingPassengers} — only passengers
+ * who actually have a deadline. Completed-but-late is reported separately from
+ * deadline-bearing-but-unserved: an unserved passenger is never counted as on time, and never
+ * silently folded into the late count either.
+ *
+ * **Savings.** Computed as `baseline - candidate` on identical definitions, and **not clamped**. A
+ * candidate that performs worse than baseline shows a negative saving, because hiding that would
+ * defeat the purpose of the comparison.
+ */
+type SimMetrics {
+
+  /**
+   * Mean wait, in minutes, over passengers who **completed** their journey. Denominator is
+   * {@link SimMetrics#completedPassengers}; read together with
+   * {@link SimMetrics#unservedAtHorizon}, never alone.
+   */
+  avgWaitMinutesCompleted: double
+
+  /**
+   * 95th-percentile wait in minutes over completed passengers, by nearest-rank on the
+   * passenger-weighted distribution. Exposes the tail that an average flattens.
+   */
+  p95WaitMinutesCompleted: double
+
+  /** Total wait in minutes accumulated by completed passengers only. */
+  totalWaitingMinutesCompleted: double
+
+  /**
+   * Total wait in minutes over **all** generated passengers: completed waits plus the wait accrued
+   * up to {@link SimScenario#horizonEnd} by passengers still queued.
+   *
+   * This is the comparison-safe aggregate — it cannot be improved by abandoning passengers. The
+   * accrued portion is censored at the horizon and is a lower bound on any eventual wait.
+   */
+  horizonTotalWaitingMinutes: double
+
+  /** The accrued-but-incomplete portion of {@link SimMetrics#horizonTotalWaitingMinutes}, broken out. */
+  accruedWaitingMinutesUnserved: double
+
+  /** Passengers who completed their journey — the denominator for the completed-passenger statistics. */
+  completedPassengers: int
+
+  /**
+   * Waiting minutes saved versus the mock old-model baseline, on the
+   * {@link SimMetrics#horizonTotalWaitingMinutes} definition: `baseline - candidate`.
+   *
+   * **Negative values are preserved**, never clamped to zero. Null on the baseline run itself,
+   * which has nothing to compare against.
+   */
+  horizonWaitingMinutesSavedVsBaseline: double
+
+  /** Mean total trip time (wait plus in-vehicle), in minutes, over completed passengers. */
+  avgTripTimeMinutesCompleted: double
+
+  /** Mean in-vehicle time in minutes over completed passengers. */
+  avgInVehicleMinutesCompleted: double
+
+  /**
+   * Passengers who had a deadline, completed their journey, and arrived **after** it. Strictly a
+   * subset of {@link SimMetrics#completedPassengers}.
+   */
+  lateCompletedPassengers: int
+
+  /**
+   * Passengers carrying a deadline at all — the **only** valid lateness denominator. Equals
+   * {@link SimDemandSnapshot#deadlineBearingPassengers} and is therefore identical across baseline
+   * and candidates.
+   */
+  deadlineBearingPassengers: int
+
+  /**
+   * {@link SimMetrics#lateCompletedPassengers} as a percentage of
+   * {@link SimMetrics#deadlineBearingPassengers}, 0..100. Null when the denominator is zero, rather
+   * than a misleading 0%.
+   */
+  lateCompletedPct: double
+
+  /**
+   * Deadline-bearing passengers who never arrived at all — unserved, so neither on time nor
+   * "late".
+   *
+   * Reported separately and deliberately **not** added to
+   * {@link SimMetrics#lateCompletedPassengers}, because conflating "arrived late" with "never
+   * arrived" would let a plan look punctual by stranding people.
+   */
+  deadlineBearingUnserved: int
+
+  /**
+   * Passengers who had not reached their destination when the horizon ended: still waiting, still
+   * onboard, or denied by a stop closure. See {@link SimAccounting} for the breakdown.
+   */
+  unservedAtHorizon: int
+
+  /** Total extra-bus operating cost for the run, in {@link SimMetrics#currency}. Zero for the baseline. */
+  extraBusOperatingCost: double
+
+  /** ISO 4217 code for {@link SimMetrics#extraBusOperatingCost}, from {@link SimCostConfig#currency}. */
+  currency: string
+
+  /**
+   * {@link SimMetrics#extraBusOperatingCost} divided by
+   * {@link SimMetrics#horizonWaitingMinutesSavedVsBaseline}.
+   *
+   * **Null whenever savings are zero or negative** — a cost per minute saved is meaningless when
+   * no minutes were saved, and reporting a negative or infinite ratio would be worse than
+   * reporting nothing. {@link SimMetrics#costPerMinuteSavedUnavailableReason} explains which case
+   * applies so the UI can say why the cell is empty.
+   */
+  costPerWaitingMinuteSaved: double
+
+  /**
+   * Why {@link SimMetrics#costPerWaitingMinuteSaved} is null: `BaselineRun`, `ZeroSavings`,
+   * `NegativeSavings`, or null when the ratio is available.
+   */
+  costPerMinuteSavedUnavailableReason: string
+
+  /**
+   * Restatement of what went into the cost: whether idle allocated buses were charged
+   * ({@link SimCostConfig#includeIdleAllocatedBuses}), and that operating, deadhead and dwell
+   * minutes are all included while core-service cost is excluded.
+   *
+   * Travels with the metrics so a cost figure is never read without its basis.
+   */
+  costBasisNote: string
+
+  /**
+   * Plain-language statement of the denominators and of the horizon censoring, rendered next to
+   * the metrics in the UI and included in exports.
+   */
+  denominatorNote: string
+}

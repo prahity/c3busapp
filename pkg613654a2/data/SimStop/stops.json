@@ -1,0 +1,352 @@
+[
+  {
+    "id": "stop_normal_ike",
+    "name": "Ikenberry Commons",
+    "scenarioId": "sc_normal",
+    "latitude": 40.1005,
+    "longitude": -88.2335,
+    "isCoreStop": true,
+    "stopCode": "IKE",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_normal_arena",
+    "name": "State Farm Center",
+    "scenarioId": "sc_normal",
+    "latitude": 40.0959,
+    "longitude": -88.2358,
+    "isCoreStop": true,
+    "stopCode": "SFC",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_normal_green",
+    "name": "Green Street & Fourth",
+    "scenarioId": "sc_normal",
+    "latitude": 40.1101,
+    "longitude": -88.2375,
+    "isCoreStop": true,
+    "stopCode": "GR4",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_normal_union",
+    "name": "Illini Union",
+    "scenarioId": "sc_normal",
+    "latitude": 40.1095,
+    "longitude": -88.2272,
+    "isCoreStop": true,
+    "stopCode": "UNI",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_normal_grainger",
+    "name": "Grainger Engineering Library",
+    "scenarioId": "sc_normal",
+    "latitude": 40.1125,
+    "longitude": -88.2268,
+    "isCoreStop": true,
+    "stopCode": "GEL",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_rush_ike",
+    "name": "Ikenberry Commons",
+    "scenarioId": "sc_rush",
+    "latitude": 40.1005,
+    "longitude": -88.2335,
+    "isCoreStop": true,
+    "stopCode": "IKE",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_rush_arena",
+    "name": "State Farm Center",
+    "scenarioId": "sc_rush",
+    "latitude": 40.0959,
+    "longitude": -88.2358,
+    "isCoreStop": true,
+    "stopCode": "SFC",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_rush_green",
+    "name": "Green Street & Fourth",
+    "scenarioId": "sc_rush",
+    "latitude": 40.1101,
+    "longitude": -88.2375,
+    "isCoreStop": true,
+    "stopCode": "GR4",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_rush_union",
+    "name": "Illini Union",
+    "scenarioId": "sc_rush",
+    "latitude": 40.1095,
+    "longitude": -88.2272,
+    "isCoreStop": true,
+    "stopCode": "UNI",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_rush_grainger",
+    "name": "Grainger Engineering Library",
+    "scenarioId": "sc_rush",
+    "latitude": 40.1125,
+    "longitude": -88.2268,
+    "isCoreStop": true,
+    "stopCode": "GEL",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_surge_ike",
+    "name": "Ikenberry Commons",
+    "scenarioId": "sc_surge",
+    "latitude": 40.1005,
+    "longitude": -88.2335,
+    "isCoreStop": true,
+    "stopCode": "IKE",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_surge_arena",
+    "name": "State Farm Center",
+    "scenarioId": "sc_surge",
+    "latitude": 40.0959,
+    "longitude": -88.2358,
+    "isCoreStop": true,
+    "stopCode": "SFC",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_surge_green",
+    "name": "Green Street & Fourth",
+    "scenarioId": "sc_surge",
+    "latitude": 40.1101,
+    "longitude": -88.2375,
+    "isCoreStop": true,
+    "stopCode": "GR4",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_surge_union",
+    "name": "Illini Union",
+    "scenarioId": "sc_surge",
+    "latitude": 40.1095,
+    "longitude": -88.2272,
+    "isCoreStop": true,
+    "stopCode": "UNI",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_surge_grainger",
+    "name": "Grainger Engineering Library",
+    "scenarioId": "sc_surge",
+    "latitude": 40.1125,
+    "longitude": -88.2268,
+    "isCoreStop": true,
+    "stopCode": "GEL",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_lowconf_ike",
+    "name": "Ikenberry Commons",
+    "scenarioId": "sc_lowconf",
+    "latitude": 40.1005,
+    "longitude": -88.2335,
+    "isCoreStop": true,
+    "stopCode": "IKE",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_lowconf_arena",
+    "name": "State Farm Center",
+    "scenarioId": "sc_lowconf",
+    "latitude": 40.0959,
+    "longitude": -88.2358,
+    "isCoreStop": true,
+    "stopCode": "SFC",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_lowconf_green",
+    "name": "Green Street & Fourth",
+    "scenarioId": "sc_lowconf",
+    "latitude": 40.1101,
+    "longitude": -88.2375,
+    "isCoreStop": true,
+    "stopCode": "GR4",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_lowconf_union",
+    "name": "Illini Union",
+    "scenarioId": "sc_lowconf",
+    "latitude": 40.1095,
+    "longitude": -88.2272,
+    "isCoreStop": true,
+    "stopCode": "UNI",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_lowconf_grainger",
+    "name": "Grainger Engineering Library",
+    "scenarioId": "sc_lowconf",
+    "latitude": 40.1125,
+    "longitude": -88.2268,
+    "isCoreStop": true,
+    "stopCode": "GEL",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_empty_ike",
+    "name": "Ikenberry Commons",
+    "scenarioId": "sc_empty",
+    "latitude": 40.1005,
+    "longitude": -88.2335,
+    "isCoreStop": true,
+    "stopCode": "IKE",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_empty_arena",
+    "name": "State Farm Center",
+    "scenarioId": "sc_empty",
+    "latitude": 40.0959,
+    "longitude": -88.2358,
+    "isCoreStop": true,
+    "stopCode": "SFC",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_empty_green",
+    "name": "Green Street & Fourth",
+    "scenarioId": "sc_empty",
+    "latitude": 40.1101,
+    "longitude": -88.2375,
+    "isCoreStop": true,
+    "stopCode": "GR4",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_empty_union",
+    "name": "Illini Union",
+    "scenarioId": "sc_empty",
+    "latitude": 40.1095,
+    "longitude": -88.2272,
+    "isCoreStop": true,
+    "stopCode": "UNI",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_empty_grainger",
+    "name": "Grainger Engineering Library",
+    "scenarioId": "sc_empty",
+    "latitude": 40.1125,
+    "longitude": -88.2268,
+    "isCoreStop": true,
+    "stopCode": "GEL",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_overload_ike",
+    "name": "Ikenberry Commons",
+    "scenarioId": "sc_overload",
+    "latitude": 40.1005,
+    "longitude": -88.2335,
+    "isCoreStop": true,
+    "stopCode": "IKE",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_overload_arena",
+    "name": "State Farm Center",
+    "scenarioId": "sc_overload",
+    "latitude": 40.0959,
+    "longitude": -88.2358,
+    "isCoreStop": true,
+    "stopCode": "SFC",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_overload_green",
+    "name": "Green Street & Fourth",
+    "scenarioId": "sc_overload",
+    "latitude": 40.1101,
+    "longitude": -88.2375,
+    "isCoreStop": true,
+    "stopCode": "GR4",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_overload_union",
+    "name": "Illini Union",
+    "scenarioId": "sc_overload",
+    "latitude": 40.1095,
+    "longitude": -88.2272,
+    "isCoreStop": true,
+    "stopCode": "UNI",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_overload_grainger",
+    "name": "Grainger Engineering Library",
+    "scenarioId": "sc_overload",
+    "latitude": 40.1125,
+    "longitude": -88.2268,
+    "isCoreStop": true,
+    "stopCode": "GEL",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_disrupt_ike",
+    "name": "Ikenberry Commons",
+    "scenarioId": "sc_disrupt",
+    "latitude": 40.1005,
+    "longitude": -88.2335,
+    "isCoreStop": true,
+    "stopCode": "IKE",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_disrupt_arena",
+    "name": "State Farm Center",
+    "scenarioId": "sc_disrupt",
+    "latitude": 40.0959,
+    "longitude": -88.2358,
+    "isCoreStop": true,
+    "stopCode": "SFC",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_disrupt_green",
+    "name": "Green Street & Fourth",
+    "scenarioId": "sc_disrupt",
+    "latitude": 40.1101,
+    "longitude": -88.2375,
+    "isCoreStop": true,
+    "stopCode": "GR4",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_disrupt_union",
+    "name": "Illini Union",
+    "scenarioId": "sc_disrupt",
+    "latitude": 40.1095,
+    "longitude": -88.2272,
+    "isCoreStop": true,
+    "stopCode": "UNI",
+    "isSynthetic": true
+  },
+  {
+    "id": "stop_disrupt_grainger",
+    "name": "Grainger Engineering Library",
+    "scenarioId": "sc_disrupt",
+    "latitude": 40.1125,
+    "longitude": -88.2268,
+    "isCoreStop": true,
+    "stopCode": "GEL",
+    "isSynthetic": true
+  }
+]

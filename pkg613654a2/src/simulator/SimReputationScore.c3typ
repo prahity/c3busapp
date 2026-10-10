@@ -1,0 +1,62 @@
+/**
+ * A reliability score for a user or an event, supplied by the external user/event reputation
+ * component.
+ *
+ * This simulator **consumes** reputation; computing it from real-world behaviour is explicitly
+ * out of scope. Scores reach the engine through {@link SimReputationAdapter#getScores} and are
+ * referenced from {@link SimEvent#userReputationScoreId} and
+ * {@link SimEvent#eventReputationScoreId}.
+ *
+ * How a score influences generated demand is governed entirely by
+ * {@link SimAssumptions#reliabilityPolicy}, and every application is logged as a
+ * `ReliabilityWeightApplied` {@link SimReconciliationEntry}. A missing score is **not** treated as
+ * zero — it falls back to the neutral {@link SimAssumptions#defaultReputation}, because "we have
+ * never seen this reporter" is not evidence that they are wrong.
+ */
+@db(index=['scenarioId, subjectKind, subjectId'])
+entity type SimReputationScore {
+
+  /** Id of the owning {@link SimScenario}. */
+  scenarioId: !string
+
+  /**
+   * Whether {@link SimReputationScore#subjectId} names a reporting user or an event. The two are
+   * scored independently: a reliable user can report an event that nevertheless rarely
+   * materializes.
+   */
+  subjectKind: !string enum('User','Event')
+
+  /**
+   * Id of the subject — a synthetic user handle such as `user_mock_03`, or a {@link SimEvent} id.
+   * No personally identifying data is used.
+   */
+  subjectId: !string
+
+  /**
+   * Reliability on 0..1, where 1 means historically dependable.
+   *
+   * A weighting input, **not** a probability that any particular event is real. See
+   * {@link SimAssumptions#reliabilityPolicy} for how it is combined with
+   * {@link SimEvent#confidence}.
+   */
+  reliability: !double
+
+  /**
+   * Documented scale of {@link SimReputationScore#reliability}, e.g. `0to1`. Stated explicitly so
+   * a producer switching to a 0–100 scale is caught rather than silently misread by a factor
+   * of 100; a value other than `0to1` is a validation error.
+   */
+  scoreScale: string
+
+  /** When the score was computed. Informational — the mock policy always uses the latest score per subject. */
+  observedAt: datetime
+
+  /**
+   * Number of past observations behind the score. Surfaced in the UI so a confident-looking 0.95
+   * drawn from two observations can be recognised as thin evidence. Not used in the weighting.
+   */
+  sampleSize: int
+
+  /** Always true — synthetic mock data. */
+  isSynthetic: boolean
+}

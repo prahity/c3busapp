@@ -1,0 +1,91 @@
+/**
+ * A **raw** event observation — auto-detected or hand-submitted — kept deliberately distinct from
+ * the reconciled {@link SimEvent} it may describe.
+ *
+ * Keeping reports separate is what makes reconciliation auditable. Several reports can describe
+ * one real-world event; {@link SimInputAssembler#assemble} attaches each to a canonical
+ * {@link SimEvent} via {@link SimEventReport#event} and records the decision in a
+ * {@link SimReconciliationEntry}. The reports raise or lower the event's effective reliability,
+ * but they never add a second cohort of passengers — attendance comes from the canonical event's
+ * {@link SimEvent#demandEffect} alone.
+ *
+ * **Matching.** Reconciliation prefers an explicit canonical id (a report authored with
+ * {@link SimEventReport#event} already set). When that is absent, the mock fallback matcher pairs
+ * a report with a canonical event only if all of: same {@link SimEventReport#scenarioId}; the
+ * reported stop appears in {@link SimEvent#affectedStopIds}; and the reported start time is
+ * within {@link SimAssumptions#reportMatchWindowMinutes} of {@link SimEvent#startTime}. Reports
+ * matching nothing stay unmatched (null {@link SimEventReport#event}) and are reported as a
+ * validation warning rather than being silently promoted to a new event.
+ *
+ * All records are synthetic ({@link SimEventReport#isSynthetic}).
+ */
+@db(index=['scenarioId, reportTime'])
+entity type SimEventReport {
+
+  /** Id of the owning {@link SimScenario}; all adapter queries are scoped by it. */
+  scenarioId: !string
+
+  /**
+   * The canonical {@link SimEvent} this report was reconciled to, or null when the report could
+   * not be matched.
+   *
+   * A report authored with this field already populated represents a producer that knows the
+   * shared event id — the preferred integration, since it removes any reliance on fuzzy
+   * location/time matching.
+   */
+  event: SimEvent
+
+  /** Event name exactly as reported, retained even when it disagrees with {@link SimEvent}'s name. */
+  reportedEventName: string
+
+  /**
+   * Whether this observation came from an automatic detector or a human submission. Mirrors the
+   * corresponding values of {@link SimEvent#eventSource}; `Scheduled` is absent because a
+   * timetable entry is not a report.
+   */
+  reportSource: !string enum('AutoDetected','ManuallyReported')
+
+  /**
+   * Synthetic id of the submitting user for `ManuallyReported` rows, used to look up that user's
+   * {@link SimReputationScore}. Null for `AutoDetected` rows.
+   */
+  submittingUserId: string
+
+  /** Id of the {@link SimStop} the reporter associated with the event; an input to fallback matching. */
+  reportedStopId: string
+
+  /** Event start as reported. Compared against {@link SimEvent#startTime} during fallback matching. */
+  reportedStartTime: datetime
+
+  /** Event end as reported; null when the reporter did not know it. */
+  reportedEndTime: datetime
+
+  /**
+   * Crowd size as reported, a head count. Informational: generated demand always comes from the
+   * canonical {@link SimEvent#demandEffect}, so a wildly overstated report cannot by itself
+   * inflate ridership.
+   */
+  reportedAttendance: int
+
+  /**
+   * The reporter's own confidence on 0..1. Combined with the submitting user's
+   * {@link SimReputationScore} under {@link SimAssumptions#reliabilityPolicy}. Null falls back to
+   * {@link SimAssumptions#defaultConfidence}.
+   */
+  reportedConfidence: double
+
+  /**
+   * When the report was submitted. Propagates into {@link SimEvent#knownAt} for events that only
+   * became known through reporting, and therefore decides whether the planner could have used it.
+   */
+  reportTime: !datetime
+
+  /**
+   * Verbatim producer payload, retained so no field is lost when the real contract carries more
+   * than this type models. Opaque to the engine.
+   */
+  rawPayload: json
+
+  /** Always true — synthetic mock data. */
+  isSynthetic: boolean
+}

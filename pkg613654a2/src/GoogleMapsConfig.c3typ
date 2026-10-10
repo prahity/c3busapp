@@ -1,0 +1,26 @@
+/**
+ * Deployment configuration for the Google Maps Platform Directions API, used by
+ * {@link GoogleDirectionsClient} to estimate end-to-end and per-leg travel times for a
+ * candidate bus route.
+ *
+ * The {@link GoogleMapsConfig#apiKey} is a secret: configure it through the platform
+ * secret store (Settings / Console), never hardcoded. When no key is configured the
+ * {@link RoutePlanner} falls back to a haversine/average-speed travel-time estimate so
+ * the planner still produces a route.
+ */
+@config
+type GoogleMapsConfig mixes Config, Singleton {
+  /**
+   * Base URL of the Google Maps Platform web-service API. Endpoint URIs such as
+   * {@code directions/json} are appended directly to it.
+   */
+  @config
+  baseUrl: !string = "https://maps.googleapis.com/maps/api/"
+
+  /**
+   * Google Maps Platform API key, passed as the {@code key} query parameter. Secret —
+   * set it via the platform secret store; it is never logged or returned.
+   */
+  @config(secret=true)
+  apiKey: string
+}

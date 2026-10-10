@@ -1,0 +1,106 @@
+/**
+ * Generates a candidate bus route for servicing a {@link MergedEvent}, combining four signals
+ * the way the user asked for:
+ *
+ * <ol>
+ *   <li><b>Current routes</b> — the CUMTD baseline-route map (see {@link MtdRoutesClient}) is
+ *       inspected to find which rider-origin stops are already served and at what cadence, so
+ *       the new route complements rather than duplicates existing coverage.</li>
+ *   <li><b>Mean time to service</b> — the target average wait a rider should experience; with
+ *       uniform arrivals mean wait = headway / 2, so it sets the service headway.</li>
+ *   <li><b>Event capacity</b> — {@link MergedEvent#estimatedPopulation} (reputation-weighted
+ *       demand) divided by bus capacity sets how many departures are needed.</li>
+ *   <li><b>Google Maps planning + route convolution</b> — rider-origin stop candidates are
+ *       convolved along the venue-bearing corridor (nearby demand peaks merged under a distance
+ *       kernel) to produce consolidated waypoints, then the full route is sent to the Google
+ *       Directions API ({@link GoogleDirectionsClient}) for total and per-leg travel times. If no
+ *       Google key is configured the planner falls back to a haversine/average-speed estimate.</li>
+ * </ol>
+ *
+ * The result is a new route in the same nested shape produced by {@link MtdRoutesClient}, plus a
+ * transparent {@code plan} object documenting every heuristic input and output.
+ */
+type RoutePlanner {
+  /**
+   * Build a candidate route for one merged event.
+   *
+   * @param mergedEventId        id of the {@link MergedEvent} to service.
+   * @param meanTimeToServiceMin target mean time (minutes) a rider waits before a bus arrives;
+   *                             drives the headway (headway = 2 x mean wait). Non-positive -> 7.5.
+   * @param busCapacity          seated+standing riders per bus; non-positive -> 40.
+   * @param baselineRoutes       optional CUMTD baseline-route map (from {@link MtdRoutesClient});
+   *                             used to report existing coverage of the chosen origin stops. May be null.
+   * @return {@code {route: {<startStopId>: {departure_times, destinations:[{stop_id,name,arrival_times}]}},
+   *         plan: {...rationale...}}}.
+   */
+  generateRoute: function(
+    mergedEventId: string,
+    meanTimeToServiceMin: double,
+    busCapacity: int,
+    baselineRoutes: json
+  ): json js-server
+
+  /**
+   * Build a <b>network of supplemental proposal routes</b> that together service the aggregated
+   * demand of <i>all upcoming</i> {@link MergedEvent}s in a window. Routes are demand corridors —
+   * the route count is driven by how many useful stops exist, NOT by {@code numBuses}; a fleet of
+   * {@code numBuses} vehicles is then <i>assigned</i> to those routes. A route is a stop sequence; a
+   * run (trip) is one scheduled departure along it; a vehicle is a physical bus that performs
+   * several runs. {@code N} buses do not imply {@code N} routes.
+   *
+   * <p>Pipeline:
+   * <ol>
+   *   <li><b>Aggregate demand (audited)</b> — every resolved event whose {@link MergedEvent#startTime}
+   *       falls in {@code [now-1d, now+windowDays]} contributes an inbound demand of
+   *       {@code attendance x transitShare} ({@link PlannerConfig#transitShare}), where attendance is
+   *       {@link MergedEvent#estimatedPopulation}, else {@link CampusVenue#capacity}, else
+   *       <b>unknown</b> (the event is listed but contributes no fabricated demand). Each event's
+   *       inbound demand is split across its {@link MergedEvent#startStopCandidates} by candidate
+   *       score (shares sum to 1, so no rider is double-counted), and the event's actual venue is
+   *       recorded as that demand's destination. {@code plan.demand.perEvent} reports every event's
+   *       contribution; an equal outbound surge mirrors the routes in reverse.</li>
+   *   <li><b>Consolidate stops</b> — origins at the same ~100 m location merge into one distinct
+   *       boarding stop carrying a readable name (no {@code (+N)} collapsing).</li>
+   *   <li><b>Corridors (~{@code targetStopsPerRoute} stops each)</b> — stops are partitioned into
+   *       {@code round(#stops / targetStops)} geographic corridors by iterative farthest-point
+   *       seeding + nearest assignment. {@code targetStops} defaults to 10, or the average stop count
+   *       of comparable baseline MTD routes, clamped to [8,12]. Each corridor's destination is the
+   *       dominant actual event venue among its stops; stops are ordered farthest-first toward it.</li>
+   *   <li><b>Fleet assignment + schedule validation</b> — vehicles are allocated across corridors by
+   *       demand (surplus greedily to the busiest-per-vehicle route); a corridor left with zero
+   *       vehicles has its demand reported unserved rather than implying unlimited trips. Each vehicle
+   *       runs back-to-back cycles (loaded run + per-stop dwell + turnaround + deadhead reposition) so
+   *       no vehicle has overlapping runs. Travel comes from Google Directions
+   *       ({@link GoogleDirectionsClient}); on haversine fallback the route is flagged
+   *       {@code preliminary}/unverified. {@code requiredRuns} vs {@code scheduledRuns},
+   *       {@code estimatedDemand} vs {@code assignedRiders} vs {@code unservedRiders} are all reported
+   *       ({@code estimatedDemand == assignedRiders + unservedRiders}).</li>
+   * </ol>
+   *
+   * @param windowDays           look-ahead horizon in days (non-positive -> 14).
+   * @param numBuses             size of the vehicle fleet to assign across the routes (non-positive
+   *                             -> 1). This is NOT the route count — routes are demand corridors.
+   * @param busCapacity          riders per vehicle per run; non-positive -> 40.
+   * @param meanTimeToServiceMin target mean rider wait (minutes); non-positive -> 7.5. Sets headway
+   *                             when a corridor needs only a single run.
+   * @param baselineRoutes       optional CUMTD baseline-route map (from {@link MtdRoutesClient}) used
+   *                             both to derive the per-route stop target and to report existing
+   *                             cadence for comparison. May be null.
+   * @return {@code {routes: [{routeId, routeName, proposed, pickupStop, destinationStop, orderedStops,
+   *         stopCount, vehicles:[{vehicleId,capacity}], departure_times, destinations:[{stop_id,name,
+   *         arrival_times}], estimatedDemand, assignedRiders, unservedRiders, requiredRuns,
+   *         scheduledRuns, headwayMin, oneWayMin, roundTripMin, travelBasis, estimationConfidence,
+   *         schedulePreliminary, note}],
+   *         plan: {window, demand:{..,perEvent[]}, fleet, coverage:{passengerServicePct,
+   *         locationCoveragePct,..}, schedule:{status,..}, baselineComparison, outboundNote}}}.
+   *         {@code departure_times[i]} aligns index-for-index with each destination's
+   *         {@code arrival_times[i]}.
+   */
+  generateNetwork: function(
+    windowDays: int,
+    numBuses: int,
+    busCapacity: int,
+    meanTimeToServiceMin: double,
+    baselineRoutes: json
+  ): json js-server
+}

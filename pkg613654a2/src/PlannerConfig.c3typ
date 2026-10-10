@@ -1,0 +1,60 @@
+/**
+ * Planner settings — the single source of tunable planner parameters, the C3-native form of the
+ * spec's "one config file for planner settings only." Values are environment-independent defaults
+ * here; override per environment under {@code config/PlannerConfig.json}. API keys and endpoints are
+ * NOT stored here — those live in the platform secret store on the per-adapter config types
+ * ({@link MtdApiConfig}, {@link GoogleMapsConfig}) so no credential is ever committed.
+ *
+ * The weights drive the three-priority score in {@link TransitPlanner}:
+ * {@code score = wTime x doorToDoorMin - wBuffer x arrivalBufferMin + wCrowd x crowdingPenalty}.
+ */
+@config
+type PlannerConfig mixes Config, Singleton {
+  /** Weight on total door-to-door trip time (walking + waiting + riding), minutes. Higher = favour faster trips. */
+  @config
+  weightTime: !double = 1.0
+
+  /** Weight rewarding arrival buffer (minutes early to the event/class). Higher = favour earlier, safer arrivals. */
+  @config
+  weightBuffer: !double = 0.5
+
+  /** Weight penalising crowding (riders / capacity). Higher = spread riders across buses more aggressively. */
+  @config
+  weightCrowd: !double = 2.0
+
+  /** Fraction of event/class attendance expected to travel by transit (0..1). */
+  @config
+  transitShare: !double = 0.6
+
+  /** Maximum walking time per walk leg, seconds. Candidate routes with a longer walk are filtered out. */
+  @config
+  maxWalkSeconds: !int = 900
+
+  /** Maximum number of transfers (vehicle boardings - 1) allowed on a candidate route. */
+  @config
+  maxTransfers: !int = 2
+
+  /** Minimum slack at a transfer: time between alighting (plus walk to the next stop) and the next departure, seconds. */
+  @config
+  minTransferSlackSeconds: !int = 120
+
+  /** Target minimum arrival buffer before the deadline, seconds. Routes arriving later than the deadline are dropped. */
+  @config
+  minArrivalBufferSeconds: !int = 300
+
+  /** Standing-ride time limit, seconds. Past seated capacity, riders may stand only for rides shorter than this. */
+  @config
+  standingTimeLimitSeconds: !int = 1200
+
+  /** Operating cost charged per supplemental bus-hour (from MTD), used in the MTD day-plan cost summary. */
+  @config
+  costPerBusHour: !double = 120.0
+
+  /** Planning-horizon length in seconds from the horizon start (e.g. 86400 = one service day). */
+  @config
+  planningHorizonSeconds: !int = 86400
+
+  /** IANA timezone the service day is expressed in (e.g. "America/Chicago" for Champaign-Urbana). */
+  @config
+  timezone: !string = "America/Chicago"
+}

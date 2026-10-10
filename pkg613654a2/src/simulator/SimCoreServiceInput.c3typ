@@ -1,0 +1,25 @@
+/**
+ * The complete fixed-service bundle returned by {@link SimCoreServiceAdapter#getCoreService} and
+ * carried on {@link SimulationInput#coreService}: the network plus the core timetable.
+ *
+ * Grouping these four collections behind one value type is what lets the core-service source be
+ * swapped (for a real GTFS feed, say) by reimplementing a single adapter method, without touching
+ * {@link SimEngine} or the UI.
+ *
+ * Everything in here is **invariant across runs**. Baseline and every candidate allocation see
+ * the same stops, routes, links and trips.
+ */
+type SimCoreServiceInput {
+
+  /** Every {@link SimStop} in the scenario network. */
+  stops: [SimStop]
+
+  /** Every {@link SimRouteDef}, core and supplemental-eligible. */
+  routes: [SimRouteDef]
+
+  /** Every directed {@link SimTravelLink}, supplying baseline travel minutes. */
+  travelLinks: [SimTravelLink]
+
+  /** Every fixed {@link SimCoreTrip} scheduled within the simulation horizon. */
+  coreTrips: [SimCoreTrip]
+}

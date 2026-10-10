@@ -1,0 +1,120 @@
+/**
+ * The explicit demand effect of a {@link SimEvent} — everything
+ * {@link SimDemandGenerator#generate} needs to synthesize passenger journeys from the event,
+ * without the event ever being pre-reduced to a bare passenger count.
+ *
+ * The deliberate design point (see `agents/INFO.md`) is that events enter the simulator with
+ * their timing, location and attendance *intact*. This type therefore carries attendance and a
+ * bus-use share rather than a finished rider count, plus origin/destination distributions and
+ * arrival/departure windows, so the simulator — not the producer — decides how many passengers
+ * appear, where, and when.
+ *
+ * **Inbound vs outbound.** A demand-generating event can produce two surges:
+ * - *inbound*: people travelling **to** the event, arriving at their origin stop during the
+ *   window `[startTime + inboundWindowStartOffsetMin, startTime + inboundWindowEndOffsetMin]`
+ *   and travelling toward {@link SimDemandEffect#destinationDistribution}.
+ * - *outbound*: people travelling **from** the event, arriving at their origin stop during
+ *   `[endTime + outboundWindowStartOffsetMin, endTime + outboundWindowEndOffsetMin]`. For the
+ *   outbound leg the roles swap: the event location acts as the origin and
+ *   {@link SimDemandEffect#originDistribution} supplies the destinations.
+ *
+ * **Units.** All `*OffsetMin` fields are **signed minutes** (negative = before the anchor
+ * instant). {@link SimDemandEffect#attendance} is a head count.
+ * {@link SimDemandEffect#busUseShare} is a 0..1 fraction.
+ *
+ * **Expected riders.** The generator computes
+ * `round(attendance * busUseShare * reliabilityWeight)`, where `reliabilityWeight` comes from
+ * {@link SimAssumptions#reliabilityPolicy} applied to {@link SimEvent#confidence} and the
+ * referenced {@link SimReputationScore}s. Attendance is never assumed equal to ridership.
+ */
+type SimDemandEffect {
+
+  /**
+   * Stable id of the demand cohort this effect produces, e.g. `cohort_class_cs225_0900`.
+   *
+   * Shared with {@link SimStudentLocationEstimate#cohortId} so that the two producers can refer
+   * to the same population. When a location estimate carries
+   * {@link SimStudentLocationEstimate#linkedEventId} pointing at the owning {@link SimEvent},
+   * {@link SimInputAssembler} suppresses one of the two sources per
+   * {@link SimAssumptions#cohortOverlapPolicy} rather than generating the cohort twice.
+   */
+  cohortId: string
+
+  /**
+   * Expected number of **people at the event**, not the number of bus riders.
+   *
+   * Multiplied by {@link SimDemandEffect#busUseShare} (and a reliability weight) to obtain
+   * generated passengers. A head count, not a rate.
+   */
+  attendance: int
+
+  /**
+   * Fraction of {@link SimDemandEffect#attendance} expected to travel by bus, on 0..1.
+   *
+   * Keeps mode share an explicit, inspectable mock assumption instead of burying it in the
+   * engine. A value of `0.0` means the event generates no demand even though it has attendance.
+   */
+  busUseShare: double
+
+  /**
+   * Where inbound travellers start from, as a distribution over {@link SimStop} ids.
+   *
+   * On the outbound leg this collection is reused as the *destination* distribution (people
+   * leaving the event disperse back to these stops).
+   */
+  originDistribution: [SimStopShare]
+
+  /**
+   * Where inbound travellers are heading, as a distribution over {@link SimStop} ids — normally
+   * the stop(s) serving the event venue.
+   *
+   * On the outbound leg this collection is reused as the *origin* distribution.
+   */
+  destinationDistribution: [SimStopShare]
+
+  /** Whether to generate the pre-event inbound surge. False for outbound-only events. */
+  generatesInbound: boolean
+
+  /** Whether to generate the post-event outbound surge. False for inbound-only events. */
+  generatesOutbound: boolean
+
+  /**
+   * Start of the inbound arrival window, in signed minutes relative to
+   * {@link SimEvent#startTime}. Typically negative, e.g. `-30` = passengers start showing up at
+   * their origin stop 30 minutes before the event begins.
+   */
+  inboundWindowStartOffsetMin: int
+
+  /**
+   * End of the inbound arrival window, in signed minutes relative to
+   * {@link SimEvent#startTime}. Must be >= {@link SimDemandEffect#inboundWindowStartOffsetMin};
+   * {@link SimInputAssembler#validate} reports an error otherwise.
+   */
+  inboundWindowEndOffsetMin: int
+
+  /**
+   * Start of the outbound departure window, in signed minutes relative to
+   * {@link SimEvent#endTime}. Typically `0` — people begin leaving as the event ends.
+   */
+  outboundWindowStartOffsetMin: int
+
+  /**
+   * End of the outbound departure window, in signed minutes relative to
+   * {@link SimEvent#endTime}. Must be >= {@link SimDemandEffect#outboundWindowStartOffsetMin}.
+   *
+   * A short window concentrates the surge (the "event-ending surge" scenario); a long one
+   * spreads it out.
+   */
+  outboundWindowEndOffsetMin: int
+
+  /**
+   * Arrival deadline for inbound passengers, in signed minutes relative to
+   * {@link SimEvent#startTime}. `0` means "must be at the destination stop by the event start".
+   *
+   * Null means the event carries **no deadline**, and its passengers are excluded from the
+   * lateness denominator in {@link SimMetrics#deadlineBearingPassengers}. This matters: an
+   * unserved passenger is never counted as on time, and passengers without a deadline are never
+   * counted as late.
+   */
+  classDeadlineOffsetMin: int
+}

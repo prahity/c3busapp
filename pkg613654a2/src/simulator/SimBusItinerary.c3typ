@@ -1,0 +1,65 @@
+/**
+ * The complete daily itinerary for one allocated extra bus — "Bus A visits Stop X, then Stop Y" —
+ * together with its operating totals and the reason it was allocated at all.
+ *
+ * Carried in {@link SimPlan#extraBusItineraries} and rendered as the per-bus itinerary table in
+ * the review UI.
+ *
+ * **Allocated, used and idle are three different things.** A bus can be allocated and still run
+ * nothing, because the planner is explicitly *not* required to use every available bus when there
+ * is no useful demand to serve. {@link SimBusItinerary#isIdle} marks that case, and
+ * {@link SimCostConfig#includeIdleAllocatedBuses} decides whether it still costs money — which is
+ * how the cost curve is able to show an allocation making things worse rather than being
+ * artificially flat.
+ */
+type SimBusItinerary {
+
+  /** Id of the {@link SimExtraBus} this itinerary belongs to. */
+  busId: !string
+
+  /** Display label for the bus in the UI, e.g. `Extra Bus A`. */
+  busLabel: string
+
+  /** Zero-based index of this bus within the allocation, in selection order. */
+  allocationIndex: int
+
+  /** Passenger capacity, copied from {@link SimExtraBus#capacity}; enforced strictly during boarding. */
+  capacity: int
+
+  /**
+   * The trips this bus runs, in departure order; see {@link SimItineraryTrip}. Empty when the bus
+   * is allocated but idle.
+   *
+   * Guaranteed non-overlapping and within {@link SimExtraBus#availableFrom} ..
+   * {@link SimExtraBus#availableTo}, with at least
+   * {@link SimAssumptions#minTurnaroundMinutes} between consecutive trips.
+   */
+  trips: [SimItineraryTrip]
+
+  /** Minutes spent in service carrying or available to carry passengers, costed at the operating rate. */
+  totalOperatingMinutes: double
+
+  /** Minutes spent running empty to reposition, costed separately so the overhead is visible. */
+  totalDeadheadMinutes: double
+
+  /** Minutes spent stationary at stops boarding and alighting. */
+  totalDwellMinutes: double
+
+  /**
+   * True when this bus was allocated but runs no trips, because no feasible trip offered a
+   * worthwhile benefit. Not a failure — it is the signal that the allocation has saturated.
+   */
+  isIdle: boolean
+
+  /**
+   * Why this bus was allocated and what its trips collectively serve, or — when
+   * {@link SimBusItinerary#isIdle} — why no useful work was found for it.
+   */
+  explanation: string
+
+  /**
+   * Operating cost attributed to this bus, in {@link SimCostConfig#currency}: the fixed
+   * allocation charge plus per-minute operating, deadhead and dwell costs.
+   */
+  operatingCost: double
+}

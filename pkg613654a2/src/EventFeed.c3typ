@@ -1,0 +1,52 @@
+/**
+ * A system that supplies {@link CampusEvent} observations, together with the dynamic
+ * reliability metrics used to weight that source during deduplication, merging, and scoring.
+ *
+ * There is one record per logical feed. Scraped events reference the institutional calendar
+ * feed ({@link EventFeed#id} `uiuc_calendar`); manually entered events reference the
+ * `manual` pseudo-source, though manual credibility is ultimately computed per entry (see
+ * {@link CampusEvent#reputationScore}) rather than taken wholesale from this record.
+ *
+ * {@link EventFeed#reliabilityScore} is recomputed by
+ * {@link EventResolver#recomputeSourceReliability} after every daily scrape:
+ * `reliabilityScore = baseReliability · freshnessFactor · corroborationFactor`, clamped to
+ * `[0.6, 0.95]` for scraped feeds. An official institutional feed earns a high
+ * {@link EventFeed#baseReliability}; the freshness factor decays it when the feed goes
+ * stale, and the corroboration factor nudges it by how often its events are independently
+ * confirmed by manual entries.
+ */
+entity type EventFeed schema name 'EVENT_FEED' {
+  /** The kind of system: an automated web scrape or hand-entry by a user. */
+  sourceType: !string enum('Scraped', 'Manual')
+
+  /** Human-readable label, e.g. "UIUC Illinois.edu Calendar (list 7)". */
+  label: !string
+
+  /**
+   * Prior trust in this source before any dynamic adjustment, in `[0, 1]`. An official
+   * institutional feed sits near 0.9; an unvetted community feed would sit lower.
+   */
+  baseReliability: !double
+
+  /** Number of raw {@link CampusEvent}s observed from this source across all scrapes. */
+  eventsObserved: int
+
+  /**
+   * Number of this source's events that have been independently corroborated (landed in the
+   * same merge cluster as an event from a different source). Drives the corroboration factor.
+   */
+  corroboratedCount: int
+
+  /** When this source last delivered data; older timestamps decay {@link EventFeed#reliabilityScore}. */
+  lastObservedAt: datetime
+
+  /**
+   * Current dynamic reliability in `[0, 1]`, recomputed each scrape by
+   * {@link EventResolver#recomputeSourceReliability}. This is the weight scraped events carry
+   * into merge/scoring.
+   */
+  reliabilityScore: double
+
+  /** Human-readable explanation of how {@link EventFeed#reliabilityScore} was derived. */
+  reliabilityBasis: string
+}

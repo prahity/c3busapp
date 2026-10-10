@@ -1,0 +1,24 @@
+/**
+ * Deployment configuration for the Champaign-Urbana Mass Transit District (CUMTD)
+ * developer REST API, used by {@link MtdRoutesClient} to pull baseline bus routes.
+ *
+ * The {@link MtdApiConfig#apiKey} is a secret: it is configured by an operator through
+ * the platform secret store (Settings / Console), never hardcoded or committed. Read the
+ * live value at call time with {@code MtdApiConfig.getConfig().getSecret().apiKey}.
+ */
+@config
+type MtdApiConfig mixes Config, Singleton {
+  /**
+   * Base URL of the CUMTD JSON API (v2.2). The trailing slash matters: endpoint URIs
+   * such as {@code getdeparturesbystop} are appended directly to it.
+   */
+  @config
+  baseUrl: !string = "https://developer.cumtd.com/api/v2.2/json/"
+
+  /**
+   * CUMTD developer API key, passed as the {@code key} query parameter on every request.
+   * Secret — set it via the platform secret store; it is never logged or returned.
+   */
+  @config(secret=true)
+  apiKey: string
+}

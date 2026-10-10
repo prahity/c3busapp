@@ -1,0 +1,42 @@
+/**
+ * A **directed** travel link between two stops, carrying the baseline time a bus needs to drive
+ * it.
+ *
+ * Links are the unit that `TrafficDisruption` events act on: a
+ * {@link SimOperationalEffect} of kind `TravelTimeMultiplier` names link ids in
+ * {@link SimOperationalEffect#linkIds}, and {@link SimEffects#resolve} turns those into
+ * time-windowed multipliers over {@link SimTravelLink#baselineTravelMinutes}.
+ *
+ * Direction matters — `A -> B` and `B -> A` are two records, and a disruption may legitimately
+ * affect only one of them.
+ */
+@db(index=['scenarioId, fromStopId'])
+entity type SimTravelLink {
+
+  /** Id of the owning {@link SimScenario}. */
+  scenarioId: !string
+
+  /** Id of the {@link SimStop} the bus departs from. */
+  fromStopId: !string
+
+  /** Id of the {@link SimStop} the bus arrives at. */
+  toStopId: !string
+
+  /**
+   * Undisrupted driving time for this link, **in minutes**.
+   *
+   * The engine multiplies this by the combined multiplier active at the moment of departure (see
+   * {@link SimResolvedEffects#linkIntervals}); the multiplier in force at departure applies for
+   * the whole traversal, which is documented as a simplification.
+   */
+  baselineTravelMinutes: !double
+
+  /**
+   * Link length in kilometres. Informational for the UI; the engine works in minutes. Used only
+   * as a sanity check against {@link SimTravelLink#baselineTravelMinutes}.
+   */
+  distanceKm: double
+
+  /** Always true — synthetic mock data. */
+  isSynthetic: boolean
+}

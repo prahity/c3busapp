@@ -1,0 +1,26 @@
+/**
+ * One scheduled call at a stop within a {@link SimCoreTrip} — the transit-standard
+ * "stop time" record.
+ *
+ * {@link SimCoreTrip#stopTimes} holds these in service order. Because core service is fixed,
+ * these times are an **input** the engine replays rather than something it schedules: the bus
+ * arrives at {@link SimStopTime#arrivalTime}, passengers alight and board, and it leaves at
+ * {@link SimStopTime#departureTime}.
+ */
+type SimStopTime {
+
+  /** Id of the {@link SimStop} being called at. */
+  stopId: !string
+
+  /** Absolute instant the bus arrives and alighting begins. */
+  arrivalTime: !datetime
+
+  /**
+   * Absolute instant the bus departs. Must be >= {@link SimStopTime#arrivalTime}; the difference
+   * is the scheduled dwell, which bounds how many passengers can board at this call.
+   */
+  departureTime: !datetime
+
+  /** Zero-based position of this call within {@link SimCoreTrip#stopTimes}, for readability in exports. */
+  stopSequenceIndex: int
+}

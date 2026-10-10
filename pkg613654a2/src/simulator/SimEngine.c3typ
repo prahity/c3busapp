@@ -1,0 +1,74 @@
+/**
+ * The discrete-event simulation engine: replays one plan against one demand snapshot and one
+ * realized set of operational effects, and reports what happened.
+ *
+ * Deliberately independent of both the UI and the mock adapters — it consumes only
+ * {@link SimulationInput}, {@link SimDemandSnapshot}, {@link SimPlan} and
+ * {@link SimResolvedEffects}, and holds no mock values of its own. Fully deterministic: the same
+ * four arguments always produce the same {@link SimResults}.
+ *
+ * Modelling choices, all intentional and all limitations to be aware of when reading results:
+ *
+ * - **Direct trips only.** A passenger boards a vehicle that visits their destination later in its
+ *   itinerary. Transfers are not modelled, so a journey whose origin and destination are not
+ *   connected by any single visit sequence is reported unserved rather than silently routed.
+ * - **Destination eligibility is enforced on boarding.** A passenger is never boarded onto a trip
+ *   that cannot reach their destination, even when the vehicle has space.
+ * - **Queue discipline** is FIFO by {@link SimPassengerJourney#requestTime}
+ *   ({@link SimAssumptions#queueDiscipline}), applied per stop and filtered by destination
+ *   eligibility; a group too large for the remaining capacity is split, the boarded part departing
+ *   and the remainder keeping its original position in the queue.
+ * - **Capacity** is a hard seat cap; left-behind passengers stay queued and keep accruing wait.
+ * - **Dwell** is `max(defaultDwellMinutes, passengers * perPassengerSeconds / 60)` from
+ *   {@link SimAssumptions}; travel time is the link baseline times the multiplier in force at
+ *   departure, so a disruption active when a bus departs applies to that traversal.
+ * - **Simultaneous events** need no special handling here because overlapping effects were already
+ *   combined into disjoint intervals by {@link SimEffects#resolve}.
+ * - **Stop closures are not routed around.** A closed stop cannot be served; its waiting
+ *   passengers are denied unless {@link SimOperationalEffect#fallbackStopId} was configured before
+ *   the planning cutoff. Nothing is silently relocated and nothing invents an alternate route —
+ *   affected plans are reported through {@link SimResults#infeasibilities}.
+ * - **Horizon censoring.** Passengers still waiting or onboard at
+ *   {@link SimulationInput#horizonEnd} are counted in those states with their accrued wait
+ *   recorded separately; they are never silently completed and never counted as on time.
+ */
+type SimEngine {
+
+  /**
+   * Runs one simulation and returns its metrics, per-stop delay windows, accounting identity,
+   * event activation log and replay frames.
+   *
+   * Core {@link SimCoreTrip}s always run as timetabled and are immune to
+   * `BusAvailabilityDisruption`; only extra buses can be withdrawn. Extra-bus trips come from
+   * {@link SimPlan#extraBusItineraries} and are executed as planned unless an effect makes a stop
+   * or the bus itself unavailable, in which case the affected portion is dropped and recorded —
+   * the engine never reroutes live.
+   *
+   * Invariants asserted before returning, surfaced via {@link SimAccounting#isBalanced}:
+   * generated passengers equal completed plus waiting plus onboard plus denied-by-closure; onboard
+   * count never exceeds vehicle capacity; no vehicle moves instantaneously between distinct stops;
+   * no bus has two overlapping trips.
+   *
+   * @param input The validated simulation input.
+   * @param snapshot The immutable demand snapshot, identical across baseline and candidates.
+   * @param plan The plan to execute — a baseline plan or a candidate plan.
+   * @param realizedEffects Effects resolved over **all** realized events, not just the
+   *   planner-visible ones.
+   * @return Results for this single run, tagged with the snapshot and plan ids that produced them.
+   */
+  run: function(input: !SimulationInput, snapshot: !SimDemandSnapshot, plan: !SimPlan, realizedEffects: !SimResolvedEffects): SimResults js-server
+
+  /**
+   * Aggregates completed and censored waiting into per-stop, per-time-window delay estimates for
+   * the student-facing view.
+   *
+   * A window with no observations reports {@link SimStopWindowDelay#hasObservations} false and a
+   * **null** {@link SimStopWindowDelay#estimatedWaitMinutes}. Absence of observations is not
+   * encoded as zero wait, since zero would read as "no delay here" to a student.
+   *
+   * @param input Supplies the horizon and {@link SimAssumptions#stopDelayWindowMinutes}.
+   * @param results The run whose waiting observations should be aggregated.
+   * @return One entry per stop and window across the horizon.
+   */
+  stopWindowDelays: function(input: !SimulationInput, results: !SimResults): [SimStopWindowDelay] js-server
+}

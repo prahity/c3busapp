@@ -1,0 +1,54 @@
+/**
+ * All operational effects of a scenario's events, flattened into disjoint, pre-combined
+ * {@link SimEffectInterval}s and grouped by what they act on.
+ *
+ * Produced by {@link SimEffects#resolve}, which is called **twice** per run: once with only
+ * planner-visible events (feeding {@link SimPlanner#buildPlan}) and once with every realized
+ * event (feeding {@link SimEngine#run}). Resolving ahead of the simulation rather than during it
+ * means overlap combination happens exactly once, in one place, with its rules documented — and
+ * that the engine cannot accidentally make the answer depend on the order it processed events in.
+ *
+ * **Combination rules** (see also {@link SimOperationalEffect}): travel-time multipliers on one
+ * link combine by {@link SimAssumptions#overlappingMultiplierRule} then clamp to
+ * {@link SimAssumptions#maxTravelTimeMultiplier}; stop and bus unavailability take the union; and
+ * unavailability wins over any multiplier.
+ */
+type SimResolvedEffects {
+
+  /** Id of the {@link SimScenario} these effects were resolved for. */
+  scenarioId: !string
+
+  /**
+   * Whether this resolution was restricted to planner-visible events
+   * ({@link SimEvent#knownAt} <= {@link SimulationInput#planningCutoff}).
+   *
+   * True for the view handed to {@link SimPlanner#buildPlan}; false for the fully realized view
+   * handed to {@link SimEngine#run}. Keeping the distinction on the object prevents the planner
+   * from ever being passed the realized view by mistake.
+   */
+  plannerVisibleOnly: !boolean
+
+  /** Disjoint travel-time intervals keyed by {@link SimTravelLink} id; see {@link SimEffectInterval}. */
+  linkIntervals: [SimEffectInterval]
+
+  /** Disjoint closure intervals keyed by {@link SimStop} id. */
+  stopIntervals: [SimEffectInterval]
+
+  /** Disjoint unavailability intervals keyed by {@link SimExtraBus} id. */
+  busIntervals: [SimEffectInterval]
+
+  /** The {@link SimAssumptions#overlappingMultiplierRule} applied, restated so the object is self-describing. */
+  combinationPolicy: !string
+
+  /** The {@link SimAssumptions#maxTravelTimeMultiplier} ceiling applied. */
+  maxMultiplier: double
+
+  /**
+   * True when the ceiling bound on at least one interval. Surfaced in the UI so a reviewer knows a
+   * reported travel time reflects a clamp rather than the raw product of overlapping disruptions.
+   */
+  clampApplied: boolean
+
+  /** Ids of every {@link SimEvent} that contributed at least one interval to this resolution. */
+  contributingEventIds: [string]
+}

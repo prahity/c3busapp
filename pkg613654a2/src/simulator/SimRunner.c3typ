@@ -1,0 +1,104 @@
+/**
+ * Top-level orchestrator and the single entry point the review interface calls.
+ *
+ * Sequences the whole pipeline — assemble, validate, generate demand once, resolve effects twice,
+ * run the mock baseline, plan and run every allocation, compute the cost curve, assert
+ * comparability — and returns one {@link SimComparison}.
+ *
+ * Everything this type returns is **advisory**. There is no action here, and none anywhere else in
+ * the package, that dispatches a bus, publishes a plan to MTD, or changes core service. The output
+ * is a recommendation for a human to act on.
+ */
+type SimRunner {
+
+  /**
+   * Runs the complete proactive comparison for a scenario: the mock old-model baseline plus one
+   * planned-and-simulated candidate for every allocation from 0 to `maxExtraBuses`.
+   *
+   * Sequence, and why it is in this order:
+   *
+   * 1. {@link SimInputAssembler#assemble} then `validate`. An input with `Error`-severity issues is
+   *    returned with the validation report attached and no runs, rather than simulated anyway.
+   * 2. {@link SimDemandGenerator#generate} **once**. The resulting snapshot is passed by reference
+   *    to every run below, so baseline and candidates face identical passenger demand.
+   * 3. {@link SimEffects#resolve} **twice** — once over planner-visible events for
+   *    {@link SimPlanner}, once over all realized events for {@link SimEngine}. Two separate
+   *    objects, so advance knowledge cannot leak into planning.
+   * 4. {@link SimOldModelBaseline#baselinePlan} and its run, which also supplies the bottleneck
+   *    ranking the planner needs.
+   * 5. For each allocation, {@link SimPlanner#buildPlan} then {@link SimEngine#run} against the
+   *    same snapshot and the same realized effects, plus
+   *    {@link SimPlanner#checkFeasibility} to surface plans broken by post-cutoff disruptions.
+   * 6. Metrics per run, then the {@link SimComparison#costCurve} across allocations, which is
+   *    where diminishing returns become visible. Savings are computed as baseline minus candidate
+   *    and are **not clamped**, so a harmful allocation shows a negative saving.
+   * 7. {@link SimComparison#comparabilityAssertions}: identical snapshot id, identical realized
+   *    event ids, identical core trip ids, balanced accounting on every run, and zero-bus
+   *    candidate equal to baseline.
+   *
+   * @param scenarioId Id of the {@link SimScenario} to run.
+   * @param maxExtraBuses Highest allocation to evaluate. Null uses
+   *   {@link SimScenario#maxExtraBuses}, capped by
+   *   {@link SimBusAvailabilityAdapter#getAvailableBusCount}.
+   * @return The full comparison: input, demand snapshot, realized effects, baseline, candidates,
+   *   plans and cost curve.
+   */
+  runComparison: function(scenarioId: !string, maxExtraBuses: int): SimComparison js-server
+
+  /**
+   * Returns a single run for one allocation — the cheap path for the interface's allocation slider,
+   * avoiding a full sweep on every change.
+   *
+   * Uses the same assembled input, same snapshot and same effect resolution as
+   * {@link SimRunner#runComparison}, so a result obtained here is directly comparable to one
+   * obtained there.
+   *
+   * @param scenarioId Id of the {@link SimScenario}.
+   * @param allocation Number of extra buses to allocate.
+   * @return Baseline and the single candidate, with a two-point cost curve.
+   */
+  runAllocation: function(scenarioId: !string, allocation: !int): SimComparison js-server
+
+  /**
+   * Exports one scenario as a self-contained JSON bundle for review and handoff.
+   *
+   * Contains the **original event collection** alongside the generated demand, the resolved
+   * effects, every plan, every result, the cost curve, the reconciliation trace, the validation
+   * report, the per-stop delay windows and the units and scope notes. The per-stop delay section
+   * is the structured boundary a future Google Maps integration would read; it is an export shape
+   * only, there is no live mapping-service call anywhere in this package, and every delay is
+   * labelled simulated rather than observed.
+   *
+   * @param scenarioId Id of the {@link SimScenario}.
+   * @param maxExtraBuses Highest allocation to include; null uses the scenario default.
+   * @return The export bundle, with synthetic-data and scope labels at the top level.
+   */
+  exportBundle: function(scenarioId: !string, maxExtraBuses: int): json js-server
+
+  /**
+   * Lists the available mock scenarios for the interface's scenario picker.
+   *
+   * @return Every {@link SimScenario}, ordered by id.
+   */
+  listScenarios: function(): [SimScenario] js-server
+
+  /**
+   * Returns the daily event timeline for a scenario in the shape the interface's editable timeline
+   * and network map need: each event with its timing, planning visibility relative to
+   * {@link SimulationInput#planningCutoff}, reliability inputs, effect parameters, affected
+   * stop/route/link ids with coordinates for highlighting, and the passenger count it generated.
+   *
+   * @param scenarioId Id of the {@link SimScenario}.
+   * @return A JSON timeline descriptor.
+   */
+  eventTimeline: function(scenarioId: !string): json js-server
+
+  /**
+   * Returns the assumptions, scope limitations and modelling caveats to display as visible labels
+   * in the review interface — synthetic data, mock baseline, advisory-only, no live rerouting, no
+   * transfers, heuristic not optimal, weighted reliability is not a calibrated probability.
+   *
+   * @return A JSON descriptor of scope and assumptions.
+   */
+  describeScope: function(): json js-server
+}

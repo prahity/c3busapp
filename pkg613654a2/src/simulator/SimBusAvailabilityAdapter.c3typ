@@ -1,0 +1,47 @@
+/**
+ * Mock source adapter for **extra-bus availability** — the pool of supplemental buses MTD could
+ * allocate, standing in for the bus-count API.
+ *
+ * The real API's URL and availability semantics are unresolved, so nothing here binds to an
+ * endpoint and no credentials are required. Reads authored {@link SimExtraBus} rows.
+ *
+ * Extra-bus count is a variable **controlled by MTD**, not something this system decides: the
+ * simulator evaluates every allocation from zero up to what is available and presents the
+ * tradeoff.
+ */
+type SimBusAvailabilityAdapter {
+
+  /**
+   * Returns the available {@link SimExtraBus} pool for a scenario, ordered by id.
+   *
+   * Availability windows are returned as authored and are **not** adjusted for
+   * `BusAvailabilityDisruption` events; those are operational effects resolved later by
+   * {@link SimEffects#resolve}, so that a withdrawal known only after the planning cutoff cannot
+   * leak into the planner's view of availability.
+   *
+   * @param scenarioId Id of the {@link SimScenario}.
+   * @return The available extra buses, in deterministic order.
+   */
+  getExtraBuses: function(scenarioId: !string): [SimExtraBus] js-server
+
+  /**
+   * Returns how many extra buses are available — the mocked bus-count API call.
+   *
+   * Equals the length of {@link SimBusAvailabilityAdapter#getExtraBuses} and is what caps
+   * {@link SimScenario#maxExtraBuses} during assembly, so a scenario can never ask for more buses
+   * than the pool contains.
+   *
+   * @param scenarioId Id of the {@link SimScenario}.
+   * @return Count of available extra buses.
+   */
+  getAvailableBusCount: function(scenarioId: !string): int js-server
+
+  /**
+   * Describes this adapter for the handoff documentation, including the unresolved questions about
+   * the real API: what "available" means operationally, whether windows are per-bus or per-depot,
+   * and how cost assumptions will be supplied.
+   *
+   * @return A JSON descriptor of the adapter contract.
+   */
+  adapterInfo: function(): json js-server
+}

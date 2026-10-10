@@ -1,0 +1,42 @@
+/**
+ * One fixed, scheduled trip of the **core** MTD service.
+ *
+ * Core trips are the service that exists with or without the program's recommendations. They are
+ * replayed byte-identically in the mock old-model baseline and in every candidate allocation —
+ * the engine never adds, removes, retimes or reroutes them. That invariance is what makes the
+ * baseline-versus-candidate comparison meaningful: the only difference between runs is the
+ * supplemental {@link SimBusItinerary}s in {@link SimPlan#extraBusItineraries}.
+ *
+ * Unlike extra buses, core buses are also immune to `BusAvailabilityDisruption` events
+ * (see {@link SimOperationalEffect#busIds}), again to keep runs comparable.
+ */
+@db(index=['scenarioId, routeId'])
+entity type SimCoreTrip {
+
+  /** Id of the owning {@link SimScenario}. */
+  scenarioId: !string
+
+  /** Id of the {@link SimRouteDef} this trip runs, normally one with {@link SimRouteDef#isCore} true. */
+  routeId: !string
+
+  /** Label of the vehicle operating the trip, e.g. `core-1`. Display only — core buses are not allocatable. */
+  busLabel: string
+
+  /**
+   * Seated-plus-standing passenger capacity of the vehicle, a head count.
+   *
+   * Enforced strictly by {@link SimEngine#run}: boarding stops when the onboard count reaches
+   * capacity and the remaining passengers stay queued. Capacity is never exceeded, and the
+   * resulting left-behinds are exactly the bottlenecks {@link SimPlanner#buildPlan} targets.
+   */
+  capacity: !int
+
+  /**
+   * The trip's calls, in service order. See {@link SimStopTime}. Must contain at least two
+   * entries with non-decreasing times, which {@link SimInputAssembler#validate} checks.
+   */
+  stopTimes: [SimStopTime]
+
+  /** Always true — synthetic mock data. */
+  isSynthetic: boolean
+}

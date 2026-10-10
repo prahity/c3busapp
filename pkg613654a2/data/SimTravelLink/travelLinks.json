@@ -1,0 +1,702 @@
+[
+  {
+    "id": "lnk_normal_ike_green",
+    "name": "ike to green",
+    "scenarioId": "sc_normal",
+    "fromStopId": "stop_normal_ike",
+    "toStopId": "stop_normal_green",
+    "baselineTravelMinutes": 5,
+    "distanceKm": 1.9,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_normal_green_ike",
+    "name": "green to ike",
+    "scenarioId": "sc_normal",
+    "fromStopId": "stop_normal_green",
+    "toStopId": "stop_normal_ike",
+    "baselineTravelMinutes": 5,
+    "distanceKm": 1.9,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_normal_green_union",
+    "name": "green to union",
+    "scenarioId": "sc_normal",
+    "fromStopId": "stop_normal_green",
+    "toStopId": "stop_normal_union",
+    "baselineTravelMinutes": 4,
+    "distanceKm": 1.3,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_normal_union_green",
+    "name": "union to green",
+    "scenarioId": "sc_normal",
+    "fromStopId": "stop_normal_union",
+    "toStopId": "stop_normal_green",
+    "baselineTravelMinutes": 4,
+    "distanceKm": 1.3,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_normal_union_grainger",
+    "name": "union to grainger",
+    "scenarioId": "sc_normal",
+    "fromStopId": "stop_normal_union",
+    "toStopId": "stop_normal_grainger",
+    "baselineTravelMinutes": 3,
+    "distanceKm": 0.5,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_normal_grainger_union",
+    "name": "grainger to union",
+    "scenarioId": "sc_normal",
+    "fromStopId": "stop_normal_grainger",
+    "toStopId": "stop_normal_union",
+    "baselineTravelMinutes": 3,
+    "distanceKm": 0.5,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_normal_arena_ike",
+    "name": "arena to ike",
+    "scenarioId": "sc_normal",
+    "fromStopId": "stop_normal_arena",
+    "toStopId": "stop_normal_ike",
+    "baselineTravelMinutes": 4,
+    "distanceKm": 1.1,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_normal_ike_arena",
+    "name": "ike to arena",
+    "scenarioId": "sc_normal",
+    "fromStopId": "stop_normal_ike",
+    "toStopId": "stop_normal_arena",
+    "baselineTravelMinutes": 4,
+    "distanceKm": 1.1,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_normal_arena_green",
+    "name": "arena to green",
+    "scenarioId": "sc_normal",
+    "fromStopId": "stop_normal_arena",
+    "toStopId": "stop_normal_green",
+    "baselineTravelMinutes": 8,
+    "distanceKm": 2.6,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_normal_green_arena",
+    "name": "green to arena",
+    "scenarioId": "sc_normal",
+    "fromStopId": "stop_normal_green",
+    "toStopId": "stop_normal_arena",
+    "baselineTravelMinutes": 8,
+    "distanceKm": 2.6,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_rush_ike_green",
+    "name": "ike to green",
+    "scenarioId": "sc_rush",
+    "fromStopId": "stop_rush_ike",
+    "toStopId": "stop_rush_green",
+    "baselineTravelMinutes": 5,
+    "distanceKm": 1.9,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_rush_green_ike",
+    "name": "green to ike",
+    "scenarioId": "sc_rush",
+    "fromStopId": "stop_rush_green",
+    "toStopId": "stop_rush_ike",
+    "baselineTravelMinutes": 5,
+    "distanceKm": 1.9,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_rush_green_union",
+    "name": "green to union",
+    "scenarioId": "sc_rush",
+    "fromStopId": "stop_rush_green",
+    "toStopId": "stop_rush_union",
+    "baselineTravelMinutes": 4,
+    "distanceKm": 1.3,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_rush_union_green",
+    "name": "union to green",
+    "scenarioId": "sc_rush",
+    "fromStopId": "stop_rush_union",
+    "toStopId": "stop_rush_green",
+    "baselineTravelMinutes": 4,
+    "distanceKm": 1.3,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_rush_union_grainger",
+    "name": "union to grainger",
+    "scenarioId": "sc_rush",
+    "fromStopId": "stop_rush_union",
+    "toStopId": "stop_rush_grainger",
+    "baselineTravelMinutes": 3,
+    "distanceKm": 0.5,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_rush_grainger_union",
+    "name": "grainger to union",
+    "scenarioId": "sc_rush",
+    "fromStopId": "stop_rush_grainger",
+    "toStopId": "stop_rush_union",
+    "baselineTravelMinutes": 3,
+    "distanceKm": 0.5,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_rush_arena_ike",
+    "name": "arena to ike",
+    "scenarioId": "sc_rush",
+    "fromStopId": "stop_rush_arena",
+    "toStopId": "stop_rush_ike",
+    "baselineTravelMinutes": 4,
+    "distanceKm": 1.1,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_rush_ike_arena",
+    "name": "ike to arena",
+    "scenarioId": "sc_rush",
+    "fromStopId": "stop_rush_ike",
+    "toStopId": "stop_rush_arena",
+    "baselineTravelMinutes": 4,
+    "distanceKm": 1.1,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_rush_arena_green",
+    "name": "arena to green",
+    "scenarioId": "sc_rush",
+    "fromStopId": "stop_rush_arena",
+    "toStopId": "stop_rush_green",
+    "baselineTravelMinutes": 8,
+    "distanceKm": 2.6,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_rush_green_arena",
+    "name": "green to arena",
+    "scenarioId": "sc_rush",
+    "fromStopId": "stop_rush_green",
+    "toStopId": "stop_rush_arena",
+    "baselineTravelMinutes": 8,
+    "distanceKm": 2.6,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_surge_ike_green",
+    "name": "ike to green",
+    "scenarioId": "sc_surge",
+    "fromStopId": "stop_surge_ike",
+    "toStopId": "stop_surge_green",
+    "baselineTravelMinutes": 5,
+    "distanceKm": 1.9,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_surge_green_ike",
+    "name": "green to ike",
+    "scenarioId": "sc_surge",
+    "fromStopId": "stop_surge_green",
+    "toStopId": "stop_surge_ike",
+    "baselineTravelMinutes": 5,
+    "distanceKm": 1.9,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_surge_green_union",
+    "name": "green to union",
+    "scenarioId": "sc_surge",
+    "fromStopId": "stop_surge_green",
+    "toStopId": "stop_surge_union",
+    "baselineTravelMinutes": 4,
+    "distanceKm": 1.3,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_surge_union_green",
+    "name": "union to green",
+    "scenarioId": "sc_surge",
+    "fromStopId": "stop_surge_union",
+    "toStopId": "stop_surge_green",
+    "baselineTravelMinutes": 4,
+    "distanceKm": 1.3,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_surge_union_grainger",
+    "name": "union to grainger",
+    "scenarioId": "sc_surge",
+    "fromStopId": "stop_surge_union",
+    "toStopId": "stop_surge_grainger",
+    "baselineTravelMinutes": 3,
+    "distanceKm": 0.5,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_surge_grainger_union",
+    "name": "grainger to union",
+    "scenarioId": "sc_surge",
+    "fromStopId": "stop_surge_grainger",
+    "toStopId": "stop_surge_union",
+    "baselineTravelMinutes": 3,
+    "distanceKm": 0.5,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_surge_arena_ike",
+    "name": "arena to ike",
+    "scenarioId": "sc_surge",
+    "fromStopId": "stop_surge_arena",
+    "toStopId": "stop_surge_ike",
+    "baselineTravelMinutes": 4,
+    "distanceKm": 1.1,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_surge_ike_arena",
+    "name": "ike to arena",
+    "scenarioId": "sc_surge",
+    "fromStopId": "stop_surge_ike",
+    "toStopId": "stop_surge_arena",
+    "baselineTravelMinutes": 4,
+    "distanceKm": 1.1,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_surge_arena_green",
+    "name": "arena to green",
+    "scenarioId": "sc_surge",
+    "fromStopId": "stop_surge_arena",
+    "toStopId": "stop_surge_green",
+    "baselineTravelMinutes": 8,
+    "distanceKm": 2.6,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_surge_green_arena",
+    "name": "green to arena",
+    "scenarioId": "sc_surge",
+    "fromStopId": "stop_surge_green",
+    "toStopId": "stop_surge_arena",
+    "baselineTravelMinutes": 8,
+    "distanceKm": 2.6,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_lowconf_ike_green",
+    "name": "ike to green",
+    "scenarioId": "sc_lowconf",
+    "fromStopId": "stop_lowconf_ike",
+    "toStopId": "stop_lowconf_green",
+    "baselineTravelMinutes": 5,
+    "distanceKm": 1.9,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_lowconf_green_ike",
+    "name": "green to ike",
+    "scenarioId": "sc_lowconf",
+    "fromStopId": "stop_lowconf_green",
+    "toStopId": "stop_lowconf_ike",
+    "baselineTravelMinutes": 5,
+    "distanceKm": 1.9,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_lowconf_green_union",
+    "name": "green to union",
+    "scenarioId": "sc_lowconf",
+    "fromStopId": "stop_lowconf_green",
+    "toStopId": "stop_lowconf_union",
+    "baselineTravelMinutes": 4,
+    "distanceKm": 1.3,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_lowconf_union_green",
+    "name": "union to green",
+    "scenarioId": "sc_lowconf",
+    "fromStopId": "stop_lowconf_union",
+    "toStopId": "stop_lowconf_green",
+    "baselineTravelMinutes": 4,
+    "distanceKm": 1.3,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_lowconf_union_grainger",
+    "name": "union to grainger",
+    "scenarioId": "sc_lowconf",
+    "fromStopId": "stop_lowconf_union",
+    "toStopId": "stop_lowconf_grainger",
+    "baselineTravelMinutes": 3,
+    "distanceKm": 0.5,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_lowconf_grainger_union",
+    "name": "grainger to union",
+    "scenarioId": "sc_lowconf",
+    "fromStopId": "stop_lowconf_grainger",
+    "toStopId": "stop_lowconf_union",
+    "baselineTravelMinutes": 3,
+    "distanceKm": 0.5,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_lowconf_arena_ike",
+    "name": "arena to ike",
+    "scenarioId": "sc_lowconf",
+    "fromStopId": "stop_lowconf_arena",
+    "toStopId": "stop_lowconf_ike",
+    "baselineTravelMinutes": 4,
+    "distanceKm": 1.1,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_lowconf_ike_arena",
+    "name": "ike to arena",
+    "scenarioId": "sc_lowconf",
+    "fromStopId": "stop_lowconf_ike",
+    "toStopId": "stop_lowconf_arena",
+    "baselineTravelMinutes": 4,
+    "distanceKm": 1.1,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_lowconf_arena_green",
+    "name": "arena to green",
+    "scenarioId": "sc_lowconf",
+    "fromStopId": "stop_lowconf_arena",
+    "toStopId": "stop_lowconf_green",
+    "baselineTravelMinutes": 8,
+    "distanceKm": 2.6,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_lowconf_green_arena",
+    "name": "green to arena",
+    "scenarioId": "sc_lowconf",
+    "fromStopId": "stop_lowconf_green",
+    "toStopId": "stop_lowconf_arena",
+    "baselineTravelMinutes": 8,
+    "distanceKm": 2.6,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_empty_ike_green",
+    "name": "ike to green",
+    "scenarioId": "sc_empty",
+    "fromStopId": "stop_empty_ike",
+    "toStopId": "stop_empty_green",
+    "baselineTravelMinutes": 5,
+    "distanceKm": 1.9,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_empty_green_ike",
+    "name": "green to ike",
+    "scenarioId": "sc_empty",
+    "fromStopId": "stop_empty_green",
+    "toStopId": "stop_empty_ike",
+    "baselineTravelMinutes": 5,
+    "distanceKm": 1.9,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_empty_green_union",
+    "name": "green to union",
+    "scenarioId": "sc_empty",
+    "fromStopId": "stop_empty_green",
+    "toStopId": "stop_empty_union",
+    "baselineTravelMinutes": 4,
+    "distanceKm": 1.3,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_empty_union_green",
+    "name": "union to green",
+    "scenarioId": "sc_empty",
+    "fromStopId": "stop_empty_union",
+    "toStopId": "stop_empty_green",
+    "baselineTravelMinutes": 4,
+    "distanceKm": 1.3,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_empty_union_grainger",
+    "name": "union to grainger",
+    "scenarioId": "sc_empty",
+    "fromStopId": "stop_empty_union",
+    "toStopId": "stop_empty_grainger",
+    "baselineTravelMinutes": 3,
+    "distanceKm": 0.5,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_empty_grainger_union",
+    "name": "grainger to union",
+    "scenarioId": "sc_empty",
+    "fromStopId": "stop_empty_grainger",
+    "toStopId": "stop_empty_union",
+    "baselineTravelMinutes": 3,
+    "distanceKm": 0.5,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_empty_arena_ike",
+    "name": "arena to ike",
+    "scenarioId": "sc_empty",
+    "fromStopId": "stop_empty_arena",
+    "toStopId": "stop_empty_ike",
+    "baselineTravelMinutes": 4,
+    "distanceKm": 1.1,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_empty_ike_arena",
+    "name": "ike to arena",
+    "scenarioId": "sc_empty",
+    "fromStopId": "stop_empty_ike",
+    "toStopId": "stop_empty_arena",
+    "baselineTravelMinutes": 4,
+    "distanceKm": 1.1,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_empty_arena_green",
+    "name": "arena to green",
+    "scenarioId": "sc_empty",
+    "fromStopId": "stop_empty_arena",
+    "toStopId": "stop_empty_green",
+    "baselineTravelMinutes": 8,
+    "distanceKm": 2.6,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_empty_green_arena",
+    "name": "green to arena",
+    "scenarioId": "sc_empty",
+    "fromStopId": "stop_empty_green",
+    "toStopId": "stop_empty_arena",
+    "baselineTravelMinutes": 8,
+    "distanceKm": 2.6,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_overload_ike_green",
+    "name": "ike to green",
+    "scenarioId": "sc_overload",
+    "fromStopId": "stop_overload_ike",
+    "toStopId": "stop_overload_green",
+    "baselineTravelMinutes": 5,
+    "distanceKm": 1.9,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_overload_green_ike",
+    "name": "green to ike",
+    "scenarioId": "sc_overload",
+    "fromStopId": "stop_overload_green",
+    "toStopId": "stop_overload_ike",
+    "baselineTravelMinutes": 5,
+    "distanceKm": 1.9,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_overload_green_union",
+    "name": "green to union",
+    "scenarioId": "sc_overload",
+    "fromStopId": "stop_overload_green",
+    "toStopId": "stop_overload_union",
+    "baselineTravelMinutes": 4,
+    "distanceKm": 1.3,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_overload_union_green",
+    "name": "union to green",
+    "scenarioId": "sc_overload",
+    "fromStopId": "stop_overload_union",
+    "toStopId": "stop_overload_green",
+    "baselineTravelMinutes": 4,
+    "distanceKm": 1.3,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_overload_union_grainger",
+    "name": "union to grainger",
+    "scenarioId": "sc_overload",
+    "fromStopId": "stop_overload_union",
+    "toStopId": "stop_overload_grainger",
+    "baselineTravelMinutes": 3,
+    "distanceKm": 0.5,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_overload_grainger_union",
+    "name": "grainger to union",
+    "scenarioId": "sc_overload",
+    "fromStopId": "stop_overload_grainger",
+    "toStopId": "stop_overload_union",
+    "baselineTravelMinutes": 3,
+    "distanceKm": 0.5,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_overload_arena_ike",
+    "name": "arena to ike",
+    "scenarioId": "sc_overload",
+    "fromStopId": "stop_overload_arena",
+    "toStopId": "stop_overload_ike",
+    "baselineTravelMinutes": 4,
+    "distanceKm": 1.1,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_overload_ike_arena",
+    "name": "ike to arena",
+    "scenarioId": "sc_overload",
+    "fromStopId": "stop_overload_ike",
+    "toStopId": "stop_overload_arena",
+    "baselineTravelMinutes": 4,
+    "distanceKm": 1.1,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_overload_arena_green",
+    "name": "arena to green",
+    "scenarioId": "sc_overload",
+    "fromStopId": "stop_overload_arena",
+    "toStopId": "stop_overload_green",
+    "baselineTravelMinutes": 8,
+    "distanceKm": 2.6,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_overload_green_arena",
+    "name": "green to arena",
+    "scenarioId": "sc_overload",
+    "fromStopId": "stop_overload_green",
+    "toStopId": "stop_overload_arena",
+    "baselineTravelMinutes": 8,
+    "distanceKm": 2.6,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_disrupt_ike_green",
+    "name": "ike to green",
+    "scenarioId": "sc_disrupt",
+    "fromStopId": "stop_disrupt_ike",
+    "toStopId": "stop_disrupt_green",
+    "baselineTravelMinutes": 5,
+    "distanceKm": 1.9,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_disrupt_green_ike",
+    "name": "green to ike",
+    "scenarioId": "sc_disrupt",
+    "fromStopId": "stop_disrupt_green",
+    "toStopId": "stop_disrupt_ike",
+    "baselineTravelMinutes": 5,
+    "distanceKm": 1.9,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_disrupt_green_union",
+    "name": "green to union",
+    "scenarioId": "sc_disrupt",
+    "fromStopId": "stop_disrupt_green",
+    "toStopId": "stop_disrupt_union",
+    "baselineTravelMinutes": 4,
+    "distanceKm": 1.3,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_disrupt_union_green",
+    "name": "union to green",
+    "scenarioId": "sc_disrupt",
+    "fromStopId": "stop_disrupt_union",
+    "toStopId": "stop_disrupt_green",
+    "baselineTravelMinutes": 4,
+    "distanceKm": 1.3,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_disrupt_union_grainger",
+    "name": "union to grainger",
+    "scenarioId": "sc_disrupt",
+    "fromStopId": "stop_disrupt_union",
+    "toStopId": "stop_disrupt_grainger",
+    "baselineTravelMinutes": 3,
+    "distanceKm": 0.5,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_disrupt_grainger_union",
+    "name": "grainger to union",
+    "scenarioId": "sc_disrupt",
+    "fromStopId": "stop_disrupt_grainger",
+    "toStopId": "stop_disrupt_union",
+    "baselineTravelMinutes": 3,
+    "distanceKm": 0.5,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_disrupt_arena_ike",
+    "name": "arena to ike",
+    "scenarioId": "sc_disrupt",
+    "fromStopId": "stop_disrupt_arena",
+    "toStopId": "stop_disrupt_ike",
+    "baselineTravelMinutes": 4,
+    "distanceKm": 1.1,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_disrupt_ike_arena",
+    "name": "ike to arena",
+    "scenarioId": "sc_disrupt",
+    "fromStopId": "stop_disrupt_ike",
+    "toStopId": "stop_disrupt_arena",
+    "baselineTravelMinutes": 4,
+    "distanceKm": 1.1,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_disrupt_arena_green",
+    "name": "arena to green",
+    "scenarioId": "sc_disrupt",
+    "fromStopId": "stop_disrupt_arena",
+    "toStopId": "stop_disrupt_green",
+    "baselineTravelMinutes": 8,
+    "distanceKm": 2.6,
+    "isSynthetic": true
+  },
+  {
+    "id": "lnk_disrupt_green_arena",
+    "name": "green to arena",
+    "scenarioId": "sc_disrupt",
+    "fromStopId": "stop_disrupt_green",
+    "toStopId": "stop_disrupt_arena",
+    "baselineTravelMinutes": 8,
+    "distanceKm": 2.6,
+    "isSynthetic": true
+  }
+]

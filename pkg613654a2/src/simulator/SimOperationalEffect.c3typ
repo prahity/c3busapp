@@ -1,0 +1,85 @@
+/**
+ * One concrete operational consequence of a {@link SimEvent} — a travel-time penalty, a stop
+ * closure, or a bus withdrawal — expressed as a typed effect over an explicit time window.
+ *
+ * Operational effects change how the network *behaves*; they do not create passengers (that is
+ * {@link SimDemandEffect}). A single event may carry several effects, and several events may
+ * target the same link/stop/bus at overlapping times.
+ *
+ * **How overlaps combine** (implemented by {@link SimEffects#resolve}, which flattens all
+ * effects into the disjoint intervals of {@link SimResolvedEffects}):
+ * - `TravelTimeMultiplier` on the same {@link SimTravelLink}: combined per
+ *   {@link SimAssumptions#overlappingMultiplierRule} — either `Multiply` (compounding
+ *   congestion, the default) or `Max` (worst-offender wins) — then clamped to
+ *   {@link SimAssumptions#maxTravelTimeMultiplier}.
+ * - `StopUnavailable` and `BusUnavailable`: **union**. Any active closure makes the stop or bus
+ *   unavailable; there is no partial availability.
+ * - Precedence: unavailability dominates travel time. A closed stop is skipped regardless of any
+ *   multiplier on its links.
+ * Every resolved interval retains {@link SimEffectInterval#sourceEventIds} so each applied
+ * change traces back to the events that caused it.
+ *
+ * **Units.** {@link SimOperationalEffect#travelTimeMultiplier} is dimensionless (1.0 = no
+ * change, 2.0 = twice as long). Window bounds are absolute instants.
+ */
+type SimOperationalEffect {
+
+  /**
+   * Which operational lever this effect pulls, and therefore which id collection is meaningful:
+   * `TravelTimeMultiplier` reads {@link SimOperationalEffect#linkIds},
+   * `StopUnavailable` reads {@link SimOperationalEffect#stopIds},
+   * `BusUnavailable` reads {@link SimOperationalEffect#busIds}.
+   */
+  effectKind: !string enum('TravelTimeMultiplier','StopUnavailable','BusUnavailable')
+
+  /**
+   * Start of the window during which this effect is active. Null falls back to
+   * {@link SimEvent#startTime}, which is the common case — the effect lasts exactly as long as
+   * its event. Set it explicitly to make an effect shorter than, or offset from, its event.
+   */
+  windowStart: datetime
+
+  /** End of the active window. Null falls back to {@link SimEvent#endTime}. */
+  windowEnd: datetime
+
+  /**
+   * Multiplier applied to the baseline travel time of each link in
+   * {@link SimOperationalEffect#linkIds}, for `TravelTimeMultiplier` effects only.
+   *
+   * Dimensionless and >= 1 in practice: `1.8` turns a 5-minute link into a 9-minute link. Values
+   * below 1 (a link getting *faster*) are accepted but flagged as a validation warning, since no
+   * mock category produces them. Ignored for the other effect kinds.
+   */
+  travelTimeMultiplier: double
+
+  /** Ids of the {@link SimTravelLink}s slowed by a `TravelTimeMultiplier` effect. */
+  linkIds: [string]
+
+  /** Ids of the {@link SimStop}s taken out of service by a `StopUnavailable` effect. */
+  stopIds: [string]
+
+  /**
+   * Ids of the buses withdrawn by a `BusUnavailable` effect. Normally {@link SimExtraBus} ids —
+   * core service is fixed and is never withdrawn, so that baseline and candidate runs remain
+   * comparable.
+   */
+  busIds: [string]
+
+  /**
+   * Pre-configured alternate {@link SimStop} for a `StopUnavailable` effect.
+   *
+   * **Null means there is no fallback**, and that is the default. The simulator then refuses to
+   * invent a reroute: passengers whose origin or destination stop is closed are recorded as
+   * unserved with reason `StopClosure`, counted in {@link SimAccounting#deniedByClosure}, and any
+   * plan that still calls at the closed stop is reported through
+   * {@link SimResults#infeasibilities}. Passengers are never silently relocated.
+   *
+   * A non-null value is an explicit, auditable decision taken **before the service day started**
+   * (it is only honoured when the owning event satisfies {@link SimEvent#knownAt} <=
+   * {@link SimScenario#planningCutoff}); relocation is then recorded in the demand trace.
+   */
+  fallbackStopId: string
+
+  /** Free-text rationale for this effect, surfaced in the event detail panel of the review UI. */
+  effectNote: string
+}

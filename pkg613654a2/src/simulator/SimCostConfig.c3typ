@@ -1,0 +1,53 @@
+/**
+ * Scenario-level cost accounting policy for supplemental service, carried on
+ * {@link SimScenario#costConfig} and {@link SimulationInput#costConfig}.
+ *
+ * Per-bus rates live on each {@link SimExtraBus}; this type says **which rates apply at all** and
+ * supplies fallbacks when a bus leaves them null. Making the policy explicit matters because
+ * "cost per passenger waiting minute saved" is meaningless unless the reader knows what went into
+ * the numerator — so {@link SimMetrics#costBasisNote} restates these choices alongside every
+ * total.
+ *
+ * Only extra-bus cost is modelled. Core service cost is excluded entirely: it is incurred in the
+ * baseline and in every candidate alike, so including it would add a constant to both sides of
+ * every comparison.
+ */
+type SimCostConfig {
+
+  /**
+   * ISO 4217 currency for every monetary value in the scenario, e.g. `USD`. Must match each
+   * {@link SimExtraBus#currency}; a disagreement is a validation error rather than a silent
+   * mixed-unit sum.
+   */
+  currency: !string
+
+  /**
+   * Whether {@link SimCostConfig#fixedCostPerAllocatedBus} is charged for a bus that was
+   * allocated but ended up running no trips.
+   *
+   * True (the default for the mock scenarios) is the honest setting: it means allocating a bus
+   * that finds no useful demand *costs* something and therefore worsens the cost curve, which is
+   * precisely how diminishing returns become visible. Setting it false would make surplus buses
+   * free and make every extra bus look harmless.
+   */
+  includeIdleAllocatedBuses: boolean
+
+  /**
+   * Fallback for {@link SimExtraBus#fixedCostPerDay} — charged once per allocated bus, in
+   * {@link SimCostConfig#currency}.
+   */
+  fixedCostPerAllocatedBus: double
+
+  /** Fallback for {@link SimExtraBus#costPerOperatingMinute}: cost per in-service minute. */
+  costPerOperatingMinute: double
+
+  /**
+   * Fallback for {@link SimExtraBus#costPerDeadheadMinute}: cost per minute running empty to
+   * reposition. Counted separately from in-service minutes so the overhead of sending a bus
+   * across the network to chase a bottleneck is visible rather than hidden.
+   */
+  costPerDeadheadMinute: double
+
+  /** Fallback for {@link SimExtraBus#costPerDwellMinute}: cost per minute stationary at a stop. */
+  costPerDwellMinute: double
+}

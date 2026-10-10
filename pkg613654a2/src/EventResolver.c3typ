@@ -1,0 +1,52 @@
+/**
+ * The deduplication, merge, and scoring pipeline that turns raw {@link CampusEvent}
+ * observations (manual + scraped) into canonical {@link MergedEvent} records for the bus-route
+ * optimizer.
+ *
+ * The pipeline, run once per day after the scrape (and incrementally for manual entries in
+ * between), proceeds: score each raw event's reputation → block candidates by calendar day →
+ * score pairwise similarity (fuzzy name + time proximity + location) → cluster duplicates with
+ * union-find → merge each cluster into one {@link MergedEvent} with field-level provenance →
+ * compute the combined reputation, reputation-weighted population, and start/end stop
+ * candidates. All scoring here uses transparent mathematical heuristics; an LLM could be
+ * swapped in to score credibility or resolve ambiguous matches without changing the surrounding
+ * flow.
+ */
+type EventResolver {
+
+  /**
+   * Recomputes {@link EventSource#reliabilityScore} for every {@link EventSource} from its
+   * current `baseReliability`, freshness ({@link EventSource#lastObservedAt}), and corroboration
+   * ({@link EventSource#corroboratedCount} / {@link EventSource#eventsObserved}), clamping
+   * scraped feeds to `[0.6, 0.95]`. Called at the start of each daily resolve.
+   *
+   * @return A JSON summary `{ updated, sources: [{ id, reliabilityScore }] }`.
+   */
+  recomputeSourceReliability: function(): json js-server
+
+  /**
+   * Runs the full daily pipeline over every {@link CampusEvent} whose start falls within the
+   * `[now - 1 day, now + windowDays]` window: scores raw reputations, deduplicates across and
+   * within sources, merges each cluster into a {@link MergedEvent} (union of fields with
+   * provenance, combined reputation, reputation-weighted population, start/end stop candidates),
+   * links the contributing raw events, and upserts the results.
+   *
+   * @param windowDays Forward horizon in days to resolve. Defaults to 30 when null or
+   *   non-positive.
+   * @return A JSON summary `{ rawEvents, clusters, merged, windowDays }`.
+   */
+  resolveAll: function(windowDays: int): json js-server
+
+  /**
+   * Scores a single manually entered {@link CampusEvent} immediately on submission (between
+   * daily scrapes): computes its credibility, checks whether it corroborates — or is
+   * corroborated by — existing data on the same day, and merges it into the matching
+   * {@link MergedEvent} (or creates a new one). Lets a fresh manual entry participate in
+   * routing without waiting for the next scrape; it is fully re-evaluated at the next
+   * {@link EventResolver#resolveAll}.
+   *
+   * @param eventId The {@link CampusEvent#id} of the manual entry to score and merge.
+   * @return A JSON summary `{ eventId, reputationScore, credibilityBasis, mergedEventId, matched }`.
+   */
+  scoreManualEvent: function(eventId: string): json js-server
+}

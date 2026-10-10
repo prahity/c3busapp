@@ -1,0 +1,60 @@
+/**
+ * Passenger conservation accounting for one simulation run — the invariant that makes every other
+ * metric trustworthy.
+ *
+ * The identity the engine must satisfy is:
+ *
+ * `generatedPassengers = completedPassengers + waitingAtHorizon + onboardAtHorizon + deniedByClosure`
+ *
+ * {@link SimAccounting#isBalanced} records whether it held. Passengers are never silently
+ * dropped: every person generated ends the run in exactly one of these four states, and if the sum
+ * ever fails to reconcile the run is reported as unbalanced rather than quietly publishing
+ * plausible-looking averages.
+ */
+type SimAccounting {
+
+  /**
+   * Passengers in the demand snapshot; equals {@link SimDemandSnapshot#totalPassengers}. Identical
+   * across the baseline and every candidate, by construction.
+   */
+  generatedPassengers: !int
+
+  /** Passengers who reached their destination stop within the horizon. */
+  completedPassengers: !int
+
+  /**
+   * Passengers still queued at a stop when the horizon ended, never having boarded.
+   *
+   * Their accrued wait is included in {@link SimMetrics#horizonTotalWaitingMinutes} but **not** in
+   * the completed-passenger averages, because a censored wait is a lower bound, not a final
+   * figure.
+   */
+  waitingAtHorizon: !int
+
+  /** Passengers still riding when the horizon ended — boarded but not yet arrived. */
+  onboardAtHorizon: !int
+
+  /**
+   * Passengers who could not travel because their origin or destination {@link SimStop} was
+   * unavailable and no {@link SimOperationalEffect#fallbackStopId} had been configured.
+   *
+   * Tracked as its own state precisely so closures cannot be papered over by silently relocating
+   * people or inventing a reroute.
+   */
+  deniedByClosure: !int
+
+  /**
+   * True when the identity in the type comment holds exactly. False is a bug in the engine, and
+   * the review UI shows it as an error rather than rendering the metrics as if they were sound.
+   */
+  isBalanced: !boolean
+
+  /** Peak simultaneous onboard passengers across all vehicles; a sanity check against total capacity. */
+  peakOnboard: int
+
+  /** Total boarding actions, used to cross-check against {@link SimBusItinerary} dwell times. */
+  totalBoardings: int
+
+  /** Total alighting actions. Equals {@link SimAccounting#completedPassengers} for direct, transfer-free trips. */
+  totalAlightings: int
+}

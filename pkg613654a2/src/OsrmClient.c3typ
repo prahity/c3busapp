@@ -1,0 +1,45 @@
+/**
+ * Declarative REST client for the public OSRM (Open Source Routing Machine) HTTP API running on
+ * the OpenStreetMap street network — the same street data that backs the map's OSM tile layer.
+ *
+ * The transit map needs route geometry that follows real streets, not straight stop-to-stop
+ * segments. Given an ordered list of real stop coordinates, OSRM's {@code route} service snaps
+ * them to the OSM road graph and returns a full on-street polyline. This is how both existing
+ * MTD routes and proposed supplemental corridors are drawn as street-following lines.
+ *
+ * {@link TransitNetworkMap} calls {@link OsrmClient#snapPath} (a thin js-server helper over the
+ * abstract {@code @rest} endpoint) which returns a decoded {@code [[lat, lng], ...]} point list.
+ * No API key is required — OSRM is a keyless public service — so there is no secret to manage.
+ */
+type OsrmClient mixes REST {
+  /**
+   * Raw OSRM {@code route} call. Maps to
+   * {@code GET route/v1/driving/{coordinates}?overview=full&geometries=geojson&...}, where
+   * {@code coordinates} is a {@code "lon,lat;lon,lat;..."} path segment. Returns the OSRM JSON
+   * ({@code {code, routes:[{geometry:{coordinates:[[lon,lat],...]}}]}}). The platform performs
+   * the HTTP call; no implementation is needed for this method.
+   */
+  @rest(uri='route/v1/driving/', method='GET')
+  route: abstract function(
+    @rest(partOfURI=true) coordinates: string,
+    overview: string,
+    geometries: string,
+    overviewSteps: boolean
+  ): json
+
+  /**
+   * Initialize the REST base URL (defaults to the public OSRM demo server). Called by
+   * {@link OsrmClient#snapPath} before each request.
+   */
+  initialize: function() js-server
+
+  /**
+   * Snap an ordered list of {@code [lat, lng]} stop coordinates to the OSM street network and
+   * return the full on-street geometry as a {@code [[lat, lng], ...]} point list (GeoJSON is
+   * {@code [lon, lat]}; this helper flips it to the {@code [lat, lng]} order Leaflet expects).
+   * Returns an object {@code {ok, points, distanceMeters, durationSeconds, note}}; on any routing
+   * failure {@code ok} is false and {@code points} falls back to the input coordinates so callers
+   * can still draw a (straight) line.
+   */
+  snapPath: function(coords: json): json js-server
+}

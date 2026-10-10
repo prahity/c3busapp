@@ -1,0 +1,116 @@
+/**
+ * Bridges the campus bus-route planner to the SurgePlanner simulator.
+ *
+ * <p>"SurgePlanner" is the UI over the {@link SimRunner} simulation subsystem. That subsystem is
+ * entirely <b>scenario-scoped</b>: {@link SimInputAssembler#assemble} and every adapter it calls
+ * ({@code SimCoreServiceAdapter}, {@code SimBusAvailabilityAdapter}, {@code SimEventFeedAdapter}, …)
+ * read scenario-scoped entity records by {@code Filter.eq('scenarioId', scenarioId)}. The clean
+ * integration therefore does not change the simulator at all — it <b>authors</b> a
+ * {@link SimScenario} plus the scenario-scoped child records the adapters expect, after which
+ * {@link SimRunner#runComparison} runs unchanged.
+ *
+ * <p><b>What is mapped, and how the existing-vs-proposed distinction is preserved.</b> The
+ * simulator's own ontology already encodes the distinction the user cares about:
+ * <ul>
+ *   <li><b>Existing MTD service → core.</b> Core service is represented by {@code SimRouteDef}
+ *       ({@code isCore=true}) + {@code SimCoreTrip}. It is fixed and invariant across runs. This
+ *       bridge <b>cannot</b> populate core service today: core stops require latitude/longitude
+ *       (a required {@code !double} on {@link SimStop}), but the CUMTD pipeline this app uses
+ *       ({@code MtdRoutesClient.baselineRoutes} and the underlying {@code getStopTimesByTrip} /
+ *       {@code searchStops} responses) exposes only {@code stop_id}/{@code stop_name} — no
+ *       coordinates. Rather than fabricate coordinates, the bridge omits core service and reports
+ *       it as a known gap (see {@link RouteNetworkSimBridge#buildScenario}'s {@code missing} list).
+ *       The practical consequence is documented there: the simulator baseline runs with zero core
+ *       capacity, so the comparison is "proposed supplemental fleet vs no supplemental service".</li>
+ *   <li><b>Proposed supplemental routes → the extra-bus decision variable.</b> The planner's
+ *       proposed fleet ({@code numBuses} vehicles of {@code busCapacity}) becomes the
+ *       {@link SimExtraBus} pool, which is the <i>only</i> decision variable the simulator's
+ *       planner optimizes (it allocates {@code 0..maxExtraBuses} and synthesizes their trips from
+ *       demand bottlenecks). This is exactly the SurgePlanner question: how many of the proposed
+ *       supplemental buses are worth running, and what service do they buy.</li>
+ *   <li><b>Rider demand → events.</b> Each coordinate-complete {@link MergedEvent} the planner uses
+ *       becomes one {@link SimEvent} carrying a {@code SimDemandEffect}: {@code attendance} =
+ *       {@link MergedEvent#estimatedPopulation}, {@code busUseShare} = the planner's
+ *       {@link PlannerConfig#transitShare}, {@code originDistribution} = the event's
+ *       {@link MergedEvent#startStopCandidates} weighted by score, and {@code destinationDistribution}
+ *       = the event's venue. Events are authored with {@code eventSource='Scheduled'}, which makes
+ *       the demand generator apply a reliability weight of exactly {@code 1.0}, so the generated
+ *       inbound rider total reconciles with the planner's reported demand to the integer.</li>
+ *   <li><b>Stops → {@link SimStop}.</b> Every origin candidate coordinate and every venue coordinate
+ *       becomes a {@link SimStop}. Origin and destination stop ids live in separate namespaces
+ *       ({@code origin_*} vs {@code dest_*}) so that no demand leg ever has its origin stop equal to
+ *       its destination stop (the generator silently drops such passengers).</li>
+ *   <li><b>Travel times → {@link SimTravelLink}.</b> One directed link per used origin↔destination
+ *       pair, with {@code baselineTravelMinutes} and {@code distanceKm} estimated by haversine at the
+ *       scenario's deadhead speed — labelled as an estimate.</li>
+ * </ul>
+ *
+ * <p>All authored records are flagged {@code isSynthetic=true} and carry a {@code syntheticDataLabel}
+ * on the scenario, because the demand figures and stop placements are <i>estimates derived from
+ * scraped campus events</i>, not surveyed MTD operational data. Provenance (attendance basis, travel
+ * basis) is preserved in record notes and in the returned report.
+ */
+type RouteNetworkSimBridge {
+  /**
+   * Map the planner's output into a {@link SimScenario} plus scenario-scoped {@link SimStop},
+   * {@link SimEvent}, {@link SimExtraBus} and {@link SimTravelLink} records, persist them, validate
+   * the assembled {@code SimulationInput} with {@link SimInputAssembler#validate}, and return a
+   * JSON mapping/validation report.
+   *
+   * <p>The method calls {@link RoutePlanner#generateNetwork} with the same parameters to obtain the
+   * authoritative planner output (the set of events used and the reported {@code estimatedDemand}),
+   * then builds the scenario from those same {@link MergedEvent}s so the mapped inbound rider demand
+   * reconciles with the planner's figure.
+   *
+   * @param scenarioId           id to create/overwrite. Blank -> a generated {@code sc_busplan_*} id.
+   * @param windowDays           look-ahead horizon in days passed through to
+   *                             {@link RoutePlanner#generateNetwork}; non-positive -> 30.
+   * @param numBuses             size of the proposed supplemental fleet; becomes the
+   *                             {@link SimExtraBus} pool size and the scenario's
+   *                             {@link SimScenario#maxExtraBuses}. Non-positive -> 5.
+   * @param busCapacity          riders per supplemental bus; becomes {@link SimExtraBus#capacity}.
+   *                             Non-positive -> 40.
+   * @param meanTimeToServiceMin target mean rider wait (minutes) passed through to the planner;
+   *                             non-positive -> 20.
+   * @param replace              when true, existing scenario-scoped records for {@code scenarioId}
+   *                             (and the {@link SimScenario} itself) are removed before authoring.
+   * @return a report {@code {scenarioId, created:{stops,events,extraBuses,travelLinks}, horizon,
+   *         reconciliation:{plannerEstimatedDemand, mappedInboundDemand, match, perEvent[]},
+   *         distinction:{existingMtd, proposedSupplemental}, validation:{isValid, errorCount,
+   *         warningCount, errors[]}, simplifications[], missing[], provenance}}.
+   */
+  buildScenario: function(
+    scenarioId: string,
+    windowDays: int,
+    numBuses: int,
+    busCapacity: int,
+    meanTimeToServiceMin: double,
+    replace: boolean
+  ): json js-server
+
+  /**
+   * Convenience: run {@link RouteNetworkSimBridge#buildScenario} and, if the assembled input is
+   * valid, immediately run {@link SimRunner#runComparison} on the generated scenario, returning the
+   * mapping report augmented with a compact {@code comparison} summary (baseline vs best allocation,
+   * buses used, riders served/unserved, cost per minute saved). Parameters are identical to
+   * {@link RouteNetworkSimBridge#buildScenario}.
+   *
+   * @param scenarioId           see {@link RouteNetworkSimBridge#buildScenario}.
+   * @param windowDays           see {@link RouteNetworkSimBridge#buildScenario}.
+   * @param numBuses             see {@link RouteNetworkSimBridge#buildScenario}.
+   * @param busCapacity          see {@link RouteNetworkSimBridge#buildScenario}.
+   * @param meanTimeToServiceMin see {@link RouteNetworkSimBridge#buildScenario}.
+   * @param replace              see {@link RouteNetworkSimBridge#buildScenario}.
+   * @return the {@link RouteNetworkSimBridge#buildScenario} report plus a {@code comparison} block,
+   *         or the report with {@code comparison:null} and a {@code comparisonSkipped} reason when
+   *         validation failed.
+   */
+  buildAndCompare: function(
+    scenarioId: string,
+    windowDays: int,
+    numBuses: int,
+    busCapacity: int,
+    meanTimeToServiceMin: double,
+    replace: boolean
+  ): json js-server
+}

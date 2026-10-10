@@ -1,0 +1,119 @@
+[
+  {
+    "id": "stop_first_gregory",
+    "name": "First & Gregory (MTD)",
+    "latitude": 40.1017,
+    "longitude": -88.2286,
+    "stopType": "BusStop",
+    "routes": "22, 220, 13",
+    "weight": 1800
+  },
+  {
+    "id": "stop_assembly_hall",
+    "name": "First & St. Mary's (State Farm Center)",
+    "latitude": 40.0975,
+    "longitude": -88.2345,
+    "stopType": "BusStop",
+    "routes": "22, 120, 220",
+    "weight": 2200
+  },
+  {
+    "id": "stop_kirby_oak",
+    "name": "Kirby & Oak (Memorial Stadium)",
+    "latitude": 40.1,
+    "longitude": -88.2385,
+    "stopType": "BusStop",
+    "routes": "22, 50",
+    "weight": 2000
+  },
+  {
+    "id": "stop_green_wright",
+    "name": "Green & Wright (Illini Union)",
+    "latitude": 40.1098,
+    "longitude": -88.2286,
+    "stopType": "BusStop",
+    "routes": "1, 5, 21, 22, 100, 220",
+    "weight": 5200
+  },
+  {
+    "id": "stop_goodwin_oregon",
+    "name": "Goodwin & Oregon (Krannert)",
+    "latitude": 40.1092,
+    "longitude": -88.2238,
+    "stopType": "BusStop",
+    "routes": "22, 180",
+    "weight": 1500
+  },
+  {
+    "id": "stop_fourth_gregory",
+    "name": "Fourth & Gregory (ARC)",
+    "latitude": 40.1008,
+    "longitude": -88.2335,
+    "stopType": "BusStop",
+    "routes": "9, 13, 22",
+    "weight": 2600
+  },
+  {
+    "id": "pr_state_farm_lot",
+    "name": "State Farm Center Lot 31 (Park & Ride)",
+    "latitude": 40.0948,
+    "longitude": -88.2372,
+    "stopType": "ParkAndRide",
+    "routes": "120",
+    "weight": 3500
+  },
+  {
+    "id": "pr_i_hotel",
+    "name": "I-Hotel & Conference Center Lot",
+    "latitude": 40.0931,
+    "longitude": -88.236,
+    "stopType": "ParkAndRide",
+    "routes": "12, 13",
+    "weight": 1200
+  },
+  {
+    "id": "park_grainger",
+    "name": "Grainger / North Campus Parking",
+    "latitude": 40.1138,
+    "longitude": -88.2262,
+    "stopType": "ParkingArea",
+    "routes": "",
+    "weight": 900
+  },
+  {
+    "id": "pop_ikenberry",
+    "name": "Ikenberry Commons (dorms)",
+    "latitude": 40.1,
+    "longitude": -88.2318,
+    "stopType": "PopulationCenter",
+    "routes": "9, 13, 22",
+    "weight": 6500
+  },
+  {
+    "id": "pop_six_pack",
+    "name": "Florida Avenue Residence Halls",
+    "latitude": 40.0962,
+    "longitude": -88.2235,
+    "stopType": "PopulationCenter",
+    "routes": "5, 12",
+    "weight": 4200
+  },
+  {
+    "id": "pop_green_st",
+    "name": "Campustown / Green Street Apartments",
+    "latitude": 40.1101,
+    "longitude": -88.2305,
+    "stopType": "PopulationCenter",
+    "routes": "1, 5, 21, 22, 100",
+    "weight": 9000
+  },
+  {
+    "id": "pop_pennsylvania",
+    "name": "Pennsylvania Avenue Residence Halls",
+    "latitude": 40.0989,
+    "longitude": -88.2259,
+    "stopType": "PopulationCenter",
+    "routes": "5, 12, 13",
+    "weight": 3800
+  }
+]

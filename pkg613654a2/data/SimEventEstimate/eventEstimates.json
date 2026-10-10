@@ -1,0 +1,163 @@
+[
+  {
+    "id": "eve_surge_concert",
+    "name": "Attendance forecast: State Farm Center headline concert",
+    "scenarioId": "sc_surge",
+    "canonicalEventId": "ev_surge_concert",
+    "eventName": "State Farm Center headline concert",
+    "locationStopId": "stop_surge_arena",
+    "startTime": "2026-10-13T19:00:00-05:00",
+    "endTime": "2026-10-13T21:30:00-05:00",
+    "estimatedAttendance": 4200,
+    "expectedInboundPeakTime": "2026-10-13T18:40:00-05:00",
+    "expectedOutboundPeakTime": "2026-10-13T21:40:00-05:00",
+    "destinationDistribution": [
+      {
+        "stopId": "stop_surge_ike",
+        "share": 0.4
+      },
+      {
+        "stopId": "stop_surge_green",
+        "share": 0.35
+      },
+      {
+        "stopId": "stop_surge_union",
+        "share": 0.25
+      }
+    ],
+    "confidence": 0.88,
+    "producer": "mock-llm-event-estimator-v0",
+    "observedAt": "2026-10-12T23:00:00-05:00",
+    "forecastAt": "2026-10-13T05:00:00-05:00",
+    "knownAt": "2026-10-13T05:00:00-05:00",
+    "isSynthetic": true
+  },
+  {
+    "id": "eve_lowconf_rally_canonical",
+    "name": "Attendance forecast: Reported rally on the Main Quad (Green Street stop)",
+    "scenarioId": "sc_lowconf",
+    "canonicalEventId": "ev_lowconf_rally_canonical",
+    "eventName": "Reported rally on the Main Quad (Green Street stop)",
+    "locationStopId": "stop_lowconf_green",
+    "startTime": "2026-10-13T15:00:00-05:00",
+    "endTime": "2026-10-13T17:00:00-05:00",
+    "estimatedAttendance": 600,
+    "expectedInboundPeakTime": "2026-10-13T14:50:00-05:00",
+    "expectedOutboundPeakTime": "2026-10-13T17:15:00-05:00",
+    "destinationDistribution": [
+      {
+        "stopId": "stop_lowconf_ike",
+        "share": 0.5
+      },
+      {
+        "stopId": "stop_lowconf_union",
+        "share": 0.3
+      },
+      {
+        "stopId": "stop_lowconf_grainger",
+        "share": 0.2
+      }
+    ],
+    "confidence": 0.4,
+    "producer": "mock-llm-event-estimator-v0",
+    "observedAt": "2026-10-12T23:00:00-05:00",
+    "forecastAt": "2026-10-13T05:00:00-05:00",
+    "knownAt": "2026-10-13T05:00:00-05:00",
+    "isSynthetic": true
+  },
+  {
+    "id": "eve_lowconf_farmers_market",
+    "name": "Attendance forecast: Urbana evening market shuttle crowd (Illini Union stop)",
+    "scenarioId": "sc_lowconf",
+    "canonicalEventId": "ev_lowconf_farmers_market",
+    "eventName": "Urbana evening market shuttle crowd (Illini Union stop)",
+    "locationStopId": "stop_lowconf_union",
+    "startTime": "2026-10-13T17:30:00-05:00",
+    "endTime": "2026-10-13T19:00:00-05:00",
+    "estimatedAttendance": 240,
+    "expectedInboundPeakTime": "2026-10-13T17:25:00-05:00",
+    "expectedOutboundPeakTime": "2026-10-13T19:15:00-05:00",
+    "destinationDistribution": [
+      {
+        "stopId": "stop_lowconf_ike",
+        "share": 0.55
+      },
+      {
+        "stopId": "stop_lowconf_grainger",
+        "share": 0.45
+      }
+    ],
+    "confidence": 0.9,
+    "producer": "mock-llm-event-estimator-v0",
+    "observedAt": "2026-10-12T23:00:00-05:00",
+    "forecastAt": "2026-10-13T05:00:00-05:00",
+    "knownAt": "2026-10-13T05:00:00-05:00",
+    "isSynthetic": true
+  },
+  {
+    "id": "eve_overload_ol_game",
+    "name": "Attendance forecast: Sold-out basketball game, State Farm Center",
+    "scenarioId": "sc_overload",
+    "canonicalEventId": "ev_overload_ol_game",
+    "eventName": "Sold-out basketball game, State Farm Center",
+    "locationStopId": "stop_overload_arena",
+    "startTime": "2026-10-13T17:00:00-05:00",
+    "endTime": "2026-10-13T19:15:00-05:00",
+    "estimatedAttendance": 14000,
+    "expectedInboundPeakTime": "2026-10-13T16:50:00-05:00",
+    "expectedOutboundPeakTime": "2026-10-13T19:25:00-05:00",
+    "destinationDistribution": [
+      {
+        "stopId": "stop_overload_ike",
+        "share": 0.4
+      },
+      {
+        "stopId": "stop_overload_green",
+        "share": 0.35
+      },
+      {
+        "stopId": "stop_overload_union",
+        "share": 0.25
+      }
+    ],
+    "confidence": 0.95,
+    "producer": "mock-llm-event-estimator-v0",
+    "observedAt": "2026-10-12T23:00:00-05:00",
+    "forecastAt": "2026-10-13T05:00:00-05:00",
+    "knownAt": "2026-10-13T05:00:00-05:00",
+    "isSynthetic": true
+  },
+  {
+    "id": "eve_overload_ol_career_fair",
+    "name": "Attendance forecast: Engineering career fair close, Grainger",
+    "scenarioId": "sc_overload",
+    "canonicalEventId": "ev_overload_ol_career_fair",
+    "eventName": "Engineering career fair close, Grainger",
+    "locationStopId": "stop_overload_grainger",
+    "startTime": "2026-10-13T15:30:00-05:00",
+    "endTime": "2026-10-13T18:30:00-05:00",
+    "estimatedAttendance": 3000,
+    "expectedInboundPeakTime": "2026-10-13T15:15:00-05:00",
+    "expectedOutboundPeakTime": "2026-10-13T18:40:00-05:00",
+    "destinationDistribution": [
+      {
+        "stopId": "stop_overload_ike",
+        "share": 0.45
+      },
+      {
+        "stopId": "stop_overload_green",
+        "share": 0.3
+      },
+      {
+        "stopId": "stop_overload_union",
+        "share": 0.25
+      }
+    ],
+    "confidence": 0.92,
+    "producer": "mock-llm-event-estimator-v0",
+    "observedAt": "2026-10-12T23:00:00-05:00",
+    "forecastAt": "2026-10-13T05:00:00-05:00",
+    "knownAt": "2026-10-13T05:00:00-05:00",
+    "isSynthetic": true
+  }
+]

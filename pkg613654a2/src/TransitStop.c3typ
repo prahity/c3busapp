@@ -1,0 +1,36 @@
+/**
+ * A geographic point the bus-route optimizer can use as an origin or destination when
+ * servicing an event: an existing transit stop, a park-and-ride, a parking area, or a
+ * residential population center.
+ *
+ * {@link EventResolver#resolveAll} snaps each {@link MergedEvent} to nearby stops by haversine
+ * distance to populate its start- and end-stop candidate lists. Drop-offs (end stops) are
+ * drawn from {@link TransitStop#stopType} `BusStop` near the venue; origins (start stops) are
+ * drawn from `ParkAndRide`, `ParkingArea`, and `PopulationCenter` points where riders begin
+ * their trip.
+ */
+entity type TransitStop schema name 'TRANSIT_STOP' {
+  /** Stop or place name, e.g. "First & Gregory (MTD)" or "Ikenberry Commons". */
+  name: !string
+
+  /** WGS84 latitude in decimal degrees. */
+  latitude: !double
+
+  /** WGS84 longitude in decimal degrees. */
+  longitude: !double
+
+  /**
+   * How this point participates in routing: a boardable `BusStop`, a `ParkAndRide` lot, a
+   * general `ParkingArea`, or a residential `PopulationCenter` (dorm/apartment cluster).
+   */
+  stopType: !string enum('BusStop', 'ParkAndRide', 'ParkingArea', 'PopulationCenter')
+
+  /** Comma-separated MTD route identifiers served here, when known (e.g. "22, 220, 5"). */
+  routes: string
+
+  /**
+   * Approximate population or daily boardings anchored at this point; lets the optimizer rank
+   * origins by how many riders they plausibly contribute.
+   */
+  weight: int
+}

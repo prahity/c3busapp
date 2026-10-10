@@ -1,0 +1,25 @@
+/**
+ * Downloads the Champaign-Urbana MTD static GTFS feed (google_transit.zip) and parses it into
+ * per-route on-street polylines for the transit map. GTFS {@code shapes.txt} holds the actual
+ * street geometry each route traces, so these lines follow real roads (not straight segments).
+ *
+ * {@link GtfsClient#existingRoutes} downloads the zip, reads {@code routes.txt}, {@code trips.txt}
+ * and {@code shapes.txt}, picks one representative shape per route, decimates it, and returns
+ * {@code [{routeId, shortName, color, path:[[lat,lng],...]}]}. No API key is required for the
+ * public GTFS download, so there is no secret to manage.
+ */
+type GtfsClient mixes REST {
+  /** Raw GTFS zip download. Maps to {@code GET gtfs/google_transit.zip}. Platform performs the call. */
+  @rest(uri='gtfs/google_transit.zip', method='GET')
+  download: abstract function(): HttpResponse
+
+  /** Set the REST base URL (CUMTD developer host). Called before {@link GtfsClient#existingRoutes}. */
+  initialize: function() js-server
+
+  /**
+   * Download + parse the GTFS feed into existing-route polylines following real streets.
+   * {@code maxRoutes} caps how many routes are returned (most-shape-points first); {@code every}
+   * decimates shape points (keep 1 of every N) to keep the payload small.
+   */
+  existingRoutes: function(maxRoutes: int, every: int): json js-server
+}

@@ -1,0 +1,87 @@
+/**
+ * TransitPlanner — the event-transit day planner for Champaign-Urbana MTD.
+ *
+ * This is the algorithmic core described in the planner spec. It is deliberately source-agnostic:
+ * it consumes the normalized <b>segment-table</b> + <b>demand</b> contract (plain {@code json}) that
+ * the per-source adapters produce, so it can be driven by live data in production and by small fixed
+ * test networks in unit tests without changing a line. Tunable parameters come from
+ * {@link PlannerConfig} (overridable per call); API keys/endpoints never pass through here.
+ *
+ * <h3>Segment-table format</h3>
+ * <pre>
+ * { "&lt;start_stop_id&gt;": { "&lt;dest_stop_id&gt;": [
+ *     { "route_id": "...", "departure_times": [sec,...],
+ *       "arrivals": [["&lt;segment_id&gt;", arr_sec], ...], "block_id": "..." } ] } }
+ * </pre>
+ * {@code departure_times[i]} and {@code arrivals[i]} describe the same bus; arrays are equal length
+ * and sorted by departure. Seconds are since midnight of the service day and may exceed 86400.
+ * {@code segment_id = "<trip_id>|<start>:<seq>|<end>:<seq>"}. Consecutive trips sharing a
+ * {@code block_id} are the same vehicle and are NOT a transfer. Core service is never modified.
+ *
+ * <h3>Algorithm</h3> (see {@link TransitPlanner#planDay})
+ * <ol>
+ *   <li>Apply operational events (remove closed segments; add travel-time increases) within windows.</li>
+ *   <li>Process demand intervals in time order so earlier riders consume capacity for later ones.</li>
+ *   <li>Find candidate journeys with a rounds-based (RAPTOR-style) search over segments + walking
+ *       transfers, up to {@code maxTransfers}; keep routes not Pareto-beaten on all three priorities
+ *       (door-to-door time, arrival buffer, crowding).</li>
+ *   <li>Filter routes that miss the deadline or violate walk/transfer/slack limits.</li>
+ *   <li>Score {@code wTime*doorToDoor - wBuffer*buffer + wCrowd*crowdingPenalty}.</li>
+ *   <li>Assign riders to core service best-route-first, starting each trip at its background
+ *       ridership; allow standing only under the standing-time limit; never exceed total capacity;
+ *       overflow to the next-best route.</li>
+ *   <li>Plan supplemental buses for remaining overflow, reusing an extra bus across intervals when
+ *       its availability window allows.</li>
+ *   <li>Report leftover demand as unserved with a reason.</li>
+ *   <li>Produce the rider view, the MTD day-plan view, and the unserved report.</li>
+ * </ol>
+ */
+type TransitPlanner {
+  /**
+   * Plan a full service day from the normalized contract and return the three output views.
+   *
+   * @param plan a json object with:
+   *   <ul>
+   *     <li>{@code segmentTable} — the segment table above (required).</li>
+   *     <li>{@code demand} — array of interval demand entries, each
+   *         {@code {id, direction:"to"|"from", origin, destination, riders, earliestDeparture, deadline}}
+   *         (seconds since midnight). Entries are already split across start stops by the location
+   *         adapter; the planner only sums overlapping demand per trip.</li>
+   *     <li>{@code walkTimes} — {@code {"<from>-><to>": seconds}} for origin→stop, stop↔stop, stop→venue.</li>
+   *     <li>{@code operationalEvents} — array of
+   *         {@code {window:[from,to], closedSegments:[id], closedRoutes:[route_id], closedStops:[stop],
+   *         travelTimeIncreaseSeconds, affectedRoutes:[route_id]}}.</li>
+   *     <li>{@code capacities} — {@code {byRoute:{<route_id>:{seated,total}}, byBlock:{...}, default:{seated,total}}}.</li>
+   *     <li>{@code backgroundRidership} — {@code {<route_id>: ridersPerTrip}} added to each trip's starting load.</li>
+   *     <li>{@code extraBuses} — array of
+   *         {@code {id, seated, total, startLocation, availableFrom, availableUntil}}.</li>
+   *     <li>{@code settings} — optional overrides for the {@link PlannerConfig} fields.</li>
+   *   </ul>
+   * @return {@code {riderView, mtdView, unserved, assignments, supplemental, diagnostics}} — the
+   *   planner output that doubles as the simulator input.
+   */
+  planDay: function(plan: json): json js-server
+
+  /**
+   * Resolve effective planner settings: {@link PlannerConfig} defaults overlaid with any per-call
+   * overrides. Exposed so the UI/tests can preview exactly which parameters a run will use.
+   *
+   * @param overrides optional json of {@link PlannerConfig} field overrides (may be null).
+   * @return the fully-resolved settings object.
+   */
+  resolveSettings: function(overrides: json): json js-server
+
+  /**
+   * Runnable usage example: build one representative Champaign-Urbana service day entirely from
+   * inline fixture data (park-and-ride lots, a transfer hub, a stadium and a classroom quad; a
+   * morning class peak and an evening game peak; a mid-event traffic delay; an available extra bus)
+   * and run it through {@link TransitPlanner#planDay}. It needs no live feeds or secrets, so it is
+   * the quickest way to see both the rider view and the MTD day-plan view produced end-to-end.
+   *
+   * In production the same {@code plan} object is assembled by the per-source adapters instead of
+   * being hard-coded here.
+   *
+   * @return the full {@link TransitPlanner#planDay} output for the example day.
+   */
+  exampleServiceDay: function(): json js-server
+}

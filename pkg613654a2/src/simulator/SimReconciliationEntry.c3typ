@@ -1,0 +1,69 @@
+/**
+ * One auditable reconciliation decision taken while assembling {@link SimulationInput} — which
+ * reports contributed to which event, which estimates were superseded, which cohort overlap was
+ * resolved, and what reliability weight was applied and why.
+ *
+ * The brief requires the reconciliation **trace** to survive into the output, not just its
+ * result: a reviewer looking at a demand figure must be able to work backwards to the producers
+ * and the policy that produced it. Entries are collected in
+ * {@link SimReconciliationTrace#entries} and exported alongside results.
+ */
+type SimReconciliationEntry {
+
+  /**
+   * What kind of decision this entry records:
+   * - `ReportMatchedByCanonicalId` — a {@link SimEventReport} already named its event. The
+   *   preferred path.
+   * - `ReportMatchedByFallback` — matched by stop and by start time within
+   *   {@link SimAssumptions#reportMatchWindowMinutes}. A documented mock heuristic.
+   * - `ReportUnmatched` — kept, counted, and surfaced as a warning; never promoted to an event.
+   * - `DuplicateEventSuppressed` — a {@link SimEvent} with {@link SimEvent#canonicalEventId} set
+   *   was excluded from generation so its crowd is not counted twice.
+   * - `EventSuperseded` — excluded in favour of {@link SimEvent#supersededByEventId}.
+   * - `CohortOverlapResolved` — an event and a location estimate described one population;
+   *   records which side won under {@link SimAssumptions#cohortOverlapPolicy}.
+   * - `EstimateSuperseded` — an `UpdateToCohort` row replaced an earlier estimate.
+   * - `ReliabilityWeightApplied` — records the confidence, reputation and resulting weight used
+   *   for one demand source.
+   */
+  entryKind: !string enum('ReportMatchedByCanonicalId','ReportMatchedByFallback','ReportUnmatched','DuplicateEventSuppressed','EventSuperseded','CohortOverlapResolved','EstimateSuperseded','ReliabilityWeightApplied')
+
+  /** Id of the canonical {@link SimEvent} this decision concerns, when it concerns one. */
+  targetEventId: string
+
+  /** Ids of the {@link SimEventReport}s that contributed to {@link SimReconciliationEntry#targetEventId}. */
+  contributingReportIds: [string]
+
+  /**
+   * Ids of {@link SimStudentLocationEstimate} or {@link SimEventEstimate} records that were
+   * superseded or suppressed by this decision. They remain in the input for inspection but
+   * generate nothing.
+   */
+  supersededEstimateIds: [string]
+
+  /** Cohort ids touched by this decision; see {@link SimDemandEffect#cohortId}. */
+  cohortIds: [string]
+
+  /** Name of the policy applied, e.g. `PreferEvent`, `ConfidenceTimesReputation`, `FallbackStopAndTimeMatch`. */
+  policy: string
+
+  /**
+   * Prose explanation of the decision, including the assumption being made. For
+   * `ReliabilityWeightApplied` under `ConfidenceTimesReputation` this states explicitly that two
+   * possibly-dependent measures were multiplied and that the product is not a calibrated
+   * probability.
+   */
+  rationale: string
+
+  /** {@link SimEvent#confidence} actually used, after any default substitution; on 0..1. */
+  confidenceUsed: double
+
+  /** {@link SimReputationScore#reliability} actually used, after any default substitution; on 0..1. */
+  reputationUsed: double
+
+  /**
+   * Final multiplier applied to expected demand, on 0..1. Expected riders are
+   * `attendance * busUseShare * appliedWeight`. A weight of 1.0 means reliability had no effect.
+   */
+  appliedWeight: double
+}

@@ -1,0 +1,72 @@
+/**
+ * One point on the cost-versus-time-saved curve: what allocating exactly `allocation` extra buses
+ * costs and what it achieves.
+ *
+ * {@link SimComparison#costCurve} holds one of these for every allocation from 0 to
+ * {@link SimScenario#maxExtraBuses}, and the review UI plots them. The purpose is to let MTD
+ * **choose** the allocation by reading cost against benefit — so the curve deliberately presents
+ * several measures rather than one unexplained score, and it is not smoothed, clamped or forced to
+ * be monotonic. Diminishing returns, and allocations that actively make things worse, show up as
+ * what they are.
+ */
+type SimCostCurvePoint {
+
+  /** Extra buses allocated at this point, 0..{@link SimScenario#maxExtraBuses}. Allocation 0 is the zero-bus candidate. */
+  allocation: !int
+
+  /** Total extra-bus operating cost, in {@link SimCostCurvePoint#currency}; see {@link SimMetrics#costBasisNote}. */
+  operatingCost: double
+
+  /** ISO 4217 code for {@link SimCostCurvePoint#operatingCost}. */
+  currency: string
+
+  /** {@link SimMetrics#horizonTotalWaitingMinutes} at this allocation — the comparison-safe wait aggregate. */
+  horizonTotalWaitingMinutes: double
+
+  /**
+   * `baseline - candidate` on {@link SimCostCurvePoint#horizonTotalWaitingMinutes}. **Not
+   * clamped** — a negative value means this allocation was worse than doing nothing, and is
+   * plotted as such.
+   */
+  horizonWaitingMinutesSaved: double
+
+  /** {@link SimMetrics#avgWaitMinutesCompleted}; read alongside {@link SimCostCurvePoint#unservedPassengers}. */
+  avgWaitMinutesCompleted: double
+
+  /** {@link SimMetrics#p95WaitMinutesCompleted} — the tail, which an average hides. */
+  p95WaitMinutesCompleted: double
+
+  /** {@link SimMetrics#lateCompletedPassengers}: had a deadline, arrived, arrived late. */
+  lateCompletedPassengers: int
+
+  /** {@link SimMetrics#lateCompletedPct}, 0..100, over deadline-bearing passengers. Null when none have deadlines. */
+  lateCompletedPct: double
+
+  /** {@link SimMetrics#unservedAtHorizon}: never reached their destination. Never counted as on time. */
+  unservedPassengers: int
+
+  /**
+   * {@link SimMetrics#costPerWaitingMinuteSaved}, or **null** when savings are zero or negative.
+   * See {@link SimCostCurvePoint#costPerMinuteSavedUnavailableReason}; the UI renders the reason
+   * instead of a number.
+   */
+  costPerWaitingMinuteSaved: double
+
+  /** Why the ratio is unavailable: `BaselineRun`, `ZeroSavings` or `NegativeSavings`. Null when it is available. */
+  costPerMinuteSavedUnavailableReason: string
+
+  /**
+   * Allocated buses that actually ran a trip. Less than {@link SimCostCurvePoint#allocation} once
+   * demand saturates — the clearest signal that further buses add nothing.
+   */
+  busesUsed: int
+
+  /** Allocated buses that ran nothing; see {@link SimBusItinerary#isIdle}. */
+  busesIdle: int
+
+  /** Id of the {@link SimPlan} evaluated at this allocation, for drill-down from the chart. */
+  planId: string
+
+  /** Id of the {@link SimResults} behind this point. */
+  resultsId: string
+}

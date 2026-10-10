@@ -1,0 +1,116 @@
+/**
+ * One structured output of the external, LLM-based **student location estimator**: "we expect
+ * roughly this many students of this cohort to want to travel from here to there, arriving at
+ * their stop in this window, to make this class".
+ *
+ * This simulator does not call an LLM and needs no credentials — records arrive through
+ * {@link SimStudentLocationAdapter#getEstimates}, which reads authored mock rows today and is
+ * the single method to reimplement when the real producer lands.
+ *
+ * **Cohorts, not students.** A row describes a synthetic *cohort*, never an individual. No
+ * personally identifying student data appears anywhere in this package.
+ *
+ * **Distinct cohort or update?** {@link SimStudentLocationEstimate#estimateKind} answers the
+ * question explicitly, which the brief calls out as a real integration hazard: a producer that
+ * re-emits a revised figure for a cohort must mark it `UpdateToCohort` and point
+ * {@link SimStudentLocationEstimate#supersedesEstimateId} at the row it replaces. Otherwise two
+ * rows for one cohort would double the demand. Superseded rows are retained for audit and
+ * excluded from generation.
+ *
+ * **Overlap with events.** When the same population is also described by a {@link SimEvent}'s
+ * {@link SimDemandEffect} — a class modelled as a `ClassOrGathering` event, say — the row sets
+ * {@link SimStudentLocationEstimate#linkedEventId} and
+ * {@link SimAssumptions#cohortOverlapPolicy} decides which side generates the passengers. Exactly
+ * one does.
+ */
+@db(index=['scenarioId, cohortId'])
+entity type SimStudentLocationEstimate {
+
+  /** Id of the owning {@link SimScenario}. */
+  scenarioId: !string
+
+  /**
+   * Stable id of the cohort this row describes, shared with {@link SimDemandEffect#cohortId} so
+   * the two producers can refer to the same population. Multiple rows with the same `cohortId`
+   * must be sequenced via {@link SimStudentLocationEstimate#estimateKind}.
+   */
+  cohortId: !string
+
+  /**
+   * Expected number of students in the cohort wanting to travel — a head count, and already a
+   * *travel* demand figure rather than an attendance figure, so no bus-use share is applied.
+   *
+   * Magnitude is kept strictly separate from {@link SimStudentLocationEstimate#confidence}.
+   */
+  predictedStudentCount: !int
+
+  /** Id of the {@link SimStop} the cohort departs from. A dangling id is a validation error. */
+  originStopId: string
+
+  /** Id of the {@link SimStop} the cohort is travelling to. */
+  destinationStopId: string
+
+  /**
+   * Start of the window during which the cohort arrives **at the origin stop** ready to board.
+   * Individual arrival instants are spread across the window per
+   * {@link SimAssumptions#arrivalWindowDistribution}.
+   */
+  arrivalWindowStart: datetime
+
+  /**
+   * End of the arrival window. Must be >= {@link SimStudentLocationEstimate#arrivalWindowStart};
+   * equal values mean the whole cohort shows up at one instant.
+   */
+  arrivalWindowEnd: datetime
+
+  /**
+   * When the class the cohort is travelling to begins — the arrival **deadline** used for
+   * lateness. Null means this cohort carries no deadline, and it is then excluded from the
+   * lateness denominator in {@link SimMetrics#deadlineBearingPassengers} entirely.
+   */
+  classStartTime: datetime
+
+  /**
+   * Producer confidence on 0..1 that the estimate is right. Null falls back to
+   * {@link SimAssumptions#defaultConfidence}. Weighted into generated demand per
+   * {@link SimAssumptions#reliabilityPolicy}.
+   */
+  confidence: double
+
+  /**
+   * Whether this row introduces a cohort or revises an existing one. `UpdateToCohort` requires
+   * {@link SimStudentLocationEstimate#supersedesEstimateId}; the assembler reports an error if it
+   * is missing, because the alternative is silently double-counting a cohort.
+   */
+  estimateKind: !string enum('NewCohort','UpdateToCohort')
+
+  /**
+   * Id of the {@link SimStudentLocationEstimate} this row replaces. The superseded row stays in
+   * {@link SimulationInput#studentLocationEstimates} for inspection but generates nothing, and
+   * the decision is logged as an `EstimateSuperseded` {@link SimReconciliationEntry}.
+   */
+  supersedesEstimateId: string
+
+  /**
+   * Id of a {@link SimEvent} describing the same population, when the producers know they
+   * overlap. Non-null makes the overlap explicit instead of leaving it to be guessed; the winner
+   * is chosen by {@link SimAssumptions#cohortOverlapPolicy}.
+   */
+  linkedEventId: string
+
+  /** When the underlying observation was made, as distinct from when it became usable. */
+  observedAt: datetime
+
+  /**
+   * When this estimate became available to the planning system. Compared against
+   * {@link SimScenario#planningCutoff} exactly as {@link SimEvent#knownAt} is, so a late-arriving
+   * estimate cannot leak into the frozen plan.
+   */
+  knownAt: !datetime
+
+  /** Identifier of the producing component, e.g. `mock-student-location-estimator-v1`. */
+  producer: string
+
+  /** Always true — synthetic mock data. */
+  isSynthetic: boolean
+}

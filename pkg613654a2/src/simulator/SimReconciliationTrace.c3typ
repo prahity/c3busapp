@@ -1,0 +1,30 @@
+/**
+ * The complete reconciliation audit trail for one assembled {@link SimulationInput}, carried on
+ * {@link SimulationInput#reconciliation} and included in every JSON export.
+ *
+ * Input assembly is the boundary where four independent producers meet, and its job is to
+ * **preserve disagreement rather than hide it**. This trace is how that promise is kept: the
+ * policies in force are stated, and every individual decision is listed in
+ * {@link SimReconciliationTrace#entries}.
+ */
+type SimReconciliationTrace {
+
+  /** Every decision taken, in order. See {@link SimReconciliationEntry}. */
+  entries: [SimReconciliationEntry]
+
+  /**
+   * The {@link SimAssumptions#reliabilityPolicy} in force for this assembly, restated here so an
+   * exported trace is self-describing.
+   */
+  reliabilityPolicy: string
+
+  /** The {@link SimAssumptions#cohortOverlapPolicy} in force for this assembly. */
+  cohortOverlapPolicy: string
+
+  /**
+   * Plain-language notes about what the policies do and do not claim — including that a weighted
+   * demand figure is not a calibrated probability, and that fallback report matching is a mock
+   * heuristic superseded by shared canonical ids once real producers supply them.
+   */
+  policyNotes: [string]
+}

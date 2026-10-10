@@ -1,0 +1,78 @@
+/**
+ * Mock source adapter for the simulator's **`events` collection**.
+ *
+ * This is the integration seam the other agents replace. Today
+ * {@link SimEventFeedAdapter#getEvents} reads authored {@link SimEvent} rows from the database,
+ * which makes the feed fully **editable** — the review UI creates, edits and deletes events
+ * through {@link SimEventFeedAdapter#upsertEvent} and {@link SimEventFeedAdapter#removeEvent} and
+ * immediately re-runs the simulation. When the real producers are ready, reimplementing
+ * `getEvents` to call them is the only change required; nothing in
+ * {@link SimInputAssembler}, {@link SimDemandGenerator}, {@link SimEngine} or
+ * {@link SimPlanner} needs to know where events came from.
+ *
+ * **Extensibility.** The adapter returns full-fidelity {@link SimEvent}s — timing, location,
+ * provenance, reliability and explicit effects — and never reduces an event to a passenger count.
+ * Because the engine dispatches on {@link SimEvent#demandEffect} and
+ * {@link SimEvent#operationalEffects} rather than on {@link SimEvent#eventType}, a new event
+ * category from the real contract needs new effect rows, not new engine code.
+ */
+type SimEventFeedAdapter {
+
+  /**
+   * Returns every {@link SimEvent} for a scenario, ordered by {@link SimEvent#startTime} then id
+   * so the result is stable across calls.
+   *
+   * Includes duplicates ({@link SimEvent#canonicalEventId} set), superseded events and
+   * low-confidence events: suppression is {@link SimInputAssembler}'s decision to make and record,
+   * not the adapter's to make silently. The full set is what reaches
+   * {@link SimulationInput#events}.
+   *
+   * @param scenarioId Id of the {@link SimScenario} to load events for.
+   * @return All events for the scenario, full fidelity, in deterministic order.
+   */
+  getEvents: function(scenarioId: !string): [SimEvent] js-server
+
+  /**
+   * Returns only the events a planner running at `cutoff` is entitled to use — those with
+   * {@link SimEvent#knownAt} at or before it, excluding duplicates and superseded records.
+   *
+   * Exists as its own method so the planning-knowledge restriction is enforced at the data
+   * boundary rather than relying on every caller to remember to filter. {@link SimEngine} never
+   * calls it; it realizes everything.
+   *
+   * @param scenarioId Id of the {@link SimScenario}.
+   * @param cutoff The planning cutoff, normally {@link SimScenario#planningCutoff}.
+   * @return Planner-visible events, in deterministic order.
+   */
+  getPlannerVisibleEvents: function(scenarioId: !string, cutoff: !datetime): [SimEvent] js-server
+
+  /**
+   * Creates or updates one event in the mock feed and returns the persisted record.
+   *
+   * Validates the event in isolation before writing — time ordering, confidence range, effect
+   * windows, share distributions — and throws with a readable message rather than persisting
+   * something the engine would later choke on. Used by the editable timeline in the review UI.
+   *
+   * @param event The {@link SimEvent} to persist. An existing id updates; a new or absent id creates.
+   * @return The persisted event.
+   */
+  upsertEvent: function(event: !SimEvent): SimEvent js-server
+
+  /**
+   * Removes one event from the mock feed, together with the {@link SimEventReport}s reconciled to
+   * it, so no report is orphaned onto a nonexistent event.
+   *
+   * @param eventId Id of the {@link SimEvent} to remove.
+   * @return A summary `{ removedEvent, removedReports }`.
+   */
+  removeEvent: function(eventId: !string): json js-server
+
+  /**
+   * Describes this adapter for the handoff documentation: contract version, the shape it returns,
+   * which fields are required versus optional, and precisely what a real implementation must
+   * supply in its place.
+   *
+   * @return A JSON descriptor of the adapter contract.
+   */
+  adapterInfo: function(): json js-server
+}

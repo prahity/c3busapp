@@ -1,0 +1,22 @@
+[
+  {
+    "id": "uiuc_calendar",
+    "sourceType": "Scraped",
+    "label": "UIUC Public Calendar (calendars.illinois.edu)",
+    "baseReliability": 0.9,
+    "eventsObserved": 0,
+    "corroboratedCount": 0,
+    "reliabilityScore": 0.9,
+    "reliabilityBasis": "official institutional feed; initial base reliability pending first resolve"
+  },
+  {
+    "id": "manual",
+    "sourceType": "Manual",
+    "label": "Manual user entries",
+    "baseReliability": 0.5,
+    "eventsObserved": 0,
+    "corroboratedCount": 0,
+    "reliabilityScore": 0.5,
+    "reliabilityBasis": "manual entries are scored individually per submission (see EventResolver.scoreManualEvent)"
+  }
+]

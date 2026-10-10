@@ -1,0 +1,114 @@
+/**
+ * One synthetic travel demand: a group of `passengerCount` people who appear at an origin stop at
+ * a known instant, all wanting the same destination, optionally against an arrival deadline.
+ *
+ * Journeys are generated once per scenario by {@link SimDemandGenerator#generate} and then held
+ * **immutable** in {@link SimDemandSnapshot#journeys}. Every allocation size and the mock
+ * old-model baseline consume the identical collection, which is what makes their metrics
+ * comparable.
+ *
+ * **Grouping.** A journey carries a {@link SimPassengerJourney#passengerCount} rather than being
+ * one record per person; this keeps large surges tractable. Boarding may split a group when
+ * capacity runs out partway through, so the engine tracks a remaining count per journey and the
+ * accounting identity in {@link SimAccounting} holds at passenger granularity, not journey
+ * granularity.
+ *
+ * **Direct trips only.** With {@link SimAssumptions#allowTransfers} false, a journey is served by
+ * a single vehicle that calls at the origin and later at the destination. A passenger is never
+ * boarded onto a trip that cannot reach {@link SimPassengerJourney#destinationStopId}.
+ *
+ * **Provenance.** {@link SimPassengerJourney#sourceEventId} /
+ * {@link SimPassengerJourney#sourceEstimateId} tie the demand back to the event or estimate that
+ * caused it, so generated passengers are always traceable to a source rather than appearing from
+ * nowhere.
+ */
+type SimPassengerJourney {
+
+  /**
+   * Stable, deterministic id, e.g. `j_<sourceId>_<leg>_<index>`. Derived from the source and
+   * index rather than randomly, so the same scenario and seed reproduce the same ids — which is
+   * what lets tests and the FIFO tie-break be deterministic.
+   */
+  journeyId: !string
+
+  /** Cohort this demand belongs to; see {@link SimDemandEffect#cohortId}. */
+  cohortId: string
+
+  /** Number of people in this group, >= 1. The unit of all passenger accounting. */
+  passengerCount: !int
+
+  /** Id of the {@link SimStop} where the group appears and begins waiting. */
+  originStopId: !string
+
+  /** Id of the {@link SimStop} the group is travelling to. Never equal to the origin. */
+  destinationStopId: !string
+
+  /**
+   * Instant the group arrives at {@link SimPassengerJourney#originStopId} and starts accruing
+   * wait. Drawn from the source's arrival window per
+   * {@link SimAssumptions#arrivalWindowDistribution}, and always within the simulation horizon.
+   *
+   * Also the FIFO key for {@link SimAssumptions#queueDiscipline}.
+   */
+  requestTime: !datetime
+
+  /**
+   * Instant by which the group must have **arrived at the destination stop** to count as on time,
+   * or null when this demand has no deadline.
+   *
+   * Only journeys with {@link SimPassengerJourney#hasDeadline} true enter the lateness
+   * denominator; see {@link SimMetrics#deadlineBearingPassengers}.
+   */
+  classDeadline: datetime
+
+  /**
+   * Whether {@link SimPassengerJourney#classDeadline} is set. Stored explicitly so the lateness
+   * denominator never has to be inferred from a null check at report time.
+   */
+  hasDeadline: !boolean
+
+  /**
+   * Which leg of a demand event this is: `Inbound` (travelling to the event) or `Outbound`
+   * (dispersing afterwards). `Direct` for demand from a {@link SimStudentLocationEstimate}, which
+   * has no event to be inbound or outbound of.
+   */
+  legKind: !string enum('Inbound','Outbound','Direct')
+
+  /**
+   * Whether the demand came from an event's {@link SimDemandEffect} or from a
+   * {@link SimStudentLocationEstimate}. Exactly one of
+   * {@link SimPassengerJourney#sourceEventId} / {@link SimPassengerJourney#sourceEstimateId} is
+   * set accordingly.
+   */
+  sourceKind: !string enum('Event','LocationEstimate')
+
+  /** Id of the originating {@link SimEvent}, for `Event` demand. The core of the demand-to-event trace. */
+  sourceEventId: string
+
+  /** Id of the originating {@link SimStudentLocationEstimate}, for `LocationEstimate` demand. */
+  sourceEstimateId: string
+
+  /**
+   * Reliability weight applied when sizing this demand, on 0..1; see
+   * {@link SimReconciliationEntry#appliedWeight}. Recorded per journey so a reviewer can see that
+   * a low-confidence event produced proportionally fewer passengers.
+   */
+  appliedWeight: double
+
+  /**
+   * Unweighted expected passengers for this journey's source before
+   * {@link SimPassengerJourney#appliedWeight} and rounding — kept so the effect of reliability
+   * weighting is measurable rather than merely asserted.
+   */
+  rawExpectedCount: double
+
+  /**
+   * Whether this group's origin was moved by an explicit, pre-configured
+   * {@link SimOperationalEffect#fallbackStopId}. False for every journey unless a fallback was
+   * deliberately configured before the service day; passengers are otherwise never relocated.
+   */
+  wasRelocated: boolean
+
+  /** One-line account of how this journey was produced, surfaced in the demand trace view. */
+  generationNote: string
+}

@@ -1,0 +1,39 @@
+/**
+ * An ordered sequence of stops forming a route.
+ *
+ * Core routes ({@link SimRouteDef#isCore} true) describe the **fixed** MTD service. They are
+ * identical in the baseline and in every candidate allocation and are never re-planned — the
+ * simulator only ever adds supplemental extra-bus trips on top of them.
+ *
+ * Routes are referenced by id from {@link SimCoreTrip#routeId} and
+ * {@link SimEvent#affectedRouteIds}.
+ */
+@db(index=['scenarioId'])
+entity type SimRouteDef {
+
+  /** Id of the owning {@link SimScenario}. */
+  scenarioId: !string
+
+  /** Human-readable summary of what the route covers, shown in the review UI. */
+  description: string
+
+  /**
+   * Whether this is fixed core MTD service. Core routes and their {@link SimCoreTrip}s are held
+   * constant across all simulations, per the agreed scope: the simulator advises on supplemental
+   * capacity only and never competes with MTD's own routing.
+   */
+  isCore: boolean
+
+  /**
+   * **Ordered** list of {@link SimStop} ids, from first to last call.
+   *
+   * Order is significant, which is why this is `[string]` rather than a reference collection —
+   * C3 reference collections carry no guaranteed ordering. Consecutive pairs are expected to have
+   * a matching {@link SimTravelLink}; a missing link is reported as a validation warning and the
+   * engine falls back to a straight-line deadhead estimate.
+   */
+  stopSequence: [string]
+
+  /** Always true — synthetic mock data. */
+  isSynthetic: boolean
+}

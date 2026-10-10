@@ -1,0 +1,74 @@
+/**
+ * Declarative REST client for the Champaign-Urbana Mass Transit District (CUMTD) JSON API
+ * (v2.2), plus the helper logic that composes raw CUMTD endpoints into the baseline-route
+ * shape the planner consumes.
+ *
+ * The baseline-route shape is a map keyed by start stop id:
+ * <pre>
+ *   {
+ *     "&lt;start_stop_id&gt;": {
+ *       "departure_times": ["2026-10-09T17:00:00", ...],
+ *       "destinations": [
+ *         { "stop_id": "...", "name": "...", "arrival_times": ["2026-10-09T17:04:00", ...] },
+ *         ...
+ *       ]
+ *     }
+ *   }
+ * </pre>
+ *
+ * The CUMTD API key is read from {@link MtdApiConfig} (secret store) and passed as the
+ * {@code key} query parameter — it is never hardcoded. The abstract {@code @rest} methods
+ * are handled entirely by the platform; only the helper methods are implemented in
+ * {@code MtdRoutesClient.js}.
+ */
+type MtdRoutesClient mixes REST {
+  /**
+   * Real-time scheduled/expected departures leaving a stop. Maps to CUMTD
+   * {@code GET getdeparturesbystop?stop_id=&key=}. Returns {@code {departures:[...]}} where
+   * each departure carries {@code trip.trip_id}, {@code scheduled} and {@code expected}.
+   */
+  @rest(uri='getdeparturesbystop', method='GET')
+  getDeparturesByStop: abstract function(stop_id: string, key: string): json
+
+  /**
+   * The ordered stop_times for one trip. Maps to CUMTD {@code GET getstoptimesbytrip?trip_id=&key=}.
+   * Returns {@code {stop_times:[{stop_point:{stop_id,stop_name}, arrival_time, departure_time}, ...]}}
+   * in service order, which is what lets us read off downstream destinations for a departure.
+   */
+  @rest(uri='getstoptimesbytrip', method='GET')
+  getStopTimesByTrip: abstract function(trip_id: string, key: string): json
+
+  /**
+   * Fuzzy stop lookup by name. Maps to CUMTD {@code GET getstopsbysearch?query=&count=&key=}.
+   * Returns {@code {stops:[{stop_id, stop_name}, ...]}} — used by the UI to resolve a human
+   * stop name to the CUMTD stop id required by {@link MtdRoutesClient#baselineRoutes}.
+   */
+  @rest(uri='getstopsbysearch', method='GET')
+  searchStops: abstract function(query: string, count: int, key: string): json
+
+  /**
+   * Initialize the REST base URL from {@link MtdApiConfig}. Called by the helper methods
+   * before every request. Throws a clear, secret-free error if configuration is missing.
+   */
+  initialize: function() js-server
+
+  /**
+   * Build the baseline-route map for a single CUMTD start stop. Pulls up to {@code maxTrips}
+   * current departures from the stop, fetches each trip's downstream stop_times, and
+   * aggregates arrival times per downstream destination stop. Returns a one-key map
+   * {@code {&lt;stopId&gt;: {departure_times, destinations}}} in the shape documented on this type.
+   */
+  baselineRoutes: function(stopId: string, maxTrips: int): json js-server
+
+  /**
+   * Convenience wrapper that runs {@link MtdRoutesClient#baselineRoutes} for several start
+   * stops and merges the results into one map keyed by start stop id.
+   */
+  baselineRoutesForStops: function(stopIds: [string], maxTrips: int): json js-server
+
+  /**
+   * Resolve a human stop name to CUMTD stop candidates via {@link MtdRoutesClient#searchStops}.
+   * Returns a trimmed {@code [{stop_id, name}]} list for the UI stop picker.
+   */
+  findStops: function(query: string): json js-server
+}

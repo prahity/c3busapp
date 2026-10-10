@@ -7,7 +7,7 @@
  * This material may be covered by one or more patents or pending patent applications.
  */
 
-import { House } from 'lucide-react';
+import { House, Bus, CalendarPlus, Gauge, Map } from 'lucide-react';
 
 import { NavigationItem } from '@/types/navigation';
 
@@ -26,6 +26,38 @@ export const navigationConfig: NavigationItem[] = [
     iconActive: House,
     label: 'Dashboard',
     tooltip: 'Dashboard Overview',
+  },
+  {
+    id: 'busplanning',
+    path: '/busplanning',
+    icon: Bus,
+    iconActive: Bus,
+    label: 'Campus Events',
+    tooltip: 'Collect & review campus events driving transit demand',
+  },
+  {
+    id: 'add-event',
+    path: '/events/new',
+    icon: CalendarPlus,
+    iconActive: CalendarPlus,
+    label: 'Add Event',
+    tooltip: 'Manually enter a campus event',
+  },
+  {
+    id: 'surge-planner',
+    path: '/surge-planner',
+    icon: Gauge,
+    iconActive: Gauge,
+    label: 'Surge Planner',
+    tooltip: 'Simulate supplemental bus capacity for surge days',
+  },
+  {
+    id: 'surge-planning',
+    path: '/surge-planning',
+    icon: Map,
+    iconActive: Map,
+    label: 'Surge Planning (Map)',
+    tooltip: 'Optimized surge capacity plan on a live UIUC campus map',
   },
 
   /*

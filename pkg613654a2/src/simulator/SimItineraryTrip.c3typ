@@ -1,0 +1,66 @@
+/**
+ * One supplemental trip run by one extra bus: an ordered run of stop calls, plus the bottleneck it
+ * was generated to relieve and why.
+ *
+ * Trips are the planner's output unit. {@link SimPlanner#buildPlan} generates candidates aimed at
+ * measured baseline bottlenecks, filters them for feasibility, and selects a subset; the chosen
+ * ones become these records. A bus may run several trips in a day
+ * ({@link SimBusItinerary#trips}), but never two that overlap in time — the turnaround and travel
+ * checks make that impossible.
+ */
+type SimItineraryTrip {
+
+  /** Stable deterministic id, e.g. `trip_<busId>_<index>`. */
+  tripId: !string
+
+  /** Zero-based position of this trip in {@link SimBusItinerary#trips}, in departure order. */
+  tripIndex: int
+
+  /**
+   * Ordered calls, beginning with the deadhead leg from the bus's current position; see
+   * {@link SimItineraryStop}.
+   */
+  stops: [SimItineraryStop]
+
+  /**
+   * Id of the {@link SimStop} whose queue this trip was generated to relieve — the bottleneck
+   * origin.
+   */
+  targetStopId: string
+
+  /**
+   * Id of the destination {@link SimStop} the bottleneck passengers were waiting for. Destination
+   * matters because a trip that reaches the busiest stop but not where those passengers are going
+   * relieves nothing — the engine will not board them.
+   */
+  targetDestinationStopId: string
+
+  /** Start of the baseline time window whose unmet demand this trip targets. */
+  targetWindowStart: datetime
+
+  /** End of the targeted baseline window. */
+  targetWindowEnd: datetime
+
+  /**
+   * Passengers the planner expected this trip to carry, from the baseline bottleneck measurement
+   * and the bus capacity. An expectation, not a result: realized boardings appear in
+   * {@link SimResults}, and the two can differ once earlier trips have already drained the queue.
+   */
+  expectedBoardings: int
+
+  /**
+   * Waiting minutes the heuristic predicted this trip would save, which is the numerator of the
+   * benefit/cost ratio it was selected on. Reported alongside the measured outcome so an
+   * over-optimistic heuristic is visible rather than hidden.
+   */
+  expectedWaitingMinutesSaved: double
+
+  /**
+   * Plain-language reason this trip was recommended, e.g. "Serves 42 passengers queued at
+   * Union → Engineering Quad 08:40–08:55 who are left behind by full core trips".
+   *
+   * Rendered directly in the itinerary table: the interface is advisory, so every recommendation
+   * has to explain itself rather than present an unexplained score.
+   */
+  explanation: string
+}

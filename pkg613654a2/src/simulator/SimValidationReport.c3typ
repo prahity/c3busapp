@@ -1,0 +1,27 @@
+/**
+ * The outcome of validating an assembled {@link SimulationInput}, or of checking a
+ * {@link SimPlan} for feasibility.
+ *
+ * Produced by {@link SimInputAssembler#validate} and carried on
+ * {@link SimulationInput#validation} and {@link SimPlan#validation}. The engine refuses to run an
+ * input whose {@link SimValidationReport#isValid} is false, and the review UI renders the issues
+ * instead of an empty dashboard — a malformed scenario surfaces as a clear message, never as
+ * silently-zero metrics.
+ */
+type SimValidationReport {
+
+  /**
+   * True when no `Error`-severity {@link SimValidationIssue} is present. Warnings and info
+   * findings do not block a run.
+   */
+  isValid: !boolean
+
+  /** Every finding, in discovery order. See {@link SimValidationIssue}. */
+  issues: [SimValidationIssue]
+
+  /** Count of `Error` findings in {@link SimValidationReport#issues}, precomputed for display. */
+  errorCount: int
+
+  /** Count of `Warning` findings, precomputed for display. */
+  warningCount: int
+}

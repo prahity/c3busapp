@@ -1,0 +1,95 @@
+/**
+ * The canonical, deduplicated event produced by {@link EventResolver#resolveAll} from one or
+ * more raw {@link CampusEvent} observations that were detected as the same real-world event.
+ *
+ * A merged event holds the union of all unique information across its contributing sources:
+ * for each field the resolver picks the value from the highest-reputation source and records,
+ * in {@link MergedEvent#fieldProvenance}, which source supplied it and what the competing
+ * values were. It also carries the combined {@link MergedEvent#reputationScore}, a
+ * reputation-weighted {@link MergedEvent#estimatedPopulation}, and candidate transit origins
+ * and destinations for servicing the event.
+ */
+@db(index=['startTime'])
+entity type MergedEvent schema name 'MERGED_EVENT' {
+  /** Merged event title (highest-reputation source's value). */
+  name: !string
+
+  /** Merged free-text description — the longest/most-complete value across sources. */
+  description: string
+
+  /** Merged start time. */
+  startTime: !datetime
+
+  /** Merged end time, when any source supplied one. */
+  endTime: datetime
+
+  /** Merged venue reference, when the event maps to a known {@link CampusVenue}. */
+  venue: CampusVenue
+
+  /** Merged free-text location, used when no {@link MergedEvent#venue} applies. */
+  locationName: string
+
+  /** Merged latitude in decimal degrees. */
+  latitude: double
+
+  /** Merged longitude in decimal degrees. */
+  longitude: double
+
+  /** Merged event category. */
+  category: string enum('Sports', 'Concert', 'Academic', 'Conference', 'Social', 'Arts', 'Other')
+
+  /** Merged lifecycle status. */
+  status: string enum('Scheduled', 'Cancelled', 'Completed')
+
+  /**
+   * Combined reputation of the merged event in `[0, 1]`: a noisy-OR over contributing-source
+   * reputations (independent agreement raises confidence) less a conflict penalty. See
+   * {@link EventResolver}.
+   */
+  reputationScore: double
+
+  /** Human-readable explanation of how {@link MergedEvent#reputationScore} was derived. */
+  reputationBasis: string
+
+  /**
+   * Reputation-weighted estimate of how many people will attend. When sources disagree the
+   * estimate is `Σ(reputationᵢ · attendanceᵢ) / Σ(reputationᵢ)`; when no source supplies a
+   * count it is inferred from venue capacity and a category load factor.
+   */
+  estimatedPopulation: int
+
+  /** Human-readable explanation of how {@link MergedEvent#estimatedPopulation} was derived. */
+  populationBasis: string
+
+  /** Number of distinct raw sources that contributed to this merged event. */
+  sourceCount: int
+
+  /**
+   * Field-level provenance as JSON: a map from field name to
+   * `{ value, source, sourceEventId, reputation, alternatives: [{ value, source, sourceEventId, reputation }] }`,
+   * so every merged value is traceable to the source that supplied it and the values it beat.
+   */
+  fieldProvenance: json
+
+  /**
+   * Candidate rider **origins** (start stops) as JSON: an array of
+   * `{ method, name, latitude, longitude, distanceMeters, score, stopType }`, drawn from
+   * park-and-rides, parking areas, and population centers.
+   */
+  startStopCandidates: json
+
+  /**
+   * Candidate rider **destinations** (end stops) near the venue as JSON, same shape as
+   * {@link MergedEvent#startStopCandidates}, drawn from the venue centroid and nearby bus stops.
+   */
+  endStopCandidates: json
+
+  /** The calendar day (yyyyMMdd) used as the dedup blocking key for this cluster. */
+  clusterKey: string
+
+  /** When {@link EventResolver#resolveAll} last rebuilt this record. */
+  lastResolvedAt: datetime
+
+  /** The raw {@link CampusEvent} observations that merged into this record. */
+  contributingEvents: [CampusEvent](mergedEvent)
+}

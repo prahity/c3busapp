@@ -1,0 +1,58 @@
+/**
+ * Resolves the operational effects of a scenario's events into disjoint, pre-combined
+ * {@link SimEffectInterval}s — the one place where overlapping effects are combined.
+ *
+ * Centralising it here has two payoffs. First, the combination rules
+ * ({@link SimAssumptions#overlappingMultiplierRule}, the
+ * {@link SimAssumptions#maxTravelTimeMultiplier} clamp, union for unavailability, unavailability
+ * over multipliers) are stated and tested in exactly one place. Second, because resolution happens
+ * **before** the simulation rather than during it, the result cannot depend on the order the
+ * engine happened to process events in — which is precisely the class of bug that would make
+ * baseline and candidate runs incomparable.
+ */
+type SimEffects {
+
+  /**
+   * Flattens every {@link SimOperationalEffect} of the supplied events into disjoint intervals per
+   * target.
+   *
+   * Collects each effect's window (falling back to {@link SimEvent#startTime} /
+   * {@link SimEvent#endTime} when {@link SimOperationalEffect#windowStart} / `windowEnd` are
+   * null), sweeps the sorted breakpoints per target, and for each resulting elementary interval
+   * combines whatever is active: multipliers by the configured rule then clamped, availability by
+   * union. Duplicate and superseded events are skipped so one disruption reported twice is not
+   * applied twice. Every interval keeps {@link SimEffectInterval#sourceEventIds}.
+   *
+   * @param events The events to resolve. Pass planner-visible events for the planner's view, or
+   *   all realized events for the engine's.
+   * @param assumptions Supplies {@link SimAssumptions#overlappingMultiplierRule} and
+   *   {@link SimAssumptions#maxTravelTimeMultiplier}.
+   * @param planningCutoff Used to stamp {@link SimEffectInterval#visibleToPlanner}.
+   * @param plannerVisibleOnly Recorded on {@link SimResolvedEffects#plannerVisibleOnly}; set true
+   *   only when `events` was already filtered to the planner's view.
+   * @return Disjoint, combined intervals grouped by link, stop and bus.
+   */
+  resolve: function(events: [SimEvent], assumptions: !SimAssumptions, planningCutoff: !datetime, plannerVisibleOnly: boolean): SimResolvedEffects js-server
+
+  /**
+   * Returns the combined travel-time multiplier in force on one link at one instant, or 1.0 when
+   * nothing applies.
+   *
+   * @param effects A previously resolved {@link SimResolvedEffects}.
+   * @param linkId Id of the {@link SimTravelLink}.
+   * @param at The instant to query.
+   * @return The multiplier, >= 1.0 in practice; 1.0 when undisrupted.
+   */
+  multiplierAt: function(effects: !SimResolvedEffects, linkId: !string, at: !datetime): double js-server
+
+  /**
+   * Returns whether a stop or bus is unavailable at one instant.
+   *
+   * @param effects A previously resolved {@link SimResolvedEffects}.
+   * @param targetKind `Stop` or `Bus`.
+   * @param targetId Id of the {@link SimStop} or {@link SimExtraBus}.
+   * @param at The instant to query.
+   * @return True when unavailable.
+   */
+  isUnavailableAt: function(effects: !SimResolvedEffects, targetKind: !string, targetId: !string, at: !datetime): boolean js-server
+}

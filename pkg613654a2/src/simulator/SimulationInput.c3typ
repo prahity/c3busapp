@@ -1,0 +1,119 @@
+/**
+ * The single, validated input object handed to the simulator — the assembly boundary between the
+ * four external producers and the engine.
+ *
+ * {@link SimInputAssembler#assemble} builds one of these per scenario by calling each mock
+ * adapter, reconciling the results, and validating the whole. Everything downstream
+ * ({@link SimDemandGenerator}, {@link SimPlanner}, {@link SimEngine}) reads **only** this object,
+ * which is what keeps the engine independent of where the data came from and makes each producer
+ * replaceable by reimplementing one adapter method.
+ *
+ * **The `events` collection.** {@link SimulationInput#events} carries full-fidelity
+ * {@link SimEvent} records — timing, location, provenance, reliability and explicit effects all
+ * intact. Events are deliberately **not** reduced to passenger counts before they get here; the
+ * engine, not the producer, decides what consequences they have, and
+ * {@link SimDemandSnapshot#trace} records how each consequence arose.
+ *
+ * **Raw sources are retained.** The estimate, report and reputation collections are kept
+ * alongside the reconciled events rather than being consumed and discarded, so a reviewer can see
+ * what each producer actually said and where they disagreed.
+ *
+ * **Planning vs replay.** {@link SimulationInput#planningCutoff} partitions the events: the
+ * planner sees only those with {@link SimEvent#knownAt} at or before it, while the engine realizes
+ * all of them. The object itself is the same for both — the filtering is applied by the planner,
+ * and recorded in {@link SimPlan#eventIdsVisibleToPlanner}.
+ */
+type SimulationInput {
+
+  /**
+   * Version of the contract this object conforms to, e.g. `sim-contract-1.0.0`. Present in every
+   * export so a downstream consumer can detect a shape change instead of mis-parsing one.
+   */
+  contractVersion: !string
+
+  /** Id of the {@link SimScenario} this input was assembled from. */
+  scenarioId: !string
+
+  /** Service day in ISO `yyyy-MM-dd`, copied from {@link SimScenario#serviceDate}. */
+  serviceDate: !string
+
+  /** IANA service timezone, copied from {@link SimScenario#serviceTimezone}. All instants below are absolute UTC. */
+  serviceTimezone: !string
+
+  /** First instant of the simulation horizon; see {@link SimScenario#horizonStart}. */
+  horizonStart: !datetime
+
+  /** Last instant of the simulation horizon; see {@link SimScenario#horizonEnd}. */
+  horizonEnd: !datetime
+
+  /**
+   * The instant the plan is frozen. Events and estimates with `knownAt` after this are invisible
+   * to {@link SimPlanner#buildPlan} but fully realized by {@link SimEngine#run}.
+   */
+  planningCutoff: !datetime
+
+  /** Seed for deterministic demand generation; see {@link SimScenario#randomSeed}. */
+  randomSeed: !int
+
+  /** Largest allocation to evaluate, after capping by the number of available {@link SimExtraBus}es. */
+  maxExtraBuses: int
+
+  /**
+   * **The events collection.** Canonical, reconciled {@link SimEvent}s with their effects intact.
+   *
+   * Includes duplicates and superseded records (flagged by {@link SimEvent#canonicalEventId} /
+   * {@link SimEvent#supersededByEventId}) and low-confidence events, all retained so their
+   * treatment can be inspected; generation skips them but they remain visible. This is the
+   * collection the other agents will eventually supply in place of
+   * {@link SimEventFeedAdapter#getEvents}.
+   */
+  events: [SimEvent]
+
+  /** Raw student-location-estimator output for the scenario; see {@link SimStudentLocationEstimate}. */
+  studentLocationEstimates: [SimStudentLocationEstimate]
+
+  /** Raw event-estimator output; see {@link SimEventEstimate}. */
+  eventEstimates: [SimEventEstimate]
+
+  /**
+   * Raw detected and manual {@link SimEventReport}s, kept distinct from the reconciled events
+   * they were matched to so duplicate handling stays auditable.
+   */
+  eventReports: [SimEventReport]
+
+  /** Reliability scores for users and events; see {@link SimReputationScore}. */
+  reputationScores: [SimReputationScore]
+
+  /**
+   * The fixed network and core timetable; see {@link SimCoreServiceInput}. Identical in the
+   * baseline and in every candidate.
+   */
+  coreService: SimCoreServiceInput
+
+  /** The pool of supplemental buses available to allocate; see {@link SimExtraBus}. */
+  extraBuses: [SimExtraBus]
+
+  /** Cost accounting policy; see {@link SimCostConfig}. */
+  costConfig: SimCostConfig
+
+  /** Every tunable modelling assumption; see {@link SimAssumptions}. */
+  assumptions: SimAssumptions
+
+  /** The full reconciliation audit trail for this assembly; see {@link SimReconciliationTrace}. */
+  reconciliation: SimReconciliationTrace
+
+  /**
+   * Validation outcome. {@link SimEngine#run} refuses to execute when
+   * {@link SimValidationReport#isValid} is false.
+   */
+  validation: SimValidationReport
+
+  /** Synthetic-data banner text, copied from {@link SimScenario#syntheticDataLabel}. */
+  syntheticDataLabel: string
+
+  /**
+   * When this input object was assembled. Provenance only — it deliberately does **not** feed the
+   * PRNG, so results stay reproducible across assemblies.
+   */
+  assembledAt: datetime
+}

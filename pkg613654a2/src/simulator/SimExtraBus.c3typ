@@ -1,0 +1,73 @@
+/**
+ * One supplemental bus MTD could choose to put into service, together with the window it is
+ * available for, where it starts, and what it costs to run.
+ *
+ * Extra buses are the **only** decision variable in this system. The planner picks how many to
+ * allocate (0 .. {@link SimScenario#maxExtraBuses}) and what each allocated bus should do; MTD
+ * then allocates buses manually using the advisory output. The collection reaching the engine is
+ * supplied by {@link SimBusAvailabilityAdapter#getExtraBuses}, which stands in for the real
+ * bus-count API — nothing here binds to a live endpoint.
+ *
+ * A bus may be withdrawn for part of the day by a `BusAvailabilityDisruption`
+ * {@link SimEvent}; see {@link SimOperationalEffect#busIds}. If that event was known before
+ * {@link SimScenario#planningCutoff} the planner avoids the bus; if it surfaces later, the plan
+ * is already fixed and the engine reports the resulting lost trips through
+ * {@link SimResults#infeasibilities}.
+ */
+@db(index=['scenarioId'])
+entity type SimExtraBus {
+
+  /** Id of the owning {@link SimScenario}. */
+  scenarioId: !string
+
+  /** Passenger capacity, a head count. Enforced strictly during boarding, exactly as {@link SimCoreTrip#capacity}. */
+  capacity: !int
+
+  /**
+   * Earliest instant this bus may begin moving, including deadheading. The planner never schedules
+   * a departure before it.
+   */
+  availableFrom: !datetime
+
+  /**
+   * Latest instant this bus must have finished its last trip. Candidate trips that would overrun
+   * it are rejected as infeasible rather than truncated.
+   */
+  availableTo: !datetime
+
+  /**
+   * Id of the {@link SimStop} the bus begins the day at. The first leg from here to a trip's first
+   * stop is **deadhead** (running empty) and is costed at
+   * {@link SimExtraBus#costPerDeadheadMinute}.
+   */
+  startStopId: !string
+
+  /**
+   * Cost incurred the moment this bus is **allocated**, in {@link SimExtraBus#currency}, whether
+   * or not it ends up running any trips.
+   *
+   * Whether idle allocated buses are billed is governed by
+   * {@link SimCostConfig#includeIdleAllocatedBuses}, so the "allocated but useless" case shows up
+   * honestly on the cost curve instead of being free.
+   */
+  fixedCostPerDay: double
+
+  /** Cost per minute spent carrying passengers, in {@link SimExtraBus#currency} per minute. */
+  costPerOperatingMinute: double
+
+  /** Cost per minute spent repositioning empty, in {@link SimExtraBus#currency} per minute. */
+  costPerDeadheadMinute: double
+
+  /** Cost per minute spent stationary at a stop boarding/alighting, per minute. */
+  costPerDwellMinute: double
+
+  /**
+   * ISO 4217 code for every cost on this record, e.g. `USD`. Must agree with
+   * {@link SimCostConfig#currency}; a mismatch is a validation error because totals would
+   * otherwise silently mix units.
+   */
+  currency: string
+
+  /** Always true — synthetic mock data; these costs are invented, not MTD figures. */
+  isSynthetic: boolean
+}

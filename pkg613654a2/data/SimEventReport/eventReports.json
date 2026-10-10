@@ -1,0 +1,61 @@
+[
+  {
+    "id": "rpt_lowconf_rpt_rally_a",
+    "name": "Big rally on the Quad",
+    "scenarioId": "sc_lowconf",
+    "reportedEventName": "Big rally on the Quad",
+    "reportSource": "ManuallyReported",
+    "reportedStopId": "stop_lowconf_green",
+    "reportedStartTime": "2026-10-13T15:00:00-05:00",
+    "reportedEndTime": "2026-10-13T17:00:00-05:00",
+    "reportedAttendance": 600,
+    "reportedConfidence": 0.4,
+    "reportTime": "2026-10-12T21:40:00-05:00",
+    "isSynthetic": true,
+    "rawPayload": {
+      "mockSource": "mock-event-report-adapter-v0",
+      "note": "Matched to the canonical event by canonicalEventId."
+    },
+    "event": {
+      "id": "ev_lowconf_rally_canonical"
+    },
+    "submittingUserId": "user_mock_unreliable"
+  },
+  {
+    "id": "rpt_lowconf_rpt_rally_b",
+    "name": "Crowd forming near Green & Fourth",
+    "scenarioId": "sc_lowconf",
+    "reportedEventName": "Crowd forming near Green & Fourth",
+    "reportSource": "AutoDetected",
+    "reportedStopId": "stop_lowconf_green",
+    "reportedStartTime": "2026-10-13T15:20:00-05:00",
+    "reportedEndTime": "2026-10-13T17:00:00-05:00",
+    "reportedAttendance": 450,
+    "reportedConfidence": 0.5,
+    "reportTime": "2026-10-12T22:05:00-05:00",
+    "isSynthetic": true,
+    "rawPayload": {
+      "mockSource": "mock-event-report-adapter-v0",
+      "note": "DUPLICATE REPORT FOR THE SAME EVENT with no canonical id. Matched to rally_canonical by the stop-and-time fallback inside reportMatchWindowMinutes, so the rally is not counted twice."
+    }
+  },
+  {
+    "id": "rpt_lowconf_rpt_unmatched",
+    "name": "Something happening at Ikenberry?",
+    "scenarioId": "sc_lowconf",
+    "reportedEventName": "Something happening at Ikenberry?",
+    "reportSource": "ManuallyReported",
+    "reportedStopId": "stop_lowconf_ike",
+    "reportedStartTime": "2026-10-13T18:30:00-05:00",
+    "reportedEndTime": "2026-10-13T19:00:00-05:00",
+    "reportedAttendance": 80,
+    "reportedConfidence": 0.3,
+    "reportTime": "2026-10-13T06:10:00-05:00",
+    "isSynthetic": true,
+    "rawPayload": {
+      "mockSource": "mock-event-report-adapter-v0",
+      "note": "UNMATCHED REPORT. No event is within the match window, so it is recorded as unmatched in the reconciliation trace and generates no demand on its own."
+    },
+    "submittingUserId": "user_mock_brand_new"
+  }
+]

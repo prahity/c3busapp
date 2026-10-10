@@ -1,0 +1,109 @@
+/**
+ * A complete, self-contained synthetic scenario: one service day on one fictional network, with
+ * its own events, demand sources, fixed core service, extra-bus pool, costs and assumptions.
+ *
+ * A scenario is the unit the review interface selects and the unit
+ * {@link SimRunner#runComparison} evaluates. Every other record in the simulator is scoped by
+ * `scenarioId`, so the shipped scenarios never interfere with one another and a new one can be
+ * authored purely as data.
+ *
+ * **Reproducibility.** {@link SimScenario#randomSeed} plus the immutable
+ * {@link SimDemandSnapshot} generated from it means every allocation size — and the mock
+ * old-model baseline — is evaluated against identical passenger demand and identical realized
+ * events. Re-running a scenario reproduces the previous numbers exactly.
+ *
+ * **Timezone handling.** All instants are stored as absolute UTC. {@link SimScenario#serviceDate}
+ * and {@link SimScenario#serviceTimezone} exist so the UI can render local clock times and so
+ * "which service day is this" is never inferred from a UTC timestamp.
+ *
+ * All scenarios are synthetic; {@link SimScenario#syntheticDataLabel} is the banner text the UI
+ * shows to make that unmissable.
+ */
+entity type SimScenario {
+
+  /**
+   * What this scenario is designed to demonstrate — the capacity bottleneck, the event-ending
+   * surge, the low-confidence report, and so on. Shown in the scenario picker.
+   */
+  description: string
+
+  /** Service day in ISO `yyyy-MM-dd` form, in {@link SimScenario#serviceTimezone}. */
+  serviceDate: !string
+
+  /**
+   * IANA timezone name for the service day, e.g. `America/Chicago`. Used only for display and for
+   * interpreting {@link SimScenario#serviceDate}; the engine works entirely in absolute instants.
+   */
+  serviceTimezone: !string
+
+  /**
+   * First instant the simulation clock covers. Passenger arrivals before it are a validation
+   * error rather than being silently dropped.
+   */
+  horizonStart: !datetime
+
+  /**
+   * Last instant the simulation clock covers.
+   *
+   * At the horizon the run stops and whatever remains is reported honestly: passengers still
+   * queued appear in {@link SimAccounting#waitingAtHorizon}, passengers still riding in
+   * {@link SimAccounting#onboardAtHorizon}. Nothing is extrapolated past this point.
+   */
+  horizonEnd: !datetime
+
+  /**
+   * The instant the daily plan is frozen — normally at or just before
+   * {@link SimScenario#horizonStart}.
+   *
+   * {@link SimPlanner#buildPlan} may use **only** events with {@link SimEvent#knownAt} at or
+   * before this instant. The simulator still realizes later events, so a candidate plan is
+   * scored on how it copes with disruptions it could not have anticipated. There is no live
+   * rerouting: the meeting rejected it, so the plan the simulator executes is exactly the plan
+   * fixed here.
+   */
+  planningCutoff: !datetime
+
+  /**
+   * Seed for the deterministic PRNG used by demand generation (and nothing else). Identical seeds
+   * give byte-identical {@link SimDemandSnapshot}s.
+   *
+   * Note that reuse of the *snapshot*, not merely of the seed, is what guarantees comparability
+   * across allocations — different plans consume randomness in different orders, so sharing only
+   * a seed would not be enough.
+   */
+  randomSeed: !int
+
+  /**
+   * Largest number of extra buses to evaluate. {@link SimRunner#runComparison} produces a
+   * feasible daily plan for every allocation from 0 to this value inclusive, so the cost curve
+   * shows the whole tradeoff rather than one recommended number.
+   *
+   * Capped by the number of {@link SimExtraBus} records actually available in the scenario.
+   */
+  maxExtraBuses: !int
+
+  /** Cost accounting policy for this scenario; see {@link SimCostConfig}. */
+  costConfig: SimCostConfig
+
+  /** Every tunable modelling assumption for this scenario; see {@link SimAssumptions}. */
+  assumptions: SimAssumptions
+
+  /**
+   * Version of the simulator data contracts this scenario was authored against, e.g.
+   * `sim-contract-1.0.0`. Echoed into {@link SimulationInput#contractVersion} and every export so
+   * a consumer can tell which shape it is reading.
+   */
+  contractVersion: string
+
+  /**
+   * Human-readable synthetic-data banner, e.g. "Synthetic mock data — not MTD operational data".
+   * Rendered prominently by the review UI and included in exports.
+   */
+  syntheticDataLabel: string
+
+  /** Short tags used to group and filter scenarios in the picker, e.g. `rush`, `surge`, `fixture`. */
+  scenarioTags: [string]
+
+  /** Always true — synthetic mock data. */
+  isSynthetic: boolean
+}

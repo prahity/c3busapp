@@ -1,0 +1,74 @@
+/**
+ * An **immutable** snapshot of all generated passenger demand for one scenario — the single most
+ * important object for making comparisons honest.
+ *
+ * {@link SimDemandGenerator#generate} produces exactly one snapshot per scenario, and
+ * {@link SimRunner#runComparison} then reuses that *same object* for the mock old-model baseline
+ * and for every allocation from 0 to {@link SimScenario#maxExtraBuses}.
+ *
+ * **Why the snapshot, not just the seed.** Sharing a seed is not sufficient. Different plans
+ * consume random draws in different orders, so a per-run PRNG would hand different plans
+ * different passengers and quietly invalidate every comparison. Generating demand once, up
+ * front, and never regenerating it is what guarantees that the only difference between two runs
+ * is the plan.
+ *
+ * The snapshot also fixes the realized event set: {@link SimDemandSnapshot#realizedEventIds}
+ * records which events every run experiences, including those that become known after
+ * {@link SimulationInput#planningCutoff} and were therefore invisible to the planner.
+ */
+type SimDemandSnapshot {
+
+  /**
+   * Stable, deterministic id derived from scenario, seed and contract version — e.g.
+   * `snap_<scenarioId>_<seed>`. Echoed into {@link SimResults#snapshotId} so every result states
+   * which demand it was measured against.
+   */
+  snapshotId: !string
+
+  /** Id of the {@link SimScenario} this demand was generated for. */
+  scenarioId: !string
+
+  /** The {@link SimScenario#randomSeed} used. Identical scenario and seed reproduce this snapshot exactly. */
+  seed: !int
+
+  /**
+   * Every generated demand group, sorted by {@link SimPassengerJourney#requestTime} then by
+   * {@link SimPassengerJourney#journeyId}.
+   *
+   * The sort is part of the contract: it makes queue order and therefore all results independent
+   * of the order in which sources happened to be processed.
+   */
+  journeys: [SimPassengerJourney]
+
+  /**
+   * Total passengers in the snapshot — the sum of
+   * {@link SimPassengerJourney#passengerCount}. The left-hand side of the accounting identity
+   * checked by {@link SimAccounting#isBalanced}.
+   */
+  totalPassengers: !int
+
+  /** Count of {@link SimPassengerJourney}s carrying a deadline — the lateness denominator. */
+  deadlineBearingPassengers: int
+
+  /** Source-to-journey arithmetic for every demand source; see {@link SimDemandTraceEntry}. */
+  trace: [SimDemandTraceEntry]
+
+  /**
+   * Ids of every {@link SimEvent} realized during the simulated day, including purely operational
+   * ones and those unknown at the planning cutoff.
+   *
+   * Baseline and candidate runs must experience this identical set; {@link SimRunner} asserts it,
+   * so a plan can never be credited for a disruption that only it avoided.
+   */
+  realizedEventIds: [string]
+
+  /**
+   * Ids of events that were realized but **not** visible to the planner because
+   * {@link SimEvent#knownAt} fell after {@link SimulationInput#planningCutoff}. Exactly the
+   * disruptions the fixed plan had to absorb blind.
+   */
+  eventIdsUnknownAtCutoff: [string]
+
+  /** Ids of events excluded from generation as duplicates or superseded; retained for inspection. */
+  suppressedEventIds: [string]
+}

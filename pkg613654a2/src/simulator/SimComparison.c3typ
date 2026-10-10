@@ -1,0 +1,94 @@
+/**
+ * The complete "without changes versus with these recommendations" comparison for one scenario —
+ * the top-level object {@link SimRunner#runComparison} returns and the review UI renders.
+ *
+ * It bundles the mock old-model baseline, one evaluated candidate per allocation, the cost curve
+ * across allocations, and the inputs all of them shared.
+ *
+ * **What makes the comparison valid.** Every result in here was produced from the *same*
+ * {@link SimComparison#demandSnapshot} and the same realized event set, over identical fixed core
+ * service. {@link SimComparison#comparabilityAssertions} records the checks that confirmed it, so
+ * the claim is verified rather than asserted. The zero-bus candidate is expected to match
+ * {@link SimComparison#baseline} exactly, and that equality is itself one of the assertions.
+ *
+ * The output is advisory. It presents a tradeoff for MTD to choose from; it does not recommend a
+ * single allocation, and nothing here dispatches a bus or publishes to MTD.
+ */
+type SimComparison {
+
+  /** Id of the {@link SimScenario} compared. */
+  scenarioId: !string
+
+  /** Scenario name, denormalized for display. */
+  scenarioName: string
+
+  /** Contract version shared by every object in this comparison. */
+  contractVersion: string
+
+  /**
+   * The assembled input every run shared, including the full-fidelity
+   * {@link SimulationInput#events} collection, the raw producer outputs, and the reconciliation
+   * trace. Exported alongside the results so a comparison can be reproduced from its own export.
+   */
+  input: SimulationInput
+
+  /**
+   * The immutable demand every run consumed; see {@link SimDemandSnapshot}. Shared by reference,
+   * not regenerated — the single most important property of the comparison.
+   */
+  demandSnapshot: SimDemandSnapshot
+
+  /**
+   * Operational effects as actually realized (all events, not merely planner-visible ones), with
+   * overlaps already combined; see {@link SimResolvedEffects}.
+   */
+  realizedEffects: SimResolvedEffects
+
+  /**
+   * Results for the mock old-model baseline: fixed core service, **zero** extra buses.
+   *
+   * Labelled "mock" because no historical MTD model was found in the project to integrate. It does
+   * not reproduce one, and {@link SimOldModelBaseline#describe} states exactly what it does and
+   * does not supply.
+   */
+  baseline: SimResults
+
+  /**
+   * One {@link SimResults} per allocation from 0 to {@link SimScenario#maxExtraBuses}, in
+   * ascending order. Index 0 is the zero-bus candidate that must equal
+   * {@link SimComparison#baseline}.
+   */
+  candidates: [SimResults]
+
+  /** The {@link SimPlan} evaluated at each allocation, aligned index-for-index with {@link SimComparison#candidates}. */
+  plans: [SimPlan]
+
+  /** The cost-versus-time-saved curve across allocations; see {@link SimCostCurvePoint}. */
+  costCurve: [SimCostCurvePoint]
+
+  /**
+   * Results of the checks that make this comparison trustworthy: identical snapshot id across
+   * runs, identical realized event ids, identical core trip ids, balanced passenger accounting,
+   * and zero-bus candidate equal to baseline.
+   *
+   * Each entry reads like `identicalDemandSnapshot: PASS`. A failure is surfaced in the UI rather
+   * than letting an invalid comparison be read as a valid one.
+   */
+  comparabilityAssertions: [string]
+
+  /**
+   * Limitations of the planning heuristic in plain language: that it is greedy and explainable
+   * rather than optimal, that no global optimality or monotonic improvement is claimed, and that a
+   * candidate may legitimately come out worse than baseline.
+   */
+  heuristicNotes: [string]
+
+  /** Scope assumptions in force, chiefly that only supplemental capacity allocation is advised on. */
+  scopeNotes: [string]
+
+  /** Synthetic-data banner; see {@link SimScenario#syntheticDataLabel}. */
+  syntheticDataLabel: string
+
+  /** When this comparison was computed. Provenance only — it does not affect results. */
+  computedAt: datetime
+}

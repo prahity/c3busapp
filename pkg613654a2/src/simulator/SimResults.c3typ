@@ -1,0 +1,84 @@
+/**
+ * The outcome of simulating one {@link SimPlan} against one {@link SimDemandSnapshot} — metrics,
+ * per-stop delays, passenger accounting, the realized event log, and any infeasibility.
+ *
+ * Results are a **separate contract from the plan**, and they name their inputs explicitly
+ * ({@link SimResults#snapshotId}, {@link SimResults#seed}, {@link SimResults#planId}) so a figure
+ * can never be read without knowing what produced it. That is also what makes the comparison
+ * auditable: two results are comparable precisely when their snapshot ids match.
+ */
+type SimResults {
+
+  /** Stable deterministic id, e.g. `res_<planId>`. */
+  resultsId: !string
+
+  /** Id of the {@link SimScenario} simulated. */
+  scenarioId: !string
+
+  /** Contract version, copied from {@link SimulationInput#contractVersion} and present in all exports. */
+  contractVersion: string
+
+  /** Id of the {@link SimDemandSnapshot} used. Identical across the baseline and every candidate of a comparison. */
+  snapshotId: !string
+
+  /** {@link SimScenario#randomSeed} behind the snapshot, restated for reproducibility. */
+  seed: int
+
+  /** Id of the {@link SimPlan} evaluated. */
+  planId: !string
+
+  /** {@link SimPlan#planKind} — the mock old-model baseline, or a candidate. */
+  planKind: string
+
+  /** {@link SimPlan#allocation}: extra buses allocated, including any that ended up idle. */
+  allocation: int
+
+  /** Headline metrics with their denominators and censoring; see {@link SimMetrics}. */
+  metrics: SimMetrics
+
+  /**
+   * Expected wait by stop and time window — the student-facing delay estimate and the
+   * Maps-oriented export rows. Windows with no observations are present with a null estimate
+   * rather than omitted or zeroed; see {@link SimStopWindowDelay}.
+   */
+  stopWindowDelays: [SimStopWindowDelay]
+
+  /** Passenger conservation check for this run; see {@link SimAccounting}. */
+  accounting: SimAccounting
+
+  /**
+   * Every event realized during the run, with timing and planner visibility; see
+   * {@link SimEventActivation}. Identical across the baseline and all candidates of a comparison,
+   * which {@link SimRunner#runComparison} asserts.
+   */
+  eventActivations: [SimEventActivation]
+
+  /**
+   * Feasibility problems encountered while executing the plan against the realized day — a planned
+   * call at a stop that closed, a trip lost because its bus was withdrawn after the cutoff.
+   *
+   * Reported here and reflected in the metrics; never repaired, and never hidden.
+   */
+  infeasibilities: [SimValidationIssue]
+
+  /**
+   * Time-ordered replay frames as JSON, for the replay view: per frame, the active event ids,
+   * waiting counts by stop, onboard and completed totals, active travel-time multipliers, and
+   * unavailable stop and bus ids.
+   *
+   * Typed as `json` rather than a value type because it is a dense, purely presentational
+   * time series whose shape is documented on {@link SimEngine#run}; the authoritative, typed
+   * results are the fields above.
+   */
+  replayFrames: json
+
+  /**
+   * Units and definitions for every metric in this object — minutes for all durations,
+   * {@link SimCostConfig#currency} for money, head counts for passengers — carried in the export so
+   * a consumer never has to guess.
+   */
+  unitsNote: string
+
+  /** Synthetic-data banner, copied from {@link SimScenario#syntheticDataLabel}. These are simulated, not live, figures. */
+  syntheticDataLabel: string
+}

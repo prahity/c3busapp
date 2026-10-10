@@ -1,0 +1,87 @@
+/**
+ * Assembles the four mock source feeds plus core service and bus availability into one validated
+ * {@link SimulationInput}, and owns **reconciliation**.
+ *
+ * This is the seam between "where data comes from" and "what the simulator does with it". Every
+ * adapter is called through its own type ({@link SimEventFeedAdapter},
+ * {@link SimStudentLocationAdapter}, {@link SimEventEstimateAdapter},
+ * {@link SimEventReportAdapter}, {@link SimReputationAdapter}, {@link SimCoreServiceAdapter},
+ * {@link SimBusAvailabilityAdapter}), so replacing a mock with a real integration means
+ * reimplementing one adapter and changing nothing here.
+ *
+ * Reconciliation lives here and nowhere else. The engine and the planner receive an input in which
+ * duplicates are already suppressed, cohort overlaps are already resolved and reliability weights
+ * are already attached — together with the {@link SimReconciliationTrace} explaining each of those
+ * decisions.
+ */
+type SimInputAssembler {
+
+  /**
+   * Builds the complete {@link SimulationInput} for a scenario: pulls every feed, reconciles
+   * reports against events, resolves class-demand versus event-demand cohort overlap, attaches
+   * reliability weights, validates, and records the trace.
+   *
+   * Reconciliation order, which is fixed so the output is deterministic:
+   *
+   * 1. **Canonical id first** — a {@link SimEventReport} whose {@link SimEventReport#event} is set
+   *    attaches to that event (`ReportMatchedByCanonicalId`).
+   * 2. **Fallback matcher** — otherwise match on same scenario, reported stop within
+   *    {@link SimEvent#affectedStopIds}, and reported start within
+   *    {@link SimAssumptions#reportMatchWindowMinutes} (`ReportMatchedByFallback`). Unmatched
+   *    reports are retained and traced as `ReportUnmatched`; they are never discarded and never
+   *    promoted into events.
+   * 3. **Duplicate suppression** — an event with {@link SimEvent#canonicalEventId} pointing at
+   *    another event, or with {@link SimEvent#supersededByEventId} set, contributes no demand and
+   *    no operational effects (`DuplicateEventSuppressed` / `EventSuperseded`). N reports of one
+   *    event therefore produce one event's worth of demand.
+   * 4. **Cohort overlap** — when a {@link SimStudentLocationEstimate} and a {@link SimEvent}
+   *    demand effect carry the same cohort id, {@link SimAssumptions#cohortOverlapPolicy} decides
+   *    which one generates the journeys; the other is suppressed and traced
+   *    (`CohortOverlapResolved`). This is what prevents a cohort appearing twice.
+   * 5. **Reliability weighting** — {@link SimAssumptions#reliabilityPolicy} combines
+   *    {@link SimEvent#confidence} with the reputation of the reporting user and of the event
+   *    itself into {@link SimReconciliationEntry#appliedWeight} (`ReliabilityWeightApplied`).
+   *    Scheduled events are exempt. Low-confidence events are **retained with a reduced weight**,
+   *    never dropped.
+   *
+   * The applied weight scales expected ridership only. It is a configurable heuristic weight, not
+   * a calibrated probability, and is labelled as such in {@link SimReconciliationTrace#policyNotes}.
+   *
+   * @param scenarioId Id of the {@link SimScenario} to assemble.
+   * @return A validated, reconciled {@link SimulationInput} including the original `events`
+   *   collection with timing, location, provenance, reliability and effects intact.
+   */
+  assemble: function(scenarioId: !string): SimulationInput js-server
+
+  /**
+   * Validates an assembled input and returns every issue found, without throwing.
+   *
+   * Checks: dangling stop/route/link/bus references (`DanglingStopRef`); time ordering of event,
+   * window, availability and horizon bounds (`TimeOrdering`); `knownAt` not after the realized
+   * start; distribution shares summing to 1.0 within tolerance; reputation scales
+   * (`ScoreScaleUnsupported`); one currency across {@link SimCostConfig} and every
+   * {@link SimExtraBus} (`CurrencyMismatch`); `UpdateToCohort` estimates carrying
+   * {@link SimStudentLocationEstimate#supersedesEstimateId}; and
+   * {@link SimAssumptions#allowTransfers} being false (`TransfersNotSupported`, an error — the
+   * engine models direct trips only).
+   *
+   * @param input The assembled input to check.
+   * @return A report whose {@link SimValidationReport#isValid} is false when any `Error`-severity
+   *   issue is present.
+   */
+  validate: function(input: !SimulationInput): SimValidationReport js-server
+
+  /**
+   * Returns the subset of events the planner is allowed to see: those with
+   * {@link SimEvent#knownAt} at or before {@link SimulationInput#planningCutoff}, excluding
+   * suppressed duplicates.
+   *
+   * Used to build the planner's view of the world. The full `events` collection remains available
+   * to the engine, which is how a disruption that becomes known mid-day is realized without
+   * leaking into the plan.
+   *
+   * @param input The assembled input.
+   * @return Planner-visible events, ordered by {@link SimEvent#startTime} then id.
+   */
+  plannerVisibleEvents: function(input: !SimulationInput): [SimEvent] js-server
+}

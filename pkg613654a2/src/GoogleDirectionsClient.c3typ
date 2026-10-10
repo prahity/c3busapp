@@ -1,0 +1,31 @@
+/**
+ * Declarative REST client for the Google Maps Platform Directions API.
+ *
+ * {@link RoutePlanner} passes a full candidate route — an origin, a destination and the
+ * intermediate pickup stops as {@code waypoints} — in a single request and reads back both
+ * the total travel time and the per-leg (stop-to-next-stop) durations from
+ * {@code routes[0].legs[].duration.value}. The API key comes from {@link GoogleMapsConfig}
+ * (secret store) and is passed as the {@code key} query parameter.
+ *
+ * This type has only abstract {@code @rest} methods, so it needs no implementation file —
+ * the platform performs the HTTP call.
+ */
+type GoogleDirectionsClient mixes REST {
+  /**
+   * Compute driving directions for a full route. Maps to
+   * {@code GET directions/json?origin=&destination=&waypoints=&mode=&key=}.
+   *
+   * {@code origin} / {@code destination} are {@code "lat,lng"} strings; {@code waypoints} is a
+   * {@code "lat,lng|lat,lng|..."} list of the intermediate stops in service order. The response
+   * {@code routes[0].legs} holds one leg per consecutive node pair, each with
+   * {@code duration.value} (seconds) and {@code distance.value} (meters).
+   */
+  @rest(uri='directions/json', method='GET')
+  getDirections: abstract function(
+    origin: string,
+    destination: string,
+    waypoints: string,
+    mode: string,
+    key: string
+  ): json
+}

@@ -1,0 +1,32 @@
+/**
+ * Mock source adapter for **fixed core MTD service** — the network and the timetable that exist
+ * with or without this program.
+ *
+ * Reads authored {@link SimStop}, {@link SimRouteDef}, {@link SimTravelLink} and
+ * {@link SimCoreTrip} rows. A real integration would most likely replace this with a GTFS reader;
+ * because everything is returned as one {@link SimCoreServiceInput}, that is a single-method
+ * change.
+ *
+ * Whatever this adapter returns is **invariant across runs**: the baseline and every candidate
+ * allocation see the identical core service, which is what makes their comparison meaningful.
+ */
+type SimCoreServiceAdapter {
+
+  /**
+   * Returns the complete fixed-service bundle for a scenario: stops, routes, travel links and core
+   * trips, each in deterministic id order.
+   *
+   * @param scenarioId Id of the {@link SimScenario}.
+   * @return The {@link SimCoreServiceInput} bundle.
+   */
+  getCoreService: function(scenarioId: !string): SimCoreServiceInput js-server
+
+  /**
+   * Describes this adapter for the handoff documentation, including the requirement that
+   * {@link SimRouteDef#stopSequence} is ordered, that {@link SimTravelLink}s are directed, and
+   * that core service must not vary between baseline and candidates.
+   *
+   * @return A JSON descriptor of the adapter contract.
+   */
+  adapterInfo: function(): json js-server
+}

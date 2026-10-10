@@ -1,0 +1,67 @@
+/**
+ * Expected passenger waiting delay at one stop during one time window — the student-facing
+ * delay estimate, and the row shape of the export intended for a future Google Maps integration.
+ *
+ * Only the **export boundary** is implemented here; there is no Maps integration and these values
+ * are explicitly simulated, not live.
+ *
+ * **No observations is not zero wait.** A window in which nobody wanted to travel is reported with
+ * {@link SimStopWindowDelay#hasObservations} false and a **null**
+ * {@link SimStopWindowDelay#estimatedWaitMinutes}. Encoding it as a zero wait would be a lie that
+ * a consumer could not detect: "no data" and "no delay" look identical once flattened to a number,
+ * and a map showing a confident 0-minute wait at a stop nobody used is worse than a map showing a
+ * gap.
+ */
+type SimStopWindowDelay {
+
+  /** Id of the {@link SimStop} this row describes. */
+  stopId: !string
+
+  /** Human-readable stop name, denormalized so the export stands alone without a stop lookup. */
+  stopName: string
+
+  /** First instant of the window, inclusive. Window width is {@link SimAssumptions#stopDelayWindowMinutes}. */
+  windowStart: !datetime
+
+  /** Last instant of the window, exclusive. */
+  windowEnd: !datetime
+
+  /**
+   * Mean wait in minutes for passengers who arrived at this stop during this window, or **null**
+   * when {@link SimStopWindowDelay#hasObservations} is false.
+   *
+   * Includes wait censored at the horizon for passengers who never boarded, consistent with
+   * {@link SimMetrics#horizonTotalWaitingMinutes}; see
+   * {@link SimStopWindowDelay#censoredPassengerCount}.
+   */
+  estimatedWaitMinutes: double
+
+  /**
+   * Passengers behind {@link SimStopWindowDelay#estimatedWaitMinutes}. A one-passenger window and
+   * a two-hundred-passenger window can have the same mean and very different weight, so the
+   * support travels with the estimate.
+   */
+  supportingPassengerCount: int
+
+  /**
+   * False when no passenger arrived at this stop in this window. The estimate is then null and
+   * consumers must render the window as unknown rather than as zero delay.
+   */
+  hasObservations: !boolean
+
+  /**
+   * How many of {@link SimStopWindowDelay#supportingPassengerCount} were still waiting at the
+   * horizon, so their contribution is a censored lower bound rather than a completed wait.
+   */
+  censoredPassengerCount: int
+
+  /** Largest individual wait in the window, in minutes. Null when there are no observations. */
+  maxWaitMinutes: double
+
+  /**
+   * True when the stop was unavailable for part or all of this window because of a `StopClosure`
+   * {@link SimEvent}; see {@link SimResolvedEffects#stopIntervals}. Distinguishes "no wait data
+   * because nobody came" from "no service here".
+   */
+  stopUnavailableInWindow: boolean
+}

@@ -1,0 +1,42 @@
+/**
+ * The **mock old-model baseline** adapter — the "without changes" side of every comparison.
+ *
+ * No prior simulation model exists anywhere in this project, so there is nothing to wrap. This
+ * type stands in for one and is labelled a mock throughout: it does **not** attempt to reproduce
+ * any historical MTD model, and its numbers must not be read as what the previous model would have
+ * said.
+ *
+ * Its behaviour is deliberately minimal and fully documented: run the fixed core service against
+ * the same demand with **zero extra buses**. That makes it a meaningful reference point — the
+ * question "what does an extra bus buy us?" is exactly "what changes relative to this?" — and it
+ * keeps the baseline trivially reproducible. By construction the zero-extra-bus candidate plan
+ * must produce identical results, which {@link SimComparison#comparabilityAssertions} asserts on
+ * every run.
+ *
+ * Replacing this with a real old model means reimplementing
+ * {@link SimOldModelBaseline#baselinePlan} to emit that model's service plan; nothing downstream
+ * changes.
+ */
+type SimOldModelBaseline {
+
+  /**
+   * Returns the baseline plan: the scenario's core trips, no extra-bus itineraries.
+   *
+   * {@link SimPlan#planKind} is `MockOldModelBaseline` and {@link SimPlan#allocation} is 0, so
+   * every export and every screen can label this result as a mock baseline rather than a
+   * historical one.
+   *
+   * @param input The validated simulation input.
+   * @return A zero-extra-bus plan over the fixed core service.
+   */
+  baselinePlan: function(input: !SimulationInput): SimPlan js-server
+
+  /**
+   * Describes this baseline for the handoff documentation and for the labels shown in the review
+   * interface: what it does, what it explicitly does not claim, and how to swap in a real
+   * old-model adapter.
+   *
+   * @return A JSON descriptor of the baseline adapter.
+   */
+  describe: function(): json js-server
+}

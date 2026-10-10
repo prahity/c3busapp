@@ -1,42 +1,70 @@
 /**
- * Automated web-scraping client for the public UIUC Localist events calendar
- * (`https://calendars.illinois.edu`).
+ * Automated web-scraping client for the public UIUC campus events calendar
+ * (`https://calendars.illinois.edu`, the Illinois Webtools calendar system).
  *
- * Localist exposes a JSON API at `/api/2/events` that returns upcoming campus events with
- * exactly the fields the bus route optimizer needs: timing (event instance start/end),
- * location (name + geo coordinates), and an estimate of the crowd. This client fetches those
- * events and normalizes them into {@link CampusEvent} records tagged with
- * `source = 'Scraped'`, deduplicated by {@link CampusEvent#externalId}.
+ * The campus "General Events" calendar (list id 7) publishes a machine-readable iCalendar
+ * (ICS) feed. This client downloads that feed and normalizes each `VEVENT` into a
+ * {@link CampusEvent} record tagged with `source = 'Scraped'`, capturing the two dimensions
+ * the feed exposes that the bus route optimizer needs — timing ({@link CampusEvent#startTime}
+ * /{@link CampusEvent#endTime}) and location ({@link CampusEvent#locationName}). The feed does
+ * not report crowd size, so {@link CampusEvent#expectedAttendance} is left null for scraped
+ * events (a human can fill it in later via the manual-entry screen).
  */
 type UiucEventScraper mixes REST {
 
   /**
-   * Declarative GET against the Localist `/api/2/events` endpoint. The platform performs the
-   * HTTP call automatically for this abstract method — no implementation is written for it.
+   * Declarative GET of the campus General Events iCalendar feed
+   * (`/icalGmail/7.ics`). The platform performs the HTTP call automatically for this abstract
+   * method; the raw ICS text is returned as a string for parsing by
+   * {@link UiucEventScraper#scrapeAndSave}.
    *
-   * @param days Size of the forward-looking window, in days, to fetch events for.
-   * @param pp   Page size ("per page") — the maximum number of events to return in one call.
-   * @return The raw Localist JSON response: an object with an `events` array, each element
-   *   wrapping an `event` object (title, description_text, location_name, geo,
-   *   event_instances, localist_url, filters, …).
+   * @return The raw HTTP response; its body is the iCalendar document as text.
    */
-  @rest(uri='api/2/events', method='GET')
-  getEvents: abstract function(@rest(queryParameter=true) days: int, @rest(queryParameter=true) pp: int): json
+  @rest(uri='icalGmail/7.ics', method='GET', acceptMislabeledContentType=true)
+  getIcal: abstract function(): HttpResponse
 
   /**
-   * Scrapes the UIUC Localist calendar and upserts the results as {@link CampusEvent} records.
+   * Scrapes the UIUC campus events iCalendar feed and upserts the results as
+   * {@link CampusEvent} records.
    *
-   * Points the client at the Localist base URL, calls {@link UiucEventScraper#getEvents}, maps
-   * each Localist event into a {@link CampusEvent} (start/end time, location name, geo
-   * coordinates, approximate attendance, best-effort category, source URL, and
-   * {@link CampusEvent#externalId} set to the Localist event id), deduplicates by external id,
-   * and persists them with `CampusEvent.mergeBatch` so re-runs update rather than duplicate.
+   * Calls {@link UiucEventScraper#getIcal}, parses each `VEVENT` (unfolding wrapped lines),
+   * maps `SUMMARY`/`DTSTART`/`DTEND`/`LOCATION`/`DESCRIPTION`/`CATEGORIES`/`URL`/`UID` onto a
+   * {@link CampusEvent} (with {@link CampusEvent#externalId} set to the ICS `UID` and
+   * {@link CampusEvent#source} = 'Scraped'), keeps only events starting within the next
+   * `days` days, deduplicates by external id, and persists with `CampusEvent.mergeBatch` so
+   * re-runs update rather than duplicate.
    *
-   * @param days Forward-looking window, in days, to scrape. Defaults to 30 when null or
+   * @param days Forward-looking window, in days, to keep. Defaults to 30 when null or
    *   non-positive.
    * @return A JSON summary `{ scraped, saved, skipped, errors }`: `scraped` is the number of
-   *   events Localist returned, `saved` the number upserted, `skipped` those dropped for
-   *   missing a title or start time, and `errors` any per-event parse failures.
+   *   VEVENTs in the feed, `saved` the number upserted (within the window), `skipped` those
+   *   dropped (missing title/start or outside the window), and `errors` any per-event parse
+   *   failures.
    */
   scrapeAndSave: function(days: int): json js-server
+
+  /**
+   * Scrapes the UIUC campus events iCalendar feed for an explicit calendar-date window and
+   * upserts matching {@link CampusEvent} records.
+   *
+   * This is the window-based entry point used by the UI's scrape controls — "next day"
+   * passes tomorrow as both bounds, "this week" passes the week's start/end, and the custom
+   * range picker passes arbitrary bounds. An event is kept when its `DTSTART` calendar day
+   * (compared as a cheap `yyyyMMdd` string, so no per-event timezone parsing) falls on or
+   * between `startDate` and `endDate`, inclusive. Behaves exactly like
+   * {@link UiucEventScraper#scrapeAndSave} otherwise: deduplicates by `UID`, tags
+   * {@link CampusEvent#source} = 'Scraped', and persists with `CampusEvent.mergeBatch` so
+   * re-runs update rather than duplicate.
+   *
+   * @param startDate Inclusive lower bound as an ISO calendar date (`yyyy-MM-dd`; a full ISO
+   *   datetime is also accepted and truncated to its day). Defaults to today when null.
+   * @param endDate Inclusive upper bound in the same format. Defaults to 30 days from today
+   *   when null. If it precedes `startDate` the two bounds are swapped.
+   * @param limit Maximum number of events to upsert (the "show K" cap). Defaults to 300 and
+   *   is itself hard-capped at 1000 to protect the request from the feed's thousands of
+   *   recurring-event expansions.
+   * @return The same `{ scraped, saved, skipped, errors }` summary as
+   *   {@link UiucEventScraper#scrapeAndSave}.
+   */
+  scrapeRange: function(startDate: string, endDate: string, limit: int): json js-server
 }

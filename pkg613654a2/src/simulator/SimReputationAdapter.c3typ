@@ -1,0 +1,43 @@
+/**
+ * Mock source adapter for the external **user/event reputation** component.
+ *
+ * Reads authored {@link SimReputationScore} rows. This simulator consumes reliability scores;
+ * computing reputation from real-world behaviour belongs to the other team and is out of scope
+ * here.
+ */
+type SimReputationAdapter {
+
+  /**
+   * Returns every {@link SimReputationScore} for a scenario, ordered by subject kind, subject id
+   * then {@link SimReputationScore#observedAt}.
+   *
+   * @param scenarioId Id of the {@link SimScenario}.
+   * @return All reputation scores for the scenario, in deterministic order.
+   */
+  getScores: function(scenarioId: !string): [SimReputationScore] js-server
+
+  /**
+   * Looks up the reliability to use for one subject, applying the documented missing-score
+   * default.
+   *
+   * A subject with no score returns {@link SimAssumptions#defaultReputation} — a neutral value,
+   * **not** zero. Treating "never seen before" as "known unreliable" would silently suppress
+   * demand from every new reporter.
+   *
+   * @param scenarioId Id of the {@link SimScenario}.
+   * @param subjectKind `User` or `Event`; see {@link SimReputationScore#subjectKind}.
+   * @param subjectId Synthetic user handle or {@link SimEvent} id.
+   * @param defaultReputation Fallback on 0..1 when no score exists, normally
+   *   {@link SimAssumptions#defaultReputation}.
+   * @return Reliability on 0..1, from the latest matching score or the supplied default.
+   */
+  reliabilityFor: function(scenarioId: !string, subjectKind: !string, subjectId: string, defaultReputation: double): double js-server
+
+  /**
+   * Describes this adapter for the handoff documentation, including the score scale
+   * ({@link SimReputationScore#scoreScale} must be `0to1`) and the missing-score default.
+   *
+   * @return A JSON descriptor of the adapter contract.
+   */
+  adapterInfo: function(): json js-server
+}

@@ -1,0 +1,936 @@
+[
+  {
+    "id": "ev_normal_class_math_0900",
+    "name": "MATH 241 lecture, Altgeld-adjacent (Illini Union stop)",
+    "scenarioId": "sc_normal",
+    "eventType": "ClassOrGathering",
+    "startTime": "2026-10-13T09:00:00-05:00",
+    "endTime": "2026-10-13T09:50:00-05:00",
+    "knownAt": "2026-10-10T08:00:00-05:00",
+    "affectedStopIds": [
+      "stop_normal_union"
+    ],
+    "affectedRouteIds": [],
+    "affectedLinkIds": [],
+    "eventSource": "Scheduled",
+    "isSynthetic": true,
+    "notes": "Timetabled lecture. Comfortably inside core capacity at a 15 minute headway.",
+    "confidence": 0.95,
+    "demandEffect": {
+      "cohortId": "cohort_math241",
+      "attendance": 200,
+      "busUseShare": 0.4,
+      "originDistribution": [
+        {
+          "stopId": "stop_normal_ike",
+          "share": 0.6
+        },
+        {
+          "stopId": "stop_normal_green",
+          "share": 0.4
+        }
+      ],
+      "destinationDistribution": [
+        {
+          "stopId": "stop_normal_union",
+          "share": 1
+        }
+      ],
+      "generatesInbound": true,
+      "generatesOutbound": true,
+      "inboundWindowStartOffsetMin": -40,
+      "inboundWindowEndOffsetMin": -10,
+      "outboundWindowStartOffsetMin": 5,
+      "outboundWindowEndOffsetMin": 25,
+      "classDeadlineOffsetMin": 0
+    }
+  },
+  {
+    "id": "ev_normal_class_cs_1100",
+    "name": "CS 173 lecture, Grainger",
+    "scenarioId": "sc_normal",
+    "eventType": "ClassOrGathering",
+    "startTime": "2026-10-13T11:00:00-05:00",
+    "endTime": "2026-10-13T11:50:00-05:00",
+    "knownAt": "2026-10-10T08:00:00-05:00",
+    "affectedStopIds": [
+      "stop_normal_grainger"
+    ],
+    "affectedRouteIds": [],
+    "affectedLinkIds": [],
+    "eventSource": "Scheduled",
+    "isSynthetic": true,
+    "notes": "Timetabled lecture, modest size.",
+    "confidence": 0.95,
+    "demandEffect": {
+      "cohortId": "cohort_cs173",
+      "attendance": 160,
+      "busUseShare": 0.35,
+      "originDistribution": [
+        {
+          "stopId": "stop_normal_ike",
+          "share": 0.5
+        },
+        {
+          "stopId": "stop_normal_green",
+          "share": 0.3
+        },
+        {
+          "stopId": "stop_normal_union",
+          "share": 0.2
+        }
+      ],
+      "destinationDistribution": [
+        {
+          "stopId": "stop_normal_grainger",
+          "share": 1
+        }
+      ],
+      "generatesInbound": true,
+      "generatesOutbound": true,
+      "inboundWindowStartOffsetMin": -35,
+      "inboundWindowEndOffsetMin": -10,
+      "outboundWindowStartOffsetMin": 5,
+      "outboundWindowEndOffsetMin": 25,
+      "classDeadlineOffsetMin": 0
+    }
+  },
+  {
+    "id": "ev_rush_lecture_grainger_1000",
+    "name": "PHYS 211 mega-lecture, Grainger",
+    "scenarioId": "sc_rush",
+    "eventType": "ClassOrGathering",
+    "startTime": "2026-10-13T10:00:00-05:00",
+    "endTime": "2026-10-13T10:50:00-05:00",
+    "knownAt": "2026-10-10T08:00:00-05:00",
+    "affectedStopIds": [
+      "stop_rush_grainger"
+    ],
+    "affectedRouteIds": [],
+    "affectedLinkIds": [],
+    "eventSource": "Scheduled",
+    "isSynthetic": true,
+    "notes": "The arena share has no single-seat core route to Grainger, so in the baseline it is reported unserved rather than routed through a transfer. An extra bus can serve it directly.",
+    "confidence": 0.97,
+    "demandEffect": {
+      "cohortId": "cohort_phys211",
+      "attendance": 840,
+      "busUseShare": 0.5,
+      "originDistribution": [
+        {
+          "stopId": "stop_rush_ike",
+          "share": 0.5
+        },
+        {
+          "stopId": "stop_rush_green",
+          "share": 0.35
+        },
+        {
+          "stopId": "stop_rush_arena",
+          "share": 0.15
+        }
+      ],
+      "destinationDistribution": [
+        {
+          "stopId": "stop_rush_grainger",
+          "share": 1
+        }
+      ],
+      "generatesInbound": true,
+      "generatesOutbound": true,
+      "inboundWindowStartOffsetMin": -45,
+      "inboundWindowEndOffsetMin": -5,
+      "outboundWindowStartOffsetMin": 5,
+      "outboundWindowEndOffsetMin": 30,
+      "classDeadlineOffsetMin": 0
+    }
+  },
+  {
+    "id": "ev_rush_lecture_union_1000",
+    "name": "ECON 102 lecture, Illini Union stop",
+    "scenarioId": "sc_rush",
+    "eventType": "ClassOrGathering",
+    "startTime": "2026-10-13T10:00:00-05:00",
+    "endTime": "2026-10-13T10:50:00-05:00",
+    "knownAt": "2026-10-10T08:00:00-05:00",
+    "affectedStopIds": [
+      "stop_rush_union"
+    ],
+    "affectedRouteIds": [],
+    "affectedLinkIds": [],
+    "eventSource": "Scheduled",
+    "isSynthetic": true,
+    "notes": "Simultaneous with PHYS 211 and competing for the same northbound seats. Two simultaneous events are handled by merging their journeys into one FIFO queue per stop.",
+    "confidence": 0.96,
+    "demandEffect": {
+      "cohortId": "cohort_econ102",
+      "attendance": 400,
+      "busUseShare": 0.45,
+      "originDistribution": [
+        {
+          "stopId": "stop_rush_ike",
+          "share": 0.55
+        },
+        {
+          "stopId": "stop_rush_green",
+          "share": 0.45
+        }
+      ],
+      "destinationDistribution": [
+        {
+          "stopId": "stop_rush_union",
+          "share": 1
+        }
+      ],
+      "generatesInbound": true,
+      "generatesOutbound": true,
+      "inboundWindowStartOffsetMin": -40,
+      "inboundWindowEndOffsetMin": -5,
+      "outboundWindowStartOffsetMin": 5,
+      "outboundWindowEndOffsetMin": 30,
+      "classDeadlineOffsetMin": 0
+    }
+  },
+  {
+    "id": "ev_surge_concert",
+    "name": "State Farm Center headline concert",
+    "scenarioId": "sc_surge",
+    "eventType": "LargeEvent",
+    "startTime": "2026-10-13T19:00:00-05:00",
+    "endTime": "2026-10-13T21:30:00-05:00",
+    "knownAt": "2026-10-11T19:00:00-05:00",
+    "affectedStopIds": [
+      "stop_surge_arena"
+    ],
+    "affectedRouteIds": [],
+    "affectedLinkIds": [],
+    "eventSource": "AutoDetected",
+    "isSynthetic": true,
+    "notes": "Attendance x busUseShare x reliability weight drives the surge. The outbound crowd is concentrated into a 30 minute window at a single stop.",
+    "confidence": 0.88,
+    "demandEffect": {
+      "cohortId": "cohort_concert_attendees",
+      "attendance": 4200,
+      "busUseShare": 0.11,
+      "originDistribution": [
+        {
+          "stopId": "stop_surge_ike",
+          "share": 0.4
+        },
+        {
+          "stopId": "stop_surge_green",
+          "share": 0.35
+        },
+        {
+          "stopId": "stop_surge_union",
+          "share": 0.25
+        }
+      ],
+      "destinationDistribution": [
+        {
+          "stopId": "stop_surge_arena",
+          "share": 1
+        }
+      ],
+      "generatesInbound": true,
+      "generatesOutbound": true,
+      "inboundWindowStartOffsetMin": -75,
+      "inboundWindowEndOffsetMin": -20,
+      "outboundWindowStartOffsetMin": 0,
+      "outboundWindowEndOffsetMin": 30
+    },
+    "operationalEffects": [
+      {
+        "effectKind": "TravelTimeMultiplier",
+        "windowStart": "2026-10-13T21:25:00-05:00",
+        "windowEnd": "2026-10-13T22:25:00-05:00",
+        "effectNote": "Post-event road congestion around the venue. Scheduled in advance by MTD planning, so it is visible to the planner.",
+        "travelTimeMultiplier": 1.6,
+        "linkIds": [
+          "lnk_surge_arena_ike",
+          "lnk_surge_ike_arena",
+          "lnk_surge_arena_green",
+          "lnk_surge_green_arena"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ev_surge_evening_class",
+    "name": "ARCH 271 evening studio, Grainger",
+    "scenarioId": "sc_surge",
+    "eventType": "ClassOrGathering",
+    "startTime": "2026-10-13T18:00:00-05:00",
+    "endTime": "2026-10-13T20:30:00-05:00",
+    "knownAt": "2026-10-10T08:00:00-05:00",
+    "affectedStopIds": [
+      "stop_surge_grainger"
+    ],
+    "affectedRouteIds": [],
+    "affectedLinkIds": [],
+    "eventSource": "Scheduled",
+    "isSynthetic": true,
+    "notes": "Ordinary class demand running concurrently with the surge, so the plan has to trade one against the other.",
+    "confidence": 0.95,
+    "demandEffect": {
+      "cohortId": "cohort_arch271",
+      "attendance": 90,
+      "busUseShare": 0.4,
+      "originDistribution": [
+        {
+          "stopId": "stop_surge_ike",
+          "share": 0.6
+        },
+        {
+          "stopId": "stop_surge_green",
+          "share": 0.4
+        }
+      ],
+      "destinationDistribution": [
+        {
+          "stopId": "stop_surge_grainger",
+          "share": 1
+        }
+      ],
+      "generatesInbound": true,
+      "generatesOutbound": true,
+      "inboundWindowStartOffsetMin": -30,
+      "inboundWindowEndOffsetMin": -5,
+      "outboundWindowStartOffsetMin": 5,
+      "outboundWindowEndOffsetMin": 25,
+      "classDeadlineOffsetMin": 0
+    }
+  },
+  {
+    "id": "ev_lowconf_rally_canonical",
+    "name": "Reported rally on the Main Quad (Green Street stop)",
+    "scenarioId": "sc_lowconf",
+    "eventType": "LargeEvent",
+    "startTime": "2026-10-13T15:00:00-05:00",
+    "endTime": "2026-10-13T17:00:00-05:00",
+    "knownAt": "2026-10-12T21:40:00-05:00",
+    "affectedStopIds": [
+      "stop_lowconf_green"
+    ],
+    "affectedRouteIds": [],
+    "affectedLinkIds": [],
+    "eventSource": "ManuallyReported",
+    "isSynthetic": true,
+    "notes": "RETAINED, NOT DISCARDED. Reported confidence 0.4 and reporter reliability 0.3 give an applied weight of 0.12 under ConfidenceTimesReputation, so expected ridership is scaled down rather than dropped. The weight is not a calibrated probability.",
+    "reportingUserId": "user_mock_unreliable",
+    "confidence": 0.4,
+    "userReputationScoreId": "rep_lowconf_user_mock_unreliable",
+    "eventReputationScoreId": "rep_lowconf_ev_rally",
+    "demandEffect": {
+      "cohortId": "cohort_rally_attendees",
+      "attendance": 600,
+      "busUseShare": 0.3,
+      "originDistribution": [
+        {
+          "stopId": "stop_lowconf_ike",
+          "share": 0.5
+        },
+        {
+          "stopId": "stop_lowconf_union",
+          "share": 0.3
+        },
+        {
+          "stopId": "stop_lowconf_grainger",
+          "share": 0.2
+        }
+      ],
+      "destinationDistribution": [
+        {
+          "stopId": "stop_lowconf_green",
+          "share": 1
+        }
+      ],
+      "generatesInbound": true,
+      "generatesOutbound": true,
+      "inboundWindowStartOffsetMin": -45,
+      "inboundWindowEndOffsetMin": -10,
+      "outboundWindowStartOffsetMin": 5,
+      "outboundWindowEndOffsetMin": 35
+    }
+  },
+  {
+    "id": "ev_lowconf_rally_duplicate",
+    "name": "Auto-detected gathering near Green & Fourth",
+    "scenarioId": "sc_lowconf",
+    "eventType": "LargeEvent",
+    "startTime": "2026-10-13T15:10:00-05:00",
+    "endTime": "2026-10-13T17:10:00-05:00",
+    "knownAt": "2026-10-12T22:05:00-05:00",
+    "affectedStopIds": [
+      "stop_lowconf_green"
+    ],
+    "affectedRouteIds": [],
+    "affectedLinkIds": [],
+    "eventSource": "AutoDetected",
+    "isSynthetic": true,
+    "notes": "THE SAME REAL-WORLD EVENT as rally_canonical, detected separately. canonicalEventId points at the canonical record, so this one contributes zero demand and the suppression is recorded in the reconciliation trace. Without that, the rally would be counted twice.",
+    "confidence": 0.55,
+    "canonicalEventId": "ev_lowconf_rally_canonical",
+    "demandEffect": {
+      "cohortId": "cohort_rally_attendees",
+      "attendance": 520,
+      "busUseShare": 0.3,
+      "originDistribution": [
+        {
+          "stopId": "stop_lowconf_ike",
+          "share": 0.5
+        },
+        {
+          "stopId": "stop_lowconf_union",
+          "share": 0.3
+        },
+        {
+          "stopId": "stop_lowconf_grainger",
+          "share": 0.2
+        }
+      ],
+      "destinationDistribution": [
+        {
+          "stopId": "stop_lowconf_green",
+          "share": 1
+        }
+      ],
+      "generatesInbound": true,
+      "generatesOutbound": true,
+      "inboundWindowStartOffsetMin": -45,
+      "inboundWindowEndOffsetMin": -10,
+      "outboundWindowStartOffsetMin": 5,
+      "outboundWindowEndOffsetMin": 35
+    }
+  },
+  {
+    "id": "ev_lowconf_lecture_overlap",
+    "name": "CS 225 lecture, Grainger",
+    "scenarioId": "sc_lowconf",
+    "eventType": "ClassOrGathering",
+    "startTime": "2026-10-13T14:00:00-05:00",
+    "endTime": "2026-10-13T14:50:00-05:00",
+    "knownAt": "2026-10-10T08:00:00-05:00",
+    "affectedStopIds": [
+      "stop_lowconf_grainger"
+    ],
+    "affectedRouteIds": [],
+    "affectedLinkIds": [],
+    "eventSource": "Scheduled",
+    "isSynthetic": true,
+    "notes": "EXPLICIT COHORT OVERLAP EXAMPLE. The student-location estimator also predicts cohort_cs225_lecture. Under cohortOverlapPolicy PreferEvent the estimate is suppressed so the cohort is generated exactly once.",
+    "confidence": 0.95,
+    "demandEffect": {
+      "cohortId": "cohort_cs225_lecture",
+      "attendance": 300,
+      "busUseShare": 0.45,
+      "originDistribution": [
+        {
+          "stopId": "stop_lowconf_ike",
+          "share": 0.5
+        },
+        {
+          "stopId": "stop_lowconf_green",
+          "share": 0.5
+        }
+      ],
+      "destinationDistribution": [
+        {
+          "stopId": "stop_lowconf_grainger",
+          "share": 1
+        }
+      ],
+      "generatesInbound": true,
+      "generatesOutbound": true,
+      "inboundWindowStartOffsetMin": -35,
+      "inboundWindowEndOffsetMin": -5,
+      "outboundWindowStartOffsetMin": 5,
+      "outboundWindowEndOffsetMin": 25,
+      "classDeadlineOffsetMin": 0
+    }
+  },
+  {
+    "id": "ev_lowconf_farmers_market",
+    "name": "Urbana evening market shuttle crowd (Illini Union stop)",
+    "scenarioId": "sc_lowconf",
+    "eventType": "LargeEvent",
+    "startTime": "2026-10-13T17:30:00-05:00",
+    "endTime": "2026-10-13T19:00:00-05:00",
+    "knownAt": "2026-10-12T18:00:00-05:00",
+    "affectedStopIds": [
+      "stop_lowconf_union"
+    ],
+    "affectedRouteIds": [],
+    "affectedLinkIds": [],
+    "eventSource": "ManuallyReported",
+    "isSynthetic": true,
+    "notes": "CONTRAST CASE. Same manual-report provenance, but confidence 0.9 and reporter reliability 0.9 give an applied weight of 0.81, so nearly all of the reported demand is kept.",
+    "reportingUserId": "user_mock_trusted",
+    "confidence": 0.9,
+    "userReputationScoreId": "rep_lowconf_user_mock_trusted",
+    "demandEffect": {
+      "cohortId": "cohort_market",
+      "attendance": 240,
+      "busUseShare": 0.35,
+      "originDistribution": [
+        {
+          "stopId": "stop_lowconf_ike",
+          "share": 0.55
+        },
+        {
+          "stopId": "stop_lowconf_grainger",
+          "share": 0.45
+        }
+      ],
+      "destinationDistribution": [
+        {
+          "stopId": "stop_lowconf_union",
+          "share": 1
+        }
+      ],
+      "generatesInbound": true,
+      "generatesOutbound": true,
+      "inboundWindowStartOffsetMin": -35,
+      "inboundWindowEndOffsetMin": -5,
+      "outboundWindowStartOffsetMin": 5,
+      "outboundWindowEndOffsetMin": 30
+    }
+  },
+  {
+    "id": "ev_lowconf_unscored_meetup",
+    "name": "Student org meetup, Green Street (reporter has no reputation history)",
+    "scenarioId": "sc_lowconf",
+    "eventType": "ClassOrGathering",
+    "startTime": "2026-10-13T16:00:00-05:00",
+    "endTime": "2026-10-13T17:00:00-05:00",
+    "knownAt": "2026-10-12T20:00:00-05:00",
+    "affectedStopIds": [
+      "stop_lowconf_green"
+    ],
+    "affectedRouteIds": [],
+    "affectedLinkIds": [],
+    "eventSource": "ManuallyReported",
+    "isSynthetic": true,
+    "notes": "MISSING-SCORE DEFAULTS CASE. No reported confidence and no reputation record, so the assumptions defaults (confidence 0.7, reputation 0.5) apply and the substitution is traced.",
+    "reportingUserId": "user_mock_brand_new",
+    "demandEffect": {
+      "cohortId": "cohort_meetup",
+      "attendance": 120,
+      "busUseShare": 0.3,
+      "originDistribution": [
+        {
+          "stopId": "stop_lowconf_ike",
+          "share": 0.5
+        },
+        {
+          "stopId": "stop_lowconf_grainger",
+          "share": 0.5
+        }
+      ],
+      "destinationDistribution": [
+        {
+          "stopId": "stop_lowconf_green",
+          "share": 1
+        }
+      ],
+      "generatesInbound": true,
+      "generatesOutbound": true,
+      "inboundWindowStartOffsetMin": -30,
+      "inboundWindowEndOffsetMin": -5,
+      "outboundWindowStartOffsetMin": 5,
+      "outboundWindowEndOffsetMin": 25
+    }
+  },
+  {
+    "id": "ev_overload_ol_game",
+    "name": "Sold-out basketball game, State Farm Center",
+    "scenarioId": "sc_overload",
+    "eventType": "LargeEvent",
+    "startTime": "2026-10-13T17:00:00-05:00",
+    "endTime": "2026-10-13T19:15:00-05:00",
+    "knownAt": "2026-10-10T08:00:00-05:00",
+    "affectedStopIds": [
+      "stop_overload_arena"
+    ],
+    "affectedRouteIds": [],
+    "affectedLinkIds": [],
+    "eventSource": "Scheduled",
+    "isSynthetic": true,
+    "notes": "Roughly 1960 bus riders in each direction against 35 seats per hour on the arena routes.",
+    "confidence": 0.95,
+    "demandEffect": {
+      "cohortId": "cohort_game",
+      "attendance": 14000,
+      "busUseShare": 0.14,
+      "originDistribution": [
+        {
+          "stopId": "stop_overload_ike",
+          "share": 0.4
+        },
+        {
+          "stopId": "stop_overload_green",
+          "share": 0.35
+        },
+        {
+          "stopId": "stop_overload_union",
+          "share": 0.25
+        }
+      ],
+      "destinationDistribution": [
+        {
+          "stopId": "stop_overload_arena",
+          "share": 1
+        }
+      ],
+      "generatesInbound": true,
+      "generatesOutbound": true,
+      "inboundWindowStartOffsetMin": -70,
+      "inboundWindowEndOffsetMin": -10,
+      "outboundWindowStartOffsetMin": 0,
+      "outboundWindowEndOffsetMin": 35
+    }
+  },
+  {
+    "id": "ev_overload_ol_career_fair",
+    "name": "Engineering career fair close, Grainger",
+    "scenarioId": "sc_overload",
+    "eventType": "LargeEvent",
+    "startTime": "2026-10-13T15:30:00-05:00",
+    "endTime": "2026-10-13T18:30:00-05:00",
+    "knownAt": "2026-10-10T08:00:00-05:00",
+    "affectedStopIds": [
+      "stop_overload_grainger"
+    ],
+    "affectedRouteIds": [],
+    "affectedLinkIds": [],
+    "eventSource": "Scheduled",
+    "isSynthetic": true,
+    "notes": "Overlaps the game outbound window and competes for the same northbound and southbound seats.",
+    "confidence": 0.92,
+    "demandEffect": {
+      "cohortId": "cohort_career_fair",
+      "attendance": 3000,
+      "busUseShare": 0.3,
+      "originDistribution": [
+        {
+          "stopId": "stop_overload_ike",
+          "share": 0.45
+        },
+        {
+          "stopId": "stop_overload_green",
+          "share": 0.3
+        },
+        {
+          "stopId": "stop_overload_union",
+          "share": 0.25
+        }
+      ],
+      "destinationDistribution": [
+        {
+          "stopId": "stop_overload_grainger",
+          "share": 1
+        }
+      ],
+      "generatesInbound": true,
+      "generatesOutbound": true,
+      "inboundWindowStartOffsetMin": -60,
+      "inboundWindowEndOffsetMin": -15,
+      "outboundWindowStartOffsetMin": 0,
+      "outboundWindowEndOffsetMin": 40
+    }
+  },
+  {
+    "id": "ev_overload_ol_exam",
+    "name": "CHEM 102 evening exam, Illini Union stop",
+    "scenarioId": "sc_overload",
+    "eventType": "ClassOrGathering",
+    "startTime": "2026-10-13T19:00:00-05:00",
+    "endTime": "2026-10-13T20:30:00-05:00",
+    "knownAt": "2026-10-10T08:00:00-05:00",
+    "affectedStopIds": [
+      "stop_overload_union"
+    ],
+    "affectedRouteIds": [],
+    "affectedLinkIds": [],
+    "eventSource": "Scheduled",
+    "isSynthetic": true,
+    "notes": "Deadline-bearing demand under saturation: most of these passengers are late or never served, and an unserved passenger is never counted as on time.",
+    "confidence": 0.98,
+    "demandEffect": {
+      "cohortId": "cohort_chem102_exam",
+      "attendance": 900,
+      "busUseShare": 0.5,
+      "originDistribution": [
+        {
+          "stopId": "stop_overload_ike",
+          "share": 0.5
+        },
+        {
+          "stopId": "stop_overload_green",
+          "share": 0.5
+        }
+      ],
+      "destinationDistribution": [
+        {
+          "stopId": "stop_overload_union",
+          "share": 1
+        }
+      ],
+      "generatesInbound": true,
+      "generatesOutbound": true,
+      "inboundWindowStartOffsetMin": -50,
+      "inboundWindowEndOffsetMin": -10,
+      "outboundWindowStartOffsetMin": 5,
+      "outboundWindowEndOffsetMin": 30,
+      "classDeadlineOffsetMin": 0
+    }
+  },
+  {
+    "id": "ev_disrupt_dsr_class_0900",
+    "name": "STAT 200 lecture, Illini Union stop",
+    "scenarioId": "sc_disrupt",
+    "eventType": "ClassOrGathering",
+    "startTime": "2026-10-13T09:00:00-05:00",
+    "endTime": "2026-10-13T09:50:00-05:00",
+    "knownAt": "2026-10-10T08:00:00-05:00",
+    "affectedStopIds": [
+      "stop_disrupt_union"
+    ],
+    "affectedRouteIds": [],
+    "affectedLinkIds": [],
+    "eventSource": "Scheduled",
+    "isSynthetic": true,
+    "notes": "Deadline-bearing demand aimed straight at the stop that later closes.",
+    "confidence": 0.95,
+    "demandEffect": {
+      "cohortId": "cohort_stat200",
+      "attendance": 420,
+      "busUseShare": 0.45,
+      "originDistribution": [
+        {
+          "stopId": "stop_disrupt_ike",
+          "share": 0.55
+        },
+        {
+          "stopId": "stop_disrupt_green",
+          "share": 0.45
+        }
+      ],
+      "destinationDistribution": [
+        {
+          "stopId": "stop_disrupt_union",
+          "share": 1
+        }
+      ],
+      "generatesInbound": true,
+      "generatesOutbound": true,
+      "inboundWindowStartOffsetMin": -45,
+      "inboundWindowEndOffsetMin": -5,
+      "outboundWindowStartOffsetMin": 5,
+      "outboundWindowEndOffsetMin": 30,
+      "classDeadlineOffsetMin": 0
+    }
+  },
+  {
+    "id": "ev_disrupt_dsr_class_1230",
+    "name": "MSE 280 lecture, Grainger",
+    "scenarioId": "sc_disrupt",
+    "eventType": "ClassOrGathering",
+    "startTime": "2026-10-13T12:30:00-05:00",
+    "endTime": "2026-10-13T13:20:00-05:00",
+    "knownAt": "2026-10-10T08:00:00-05:00",
+    "affectedStopIds": [
+      "stop_disrupt_grainger"
+    ],
+    "affectedRouteIds": [],
+    "affectedLinkIds": [],
+    "eventSource": "Scheduled",
+    "isSynthetic": true,
+    "notes": "Aimed at the stop that closes mid-day with no fallback, so these passengers are reported denied by closure rather than quietly moved somewhere else.",
+    "confidence": 0.95,
+    "demandEffect": {
+      "cohortId": "cohort_mse280",
+      "attendance": 260,
+      "busUseShare": 0.45,
+      "originDistribution": [
+        {
+          "stopId": "stop_disrupt_ike",
+          "share": 0.5
+        },
+        {
+          "stopId": "stop_disrupt_green",
+          "share": 0.3
+        },
+        {
+          "stopId": "stop_disrupt_union",
+          "share": 0.2
+        }
+      ],
+      "destinationDistribution": [
+        {
+          "stopId": "stop_disrupt_grainger",
+          "share": 1
+        }
+      ],
+      "generatesInbound": true,
+      "generatesOutbound": true,
+      "inboundWindowStartOffsetMin": -40,
+      "inboundWindowEndOffsetMin": -5,
+      "outboundWindowStartOffsetMin": 5,
+      "outboundWindowEndOffsetMin": 25,
+      "classDeadlineOffsetMin": 0
+    }
+  },
+  {
+    "id": "ev_disrupt_dsr_roadworks",
+    "name": "Scheduled resurfacing, Green Street corridor",
+    "scenarioId": "sc_disrupt",
+    "eventType": "TrafficDisruption",
+    "startTime": "2026-10-13T08:00:00-05:00",
+    "endTime": "2026-10-13T09:30:00-05:00",
+    "knownAt": "2026-10-10T08:00:00-05:00",
+    "affectedStopIds": [],
+    "affectedRouteIds": [],
+    "affectedLinkIds": [
+      "lnk_disrupt_green_union",
+      "lnk_disrupt_union_green"
+    ],
+    "eventSource": "Scheduled",
+    "isSynthetic": true,
+    "notes": "Planner-visible travel-time inflation. Overlaps dsr_crash between 08:40 and 09:30.",
+    "confidence": 0.9,
+    "operationalEffects": [
+      {
+        "effectKind": "TravelTimeMultiplier",
+        "windowStart": "2026-10-13T08:00:00-05:00",
+        "windowEnd": "2026-10-13T09:30:00-05:00",
+        "effectNote": "Lane closure for resurfacing. Known weeks in advance, so the planner sees it.",
+        "travelTimeMultiplier": 1.5,
+        "linkIds": [
+          "lnk_disrupt_green_union",
+          "lnk_disrupt_union_green"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ev_disrupt_dsr_crash",
+    "name": "Collision blocking Green Street at Wright",
+    "scenarioId": "sc_disrupt",
+    "eventType": "TrafficDisruption",
+    "startTime": "2026-10-13T08:40:00-05:00",
+    "endTime": "2026-10-13T10:00:00-05:00",
+    "knownAt": "2026-10-13T08:40:00-05:00",
+    "affectedStopIds": [],
+    "affectedRouteIds": [],
+    "affectedLinkIds": [
+      "lnk_disrupt_green_union",
+      "lnk_disrupt_union_green"
+    ],
+    "eventSource": "AutoDetected",
+    "isSynthetic": true,
+    "notes": "OVERLAPPING EFFECTS EXAMPLE. Between 08:40 and 09:30 this multiplies with dsr_roadworks: 1.5 x 2.2 = 3.3, clamped to the configured maximum of 3.0, and the clamp is recorded on the interval.",
+    "confidence": 0.75,
+    "operationalEffects": [
+      {
+        "effectKind": "TravelTimeMultiplier",
+        "windowStart": "2026-10-13T08:40:00-05:00",
+        "windowEnd": "2026-10-13T10:00:00-05:00",
+        "effectNote": "Incident detected at 08:40, after the plan was fixed. The simulator applies it; the planner never saw it.",
+        "travelTimeMultiplier": 2.2,
+        "linkIds": [
+          "lnk_disrupt_green_union",
+          "lnk_disrupt_union_green"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ev_disrupt_dsr_union_closure",
+    "name": "Planned Illini Union stop closure for utility work",
+    "scenarioId": "sc_disrupt",
+    "eventType": "StopClosure",
+    "startTime": "2026-10-13T10:00:00-05:00",
+    "endTime": "2026-10-13T11:30:00-05:00",
+    "knownAt": "2026-10-10T08:00:00-05:00",
+    "affectedStopIds": [
+      "stop_disrupt_union"
+    ],
+    "affectedRouteIds": [],
+    "affectedLinkIds": [],
+    "eventSource": "Scheduled",
+    "isSynthetic": true,
+    "notes": "Closure WITH a pre-configured fallback known before the cutoff. Relocated journeys carry wasRelocated=true and a generationNote naming this event.",
+    "confidence": 0.95,
+    "operationalEffects": [
+      {
+        "effectKind": "StopUnavailable",
+        "windowStart": "2026-10-13T10:00:00-05:00",
+        "windowEnd": "2026-10-13T11:30:00-05:00",
+        "effectNote": "A fallback boarding point at Green Street & Fourth was agreed BEFORE the service day, so relocating these passengers is a configured decision rather than an invented reroute.",
+        "stopIds": [
+          "stop_disrupt_union"
+        ],
+        "fallbackStopId": "stop_disrupt_green"
+      }
+    ]
+  },
+  {
+    "id": "ev_disrupt_dsr_grainger_closure",
+    "name": "Unplanned Grainger stop closure, burst water main",
+    "scenarioId": "sc_disrupt",
+    "eventType": "StopClosure",
+    "startTime": "2026-10-13T12:00:00-05:00",
+    "endTime": "2026-10-13T13:15:00-05:00",
+    "knownAt": "2026-10-13T11:45:00-05:00",
+    "affectedStopIds": [
+      "stop_disrupt_grainger"
+    ],
+    "affectedRouteIds": [],
+    "affectedLinkIds": [],
+    "eventSource": "ManuallyReported",
+    "isSynthetic": true,
+    "notes": "Closure WITHOUT a fallback, discovered after the cutoff. This is the case the brief requires to fail loudly instead of silently relocating anyone.",
+    "reportingUserId": "user_mock_trusted",
+    "confidence": 0.8,
+    "userReputationScoreId": "rep_disrupt_user_mock_trusted",
+    "operationalEffects": [
+      {
+        "effectKind": "StopUnavailable",
+        "windowStart": "2026-10-13T12:00:00-05:00",
+        "windowEnd": "2026-10-13T13:15:00-05:00",
+        "effectNote": "NO fallback was configured, and none is invented. Affected passengers are reported denied by closure and the plans that touch this stop are reported infeasible.",
+        "stopIds": [
+          "stop_disrupt_grainger"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ev_disrupt_dsr_bus_breakdown",
+    "name": "Extra bus 2 withdrawn, mechanical fault",
+    "scenarioId": "sc_disrupt",
+    "eventType": "BusAvailabilityDisruption",
+    "startTime": "2026-10-13T09:30:00-05:00",
+    "endTime": "2026-10-13T13:00:00-05:00",
+    "knownAt": "2026-10-13T09:20:00-05:00",
+    "affectedStopIds": [],
+    "affectedRouteIds": [],
+    "affectedLinkIds": [],
+    "eventSource": "AutoDetected",
+    "isSynthetic": true,
+    "notes": "Known only at 09:20, after the 05:30 cutoff.",
+    "confidence": 0.85,
+    "operationalEffects": [
+      {
+        "effectKind": "BusUnavailable",
+        "windowStart": "2026-10-13T09:30:00-05:00",
+        "windowEnd": "2026-10-13T13:00:00-05:00",
+        "effectNote": "The second extra bus in the pool is withdrawn mid-day. The planner had already committed to using it, so any trip it was given is reported infeasible. No substitute is dispatched, because that would be live rerouting.",
+        "busIds": [
+          "xb_disrupt_02"
+        ]
+      }
+    ]
+  }
+]

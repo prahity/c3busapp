@@ -1,0 +1,39 @@
+/**
+ * A single validation or feasibility finding, used both for input validation
+ * ({@link SimValidationReport#issues}) and for runtime infeasibility reporting
+ * ({@link SimResults#infeasibilities}).
+ *
+ * Findings are **reported, never swallowed**. A plan that cannot be executed — because a stop
+ * closed under it, or the bus it needed was withdrawn after the planning cutoff — produces an
+ * issue here and a correspondingly worse metric, rather than being quietly repaired. That is the
+ * difference between a simulator that measures a plan and one that flatters it.
+ */
+type SimValidationIssue {
+
+  /**
+   * How serious the finding is:
+   * - `Error` — the input or plan is unusable; {@link SimValidationReport#isValid} becomes false
+   *   and the run is refused.
+   * - `Warning` — the run proceeds but something is suspect (an unmatched report, a distribution
+   *   that does not sum to 1).
+   * - `Info` — an applied policy decision worth recording, such as a renormalized distribution.
+   */
+  severity: !string enum('Error','Warning','Info')
+
+  /**
+   * Stable machine-readable code, e.g. `DanglingStopRef`, `TimeOrdering`, `CurrencyMismatch`,
+   * `StopClosedUnderPlan`, `BusWithdrawnAfterCutoff`, `TransfersNotSupported`.
+   *
+   * Stable so the UI and tests can assert on a specific finding without matching prose.
+   */
+  code: !string
+
+  /** Human-readable explanation, including the offending values where useful. Shown directly in the UI. */
+  message: !string
+
+  /** Type of the record the finding is about, e.g. `SimEvent`, `SimStop`, `SimExtraBus`, `SimPlan`. */
+  refKind: string
+
+  /** Id of the offending record, so the UI can link straight to it. */
+  refId: string
+}

@@ -1,0 +1,77 @@
+/**
+ * Builds a supplemental-capacity plan: given an allocation of N extra buses, decides which extra
+ * trips to run and when, as an advisory recommendation.
+ *
+ * Scope boundaries that shape the whole heuristic: core MTD routes and schedules are **fixed** and
+ * never modified; only extra buses are planned; planning happens once, at start of day, using only
+ * events with {@link SimEvent#knownAt} at or before {@link SimulationInput#planningCutoff}; there
+ * is **no live rerouting** and no dispatch.
+ *
+ * The heuristic is a documented greedy benefit-per-cost search
+ * ({@link SimPlan#heuristicVersion}). **No claim of optimality is made**, and results are not
+ * guaranteed to improve monotonically with more buses — a plan can be worse than the baseline, and
+ * when it is, that is reported as measured rather than hidden.
+ */
+type SimPlanner {
+
+  /**
+   * Produces a feasible plan for exactly the given allocation.
+   *
+   * Procedure:
+   *
+   * 1. Start from the supplied baseline run and rank bottlenecks — stop/window pairs with the most
+   *    left-behind passengers and the most deadline-bearing passengers at risk.
+   * 2. For each bottleneck, generate candidate extra trips: a start stop, a departure time ahead
+   *    of the demand window, and an ordered sequence of stops covering the dominant destinations
+   *    of the waiting passengers.
+   * 3. Check feasibility against the **planner-visible** effects only: the bus is within its
+   *    {@link SimExtraBus#availableFrom}/`availableTo` window, deadhead from its current position
+   *    at {@link SimAssumptions#deadheadSpeedKmPerHour} fits, dwell and
+   *    {@link SimAssumptions#minTurnaroundMinutes} fit, no stop on the trip is closed at the time
+   *    it would be served, capacity is meaningful, and the bus can return in time for any trip
+   *    already assigned to it. Overlapping trips on one bus are rejected outright.
+   * 4. Select greedily by estimated waiting-minutes saved per unit cost, stopping when the
+   *    allocation is exhausted or no candidate has positive estimated benefit — so a bus may be
+   *    left **idle**; {@link SimPlan#busesUsed} and {@link SimPlan#busesIdle} report the
+   *    difference between allocated and used.
+   * 5. Re-simulate through {@link SimEngine#run} to measure the plan rather than trusting the
+   *    greedy estimate.
+   *
+   * Every trip carries a human-readable {@link SimItineraryTrip#explanation} naming the bottleneck
+   * and the events that caused it. Calling with `allocation` 0 returns a plan identical in effect
+   * to {@link SimOldModelBaseline#baselinePlan}.
+   *
+   * @param input The validated simulation input.
+   * @param snapshot The shared demand snapshot — identical for every allocation.
+   * @param plannerVisibleEffects Effects resolved over planner-visible events only. Passing
+   *   realized effects here would give the planner advance knowledge it must not have.
+   * @param allocation Number of extra buses made available to this plan, from 0 to
+   *   {@link SimulationInput#maxExtraBuses}.
+   * @param baselineResults The zero-extra-bus run, used to locate bottlenecks.
+   * @return A feasible plan with per-bus ordered itineraries, explanations and a validation report.
+   */
+  buildPlan: function(input: !SimulationInput, snapshot: !SimDemandSnapshot, plannerVisibleEffects: !SimResolvedEffects, allocation: !int, baselineResults: SimResults): SimPlan js-server
+
+  /**
+   * Re-checks an already-built plan against a set of effects and returns any infeasibility.
+   *
+   * Used to detect plans invalidated by disruptions that became known only **after** the planning
+   * cutoff — a stop closed under a planned visit (`StopClosedUnderPlan`) or a bus withdrawn inside
+   * its planned window (`BusWithdrawnAfterCutoff`). This reports the infeasibility; it never
+   * repairs the plan, because repairing it would amount to the live rerouting that is out of scope.
+   *
+   * @param input The validated simulation input.
+   * @param plan The plan to check.
+   * @param effects The effects to check against, normally the fully realized set.
+   * @return Issues found; empty when the plan remains feasible.
+   */
+  checkFeasibility: function(input: !SimulationInput, plan: !SimPlan, effects: !SimResolvedEffects): [SimValidationIssue] js-server
+
+  /**
+   * Describes the heuristic, its version, its selection rule and its known limitations for the
+   * handoff documentation and the review interface.
+   *
+   * @return A JSON descriptor of the planning heuristic.
+   */
+  describeHeuristic: function(): json js-server
+}

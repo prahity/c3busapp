@@ -1,0 +1,57 @@
+/**
+ * A log entry recording that one {@link SimEvent} became active during a run, what it did, and
+ * whether the planner had been allowed to know about it.
+ *
+ * Collected in {@link SimResults#eventActivations} and used to drive the replay view: as the
+ * replay clock advances, the UI shows events switching on, and what each one is doing to demand,
+ * travel times, stop availability or bus availability.
+ *
+ * Because {@link SimEventActivation#visibleToPlanner} is recorded per event, the replay can
+ * distinguish a disruption the plan was built around from one it was blindsided by — which is the
+ * whole point of separating planning knowledge from realized events.
+ */
+type SimEventActivation {
+
+  /** Id of the {@link SimEvent}. */
+  eventId: !string
+
+  /** Event name, denormalized for display. */
+  eventName: string
+
+  /** {@link SimEvent#eventType}, denormalized so the replay view needs no second lookup. */
+  eventType: string
+
+  /** Instant the event's effects began applying in this run. */
+  activationTime: !datetime
+
+  /** Instant its effects stopped applying. */
+  deactivationTime: datetime
+
+  /**
+   * True when {@link SimEvent#knownAt} <= {@link SimPlan#planningCutoff}, i.e. the planner was
+   * entitled to account for this event. False marks a disruption the fixed plan had to absorb with
+   * no warning.
+   */
+  visibleToPlanner: !boolean
+
+  /**
+   * What this event did in this run, e.g. "Generated 180 outbound passengers across 6 stops" or
+   * "Travel time x1.8 on 3 links; combined with evt_traffic_02 to x2.3".
+   */
+  effectSummary: string
+
+  /** Ids of the stops, links or buses actually affected; drives the map highlight during replay. */
+  affectedIds: [string]
+
+  /** Passengers this event generated in the demand snapshot. Zero for purely operational events. */
+  generatedPassengers: int
+
+  /**
+   * Kinds of operational effect this event contributed, drawn from
+   * {@link SimOperationalEffect#effectKind}. Empty for pure demand events.
+   */
+  operationalEffectKinds: [string]
+
+  /** {@link SimEvent#confidence} and the reliability weight finally applied, for inspection in the replay panel. */
+  appliedWeight: double
+}

@@ -1,0 +1,79 @@
+/**
+ * One **disjoint** time interval during which a single resolved operational effect is in force on
+ * one target — a link, a stop or a bus.
+ *
+ * {@link SimEffects#resolve} produces these by sweeping the breakpoints of all overlapping
+ * {@link SimOperationalEffect}s, so the intervals for a given target never overlap each other and
+ * each carries the already-combined result. The engine can therefore answer "what is the
+ * multiplier on link L at instant T" with a lookup instead of re-deriving overlaps mid-simulation,
+ * which both removes a class of ordering bugs and keeps the inner loop cheap.
+ *
+ * {@link SimEffectInterval#sourceEventIds} is what preserves the trace from an applied change
+ * back to the events that caused it — including, crucially, the case where several events combined
+ * to produce one number.
+ */
+type SimEffectInterval {
+
+  /** What {@link SimEffectInterval#targetId} names: a {@link SimTravelLink}, {@link SimStop} or {@link SimExtraBus}. */
+  targetKind: !string enum('Link','Stop','Bus')
+
+  /** Id of the affected link, stop or bus. */
+  targetId: !string
+
+  /** First instant of the interval, inclusive. */
+  intervalStart: !datetime
+
+  /** Last instant of the interval, exclusive, so abutting intervals do not double-apply at the boundary. */
+  intervalEnd: !datetime
+
+  /**
+   * Combined travel-time multiplier in force for a `Link` target — the result of applying
+   * {@link SimAssumptions#overlappingMultiplierRule} to every effect active in this interval, then
+   * clamping to {@link SimAssumptions#maxTravelTimeMultiplier}.
+   *
+   * Null for `Stop` and `Bus` targets, where the effect is binary unavailability rather than a
+   * degree.
+   */
+  multiplier: double
+
+  /**
+   * True when the target is entirely unavailable in this interval — a closed {@link SimStop} or a
+   * withdrawn {@link SimExtraBus}. Unavailability is a **union** across overlapping effects and
+   * takes precedence over any multiplier.
+   */
+  isUnavailable: boolean
+
+  /**
+   * Ids of every {@link SimEvent} contributing to this interval. More than one id means effects
+   * genuinely overlapped here and were combined under
+   * {@link SimEffectInterval#combinationApplied}.
+   */
+  sourceEventIds: [string]
+
+  /** Which rule produced {@link SimEffectInterval#multiplier}: `Multiply`, `Max`, or `Union` for unavailability. */
+  combinationApplied: string
+
+  /**
+   * True when {@link SimAssumptions#maxTravelTimeMultiplier} bound, i.e. the combined multiplier
+   * was reduced to the ceiling. Recorded so a clamped result is never mistaken for the raw
+   * combination.
+   */
+  clampApplied: boolean
+
+  /**
+   * Pre-configured alternate {@link SimStop} for a `Stop` closure interval, propagated from
+   * {@link SimOperationalEffect#fallbackStopId}. Null — the default — means affected passengers
+   * become unserved rather than being relocated.
+   */
+  fallbackStopId: string
+
+  /**
+   * True when every event in {@link SimEffectInterval#sourceEventIds} satisfied
+   * {@link SimEvent#knownAt} <= {@link SimulationInput#planningCutoff}, i.e. the planner could
+   * legitimately account for this interval.
+   *
+   * {@link SimEffects#resolve} is called twice per run — once planner-visible, once fully
+   * realized — and this flag is what keeps the two views from being confused.
+   */
+  visibleToPlanner: boolean
+}

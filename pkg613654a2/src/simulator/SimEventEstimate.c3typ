@@ -1,0 +1,90 @@
+/**
+ * One structured output of the external, LLM-based **event estimator**: an estimate of how big an
+ * event will be and when its transport demand will peak.
+ *
+ * Supplied to the engine by {@link SimEventEstimateAdapter#getEventEstimates}; no LLM is called
+ * and no credentials are needed.
+ *
+ * **Relationship to {@link SimEvent}.** An estimate is *evidence about* an event, not the event
+ * itself. When {@link SimEventEstimate#canonicalEventId} is set, the estimate is attached to that
+ * canonical event during assembly and contributes to its reliability. Attendance here is
+ * **attendance, not ridership** — the conversion is always via
+ * {@link SimDemandEffect#busUseShare} on the canonical event, so an estimate can never on its own
+ * inject passengers. That is what keeps estimates and {@link SimEventReport}s from double-counting
+ * the same crowd.
+ *
+ * An estimate whose {@link SimEventEstimate#canonicalEventId} matches nothing is retained and
+ * surfaced as a validation warning rather than being promoted to an event.
+ */
+@db(index=['scenarioId, canonicalEventId'])
+entity type SimEventEstimate {
+
+  /** Id of the owning {@link SimScenario}. */
+  scenarioId: !string
+
+  /**
+   * Id of the canonical {@link SimEvent} this estimate describes, when the producer knows the
+   * shared id. Null means unresolved identity — the documented integration requirement is that
+   * real producers emit this field.
+   */
+  canonicalEventId: string
+
+  /** Event name as the estimator reported it, retained even where it differs from the canonical event. */
+  eventName: string
+
+  /** Id of the {@link SimStop} serving the event location, per the estimator. */
+  locationStopId: string
+
+  /** Estimated event start. Compared with {@link SimEvent#startTime} when identity is unresolved. */
+  startTime: datetime
+
+  /** Estimated event end. */
+  endTime: datetime
+
+  /**
+   * Estimated head count **at the event**. Not a rider count: see the type comment. Informational
+   * unless the canonical event explicitly derives its {@link SimDemandEffect#attendance} from it.
+   */
+  estimatedAttendance: int
+
+  /**
+   * When inbound transport demand is expected to peak. Compared in the UI against the window
+   * actually used ({@link SimDemandEffect#inboundWindowStartOffsetMin}..`EndOffsetMin`) so a
+   * disagreement between producer and authored effect is visible.
+   */
+  expectedInboundPeakTime: datetime
+
+  /** When outbound transport demand is expected to peak, after the event ends. */
+  expectedOutboundPeakTime: datetime
+
+  /**
+   * Where attendees are expected to disperse to, as {@link SimStopShare} terms summing to 1.0.
+   * Null or empty when the estimator has no view, in which case the canonical event's own
+   * distribution is used.
+   */
+  destinationDistribution: [SimStopShare]
+
+  /**
+   * Producer confidence on 0..1, kept separate from {@link SimEventEstimate#estimatedAttendance}.
+   * Null falls back to {@link SimAssumptions#defaultConfidence}.
+   */
+  confidence: double
+
+  /** Identifier of the producing component, e.g. `mock-event-estimator-v1`. */
+  producer: string
+
+  /** When the underlying observation was made. */
+  observedAt: datetime
+
+  /** When the forecast was produced, as distinct from what it is a forecast *of*. */
+  forecastAt: datetime
+
+  /**
+   * When the estimate became available to the planning system; governs planner visibility exactly
+   * as {@link SimEvent#knownAt} does.
+   */
+  knownAt: !datetime
+
+  /** Always true — synthetic mock data. */
+  isSynthetic: boolean
+}

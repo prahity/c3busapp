@@ -1,0 +1,31 @@
+/**
+ * Mock source adapter for **auto-detected and manually reported** event observations.
+ *
+ * Reads authored {@link SimEventReport} rows. Raw reports are deliberately kept distinguishable
+ * from the reconciled {@link SimEvent}s they describe; reconciliation happens once, in
+ * {@link SimInputAssembler}, and is recorded in {@link SimReconciliationTrace}.
+ */
+type SimEventReportAdapter {
+
+  /**
+   * Returns every {@link SimEventReport} for a scenario, ordered by
+   * {@link SimEventReport#reportTime} then id.
+   *
+   * Returns raw reports **unreconciled and undeduplicated** — including several reports of the
+   * same event. Deduplication here would destroy exactly the signal the reputation and
+   * reconciliation logic needs.
+   *
+   * @param scenarioId Id of the {@link SimScenario}.
+   * @return All raw reports for the scenario, in deterministic order.
+   */
+  getReports: function(scenarioId: !string): [SimEventReport] js-server
+
+  /**
+   * Describes this adapter for the handoff documentation, including the reconciliation ownership
+   * split: producers should supply {@link SimEventReport#event} when they know the canonical id,
+   * and the fallback stop-and-time matcher is a mock heuristic to be retired once they do.
+   *
+   * @return A JSON descriptor of the adapter contract.
+   */
+  adapterInfo: function(): json js-server
+}

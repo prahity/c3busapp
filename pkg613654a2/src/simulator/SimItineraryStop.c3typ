@@ -1,0 +1,40 @@
+/**
+ * One call at a stop within a supplemental {@link SimItineraryTrip} — the extra-bus counterpart of
+ * {@link SimStopTime}, plus the planner's expectation of what happens there.
+ *
+ * The times here are what the **plan** says. {@link SimEngine#run} replays the plan under the
+ * realized {@link SimResolvedEffects}, so actual arrivals can be later than planned when a
+ * disruption unknown at the planning cutoff slows a link. That divergence is the measurement, not
+ * an error, so planned times are never rewritten to match.
+ */
+type SimItineraryStop {
+
+  /** Id of the {@link SimStop} called at. */
+  stopId: !string
+
+  /** Planned arrival instant. For the first, deadhead leg this is when the bus reaches the trip's first stop. */
+  arrivalTime: !datetime
+
+  /**
+   * Planned departure instant. The gap from {@link SimItineraryStop#arrivalTime} is the planned
+   * dwell, derived from {@link SimAssumptions#defaultDwellMinutes} and the per-passenger boarding
+   * and alighting rates.
+   */
+  departureTime: !datetime
+
+  /** Zero-based position of this call within {@link SimItineraryTrip#stops}. */
+  stopSequenceIndex: int
+
+  /**
+   * True when the bus reaches this stop running **empty** to reposition. Deadhead minutes are
+   * costed at {@link SimExtraBus#costPerDeadheadMinute} and reported separately in
+   * {@link SimBusItinerary#totalDeadheadMinutes}, so repositioning overhead stays visible.
+   */
+  isDeadhead: boolean
+
+  /** Passengers the planner expected to board here. Compare with the realized figure in the results. */
+  plannedBoardings: int
+
+  /** Passengers the planner expected to alight here. */
+  plannedAlightings: int
+}

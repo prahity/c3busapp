@@ -1,0 +1,55 @@
+/**
+ * Turns events and student-location estimates into an **immutable**
+ * {@link SimDemandSnapshot} of synthetic passenger journeys.
+ *
+ * The snapshot is generated **once per scenario** and then shared by reference across the baseline
+ * run and every candidate allocation. Sharing a seed would not be enough: the runs consume events
+ * in different orders, so any random draw made during simulation could diverge. Materialising
+ * demand up-front makes the comparison exact by construction rather than by care.
+ *
+ * All cohorts are synthetic and contain no personal data — a journey is a count of passengers with
+ * an origin, a destination, a request time and optionally a deadline.
+ */
+type SimDemandGenerator {
+
+  /**
+   * Generates the demand snapshot for an assembled input.
+   *
+   * How arrival windows become demand. For each non-suppressed {@link SimEvent} carrying a
+   * {@link SimDemandEffect}, expected riders are
+   * `attendance * busUseShare * appliedWeight`, apportioned across the window by
+   * {@link SimAssumptions#arrivalWindowDistribution} — `UniformDeterministic` spreads them evenly
+   * across equal sub-intervals, `SeededUniform` jitters request times within the window using the
+   * scenario seed. Passengers are grouped into {@link SimPassengerJourney} rows (a journey may
+   * carry several passengers and is split at a capacity boundary during simulation) and
+   * distributed over origins and destinations using {@link SimDemandEffect#originDistribution} /
+   * `destinationDistribution` by **largest-remainder apportionment**, so rounding never loses or
+   * invents a passenger.
+   *
+   * Inbound legs use window offsets relative to {@link SimEvent#startTime} and carry a deadline
+   * when {@link SimDemandEffect#classDeadlineOffsetMin} is set; outbound legs use offsets relative
+   * to {@link SimEvent#endTime}, swap the origin and destination distributions, and have no
+   * deadline. {@link SimStudentLocationEstimate}s generate the same journey shape from their own
+   * arrival windows, with superseded estimates skipped.
+   *
+   * Simultaneous events simply contribute independent journeys to the same snapshot; there is no
+   * interaction between their demand beyond competing for the same buses, which the engine
+   * resolves. {@link SimDemandTraceEntry} rows connect every journey back to the event or estimate
+   * that produced it.
+   *
+   * @param input A validated {@link SimulationInput}.
+   * @return An immutable snapshot with a deterministic {@link SimDemandSnapshot#snapshotId},
+   *   journeys sorted by request time then journey id, and a full generation trace.
+   */
+  generate: function(input: !SimulationInput): SimDemandSnapshot js-server
+
+  /**
+   * Re-derives a snapshot id from a scenario id and seed so callers can assert that two runs used
+   * the same demand.
+   *
+   * @param scenarioId Id of the {@link SimScenario}.
+   * @param seed The {@link SimScenario#randomSeed}.
+   * @return The deterministic snapshot id, `snap_<scenarioId>_<seed>`.
+   */
+  snapshotId: function(scenarioId: !string, seed: !int): string js-server
+}

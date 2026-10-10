@@ -1,0 +1,153 @@
+/**
+ * Every tunable modelling assumption the simulator makes, gathered in one inspectable place and
+ * carried on {@link SimScenario#assumptions} / {@link SimulationInput#assumptions}.
+ *
+ * This type exists so that mock values are **not scattered through the engine or the UI**. If a
+ * number is a guess, it belongs here, where the review interface can display it and a reviewer
+ * can see what the result depends on. None of these defaults are agreed operational facts about
+ * MTD.
+ *
+ * All durations are in **minutes** unless the field name says seconds.
+ */
+type SimAssumptions {
+
+  /**
+   * Dwell time, in minutes, used for a supplemental-trip stop call when boarding/alighting time
+   * does not already exceed it. The effective dwell is
+   * `max(defaultDwellMinutes, passengers * per-passenger seconds / 60)`.
+   */
+  defaultDwellMinutes: double
+
+  /** Seconds of dwell added per boarding passenger, converted to minutes by the engine. */
+  boardingSecondsPerPassenger: double
+
+  /** Seconds of dwell added per alighting passenger. */
+  alightingSecondsPerPassenger: double
+
+  /**
+   * How {@link SimEvent#confidence} and {@link SimReputationScore#reliability} are turned into the
+   * weight multiplying expected demand:
+   * - `None` — weight is always 1.0; confidence is recorded but ignored.
+   * - `ConfidenceOnly` — weight = confidence.
+   * - `ReputationOnly` — weight = reputation of the reporting user / the event.
+   * - `ConfidenceTimesReputation` — weight = confidence * reputation.
+   *
+   * The last option multiplies two measures that may not be independent; it is offered because
+   * it is the intuitive default, but the product is **not** a calibrated probability and
+   * {@link SimReconciliationEntry#rationale} records the assumption explicitly for every event it
+   * is applied to. Scheduled events are exempt: a timetabled class is not discounted.
+   */
+  reliabilityPolicy: !string enum('None','ConfidenceOnly','ReputationOnly','ConfidenceTimesReputation')
+
+  /**
+   * Weight substituted for a missing {@link SimEvent#confidence}, on 0..1. Deliberately below 1.0
+   * so that an estimate arriving with no stated confidence is not treated as certain.
+   */
+  defaultConfidence: double
+
+  /**
+   * Weight substituted for a missing {@link SimReputationScore}, on 0..1. A neutral value (0.5 in
+   * the mock scenarios) — an unknown reporter is neither trusted nor dismissed.
+   */
+  defaultReputation: double
+
+  /**
+   * Ceiling applied to the combined travel-time multiplier on any link, after
+   * {@link SimAssumptions#overlappingMultiplierRule} has combined overlapping effects.
+   *
+   * Prevents a stack of coincident disruptions from producing an absurd travel time. When the
+   * clamp binds, {@link SimResolvedEffects#clampApplied} is set so the result is not silently
+   * misleading.
+   */
+  maxTravelTimeMultiplier: double
+
+  /**
+   * How two or more `TravelTimeMultiplier` effects active on the **same** link at the **same**
+   * time combine:
+   * - `Multiply` — multipliers compound (1.5 and 1.4 give 2.1). Treats disruptions as independent
+   *   causes of delay; the default.
+   * - `Max` — the worst single multiplier wins (1.5 and 1.4 give 1.5). Appropriate if overlapping
+   *   reports are suspected to describe the same congestion.
+   * Either way the result is clamped to {@link SimAssumptions#maxTravelTimeMultiplier} and retains
+   * {@link SimEffectInterval#sourceEventIds}.
+   */
+  overlappingMultiplierRule: !string enum('Multiply','Max')
+
+  /**
+   * Which producer wins when a {@link SimStudentLocationEstimate} and a {@link SimEvent} describe
+   * the same population — detected by {@link SimStudentLocationEstimate#linkedEventId}, or by a
+   * shared {@link SimDemandEffect#cohortId}.
+   *
+   * `PreferEvent` keeps the event's demand effect and suppresses the estimate;
+   * `PreferLocationEstimate` does the reverse. Exactly one side generates passengers, so a cohort
+   * can never appear twice merely because two producers mentioned it. The decision is recorded as
+   * a `CohortOverlapResolved` {@link SimReconciliationEntry}.
+   */
+  cohortOverlapPolicy: !string enum('PreferEvent','PreferLocationEstimate')
+
+  /**
+   * Half-width, in minutes, of the time tolerance used by the fallback matcher that pairs a
+   * {@link SimEventReport} with a canonical {@link SimEvent} when the report carries no event
+   * reference. A report must also name a stop listed in {@link SimEvent#affectedStopIds}.
+   *
+   * Fallback matching is a documented mock heuristic. Real producers are expected to share
+   * canonical event ids instead.
+   */
+  reportMatchWindowMinutes: int
+
+  /**
+   * Whether passengers may change buses. **False** in this implementation: every generated
+   * journey is a direct origin-to-destination trip, and a passenger is never boarded onto a trip
+   * that cannot reach their destination.
+   *
+   * Recorded as a field rather than hard-coded so the limitation is visible in exports. Setting it
+   * true is not yet supported and is rejected by {@link SimInputAssembler#validate}.
+   */
+  allowTransfers: boolean
+
+  /**
+   * Queue discipline at a stop. `FifoByRequestTime`: among passengers eligible for a given
+   * vehicle, the one who arrived at the stop earliest boards first, ties broken by the stable
+   * journey id so the result is fully deterministic.
+   *
+   * Eligibility is destination-aware, so FIFO applies *within* the set of passengers the vehicle
+   * can actually serve; a passenger at the head of the queue whose destination is not on the trip
+   * does not block the queue behind them.
+   */
+  queueDiscipline: !string enum('FifoByRequestTime')
+
+  /**
+   * How an arrival **window** becomes individual arrival instants:
+   * - `UniformDeterministic` — passengers are spread evenly across the window at fixed
+   *   fractions, independent of the seed. Fully reproducible and the easier behaviour to reason
+   *   about in tests.
+   * - `SeededUniform` — arrival instants are drawn from the seeded PRNG, giving a more realistic
+   *   clumpy arrival pattern that is still reproducible for a given
+   *   {@link SimScenario#randomSeed}.
+   */
+  arrivalWindowDistribution: !string enum('UniformDeterministic','SeededUniform')
+
+  /**
+   * Width, in minutes, of the time buckets used to report expected wait by stop in
+   * {@link SimResults#stopWindowDelays} and in the student-facing delay export. 15 or 30 minutes
+   * in the mock scenarios.
+   */
+  stopDelayWindowMinutes: int
+
+  /**
+   * Average speed, in km/h, assumed when a bus must reposition between two stops that have no
+   * explicit {@link SimTravelLink}. Combined with the great-circle distance between the stops'
+   * coordinates to estimate deadhead minutes.
+   *
+   * A deliberately crude fallback; it keeps the planner from assuming instantaneous
+   * repositioning, which would be the far worse error.
+   */
+  deadheadSpeedKmPerHour: double
+
+  /**
+   * Minimum idle minutes required between one trip's last arrival and the same bus's next
+   * departure. Guarantees itineraries that are physically runnable and, with the travel-time
+   * check, is what makes overlapping trips for a single bus impossible.
+   */
+  minTurnaroundMinutes: double
+}
