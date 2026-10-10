@@ -14,28 +14,32 @@ optimizer plans around. Events are pulled from the public campus iCalendar feed 
 and stored as `CampusEvent` records with venue, time, and expected attendance, summarized by total
 riders, venues in play, and the peak event.
 
-![Campus events page](busplanning.png)
+![Campus events page](campus-events.png)
 
 ## 2. Resolve & plan transit routes
 
 Collected events are de-duplicated and merged into canonical demand, then `RoutePlanner` groups that
 demand into corridors, assigns a fleet of additional buses, and schedules back-to-back runs —
-reporting riders served vs. unserved and location coverage.
+reporting riders served vs. unserved and location coverage. The **Transit routes** tab draws the
+proposed routes as an animated map through the real stop coordinates.
 
-![Resolve and plan controls](busplanning-controls.png)
+![Resolve & plan](resolve-plan.png)
 
-## 3. Surge Planner simulation
+![Transit routes map](transit-routes.png)
 
-The **Surge Planner** runs the plan through a scenario-scoped simulator (`SimRunner`) to sweep how
-many extra buses to add and compare the resulting cost/wait curve. It is seeded with **1 real
-scenario plus 5 simulated scenarios for testing**, so you can set up a run, simulate it, and read
-the before/after results side by side.
+## 3. Future work — Surge Planner simulation (synthetic data)
+
+Everything above runs on real campus-event demand and real stop coordinates. The next step is the
+**Surge Planner**, which runs the plan through a scenario-scoped simulator (`SimRunner`) to sweep how
+many extra buses to add and compare the resulting cost/wait curve. This stage currently runs on
+**synthetic scenario data** — seeded with **1 real scenario plus 5 simulated scenarios for
+testing** — so you can set up a run, simulate it, and read the before/after results side by side
+while the model is validated against live service data.
 
 ![Scenario setup](surge-01-setup.png)
-![Simulating](surge-02-simulating.png)
 ![Results](surge-03-results-full.png)
 
-## 4. Route map & optimization opportunities
+### Route map & optimization opportunities
 
 An animated Leaflet/OpenStreetMap map draws each proposed route through its real stop coordinates
 with buses moving along it, color-coded, alongside the optimization metrics — mean time to service

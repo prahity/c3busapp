@@ -38,7 +38,7 @@ export default function App() {
           <div className="flex-1 flex flex-col min-w-0">
             <main className="flex-1 overflow-auto bg-[var(--c3-style-basic-bg-page)]">
               <Routes>
-                {/* Add page routes here */}
+                {/* Application routes */}
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/busplanning" element={<Busplanning />} />
                 <Route path="/events/new" element={<ManualEntry />} />
